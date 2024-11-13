@@ -227,14 +227,7 @@ public class Mutil {
         System.out.println(line3);
     }
     public static void printTaxMan() {
-        // determine correct file path
-        String filePath;
-        if (Main.NDEV) {
-            filePath = System.getenv("APPDATA") + "\\Terminal Trader\\assets\\taxman70.txt";
-        }
-        else {
-            filePath = "assets/taxman70.txt";
-        }
+        String filePath = "assets/taxman70.txt";
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;

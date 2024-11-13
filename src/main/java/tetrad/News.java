@@ -141,7 +141,7 @@ public class News {
         Random random = new Random();
         int randomLineIndex = random.nextInt(RHF_LENGTH);
 
-        try (Scanner scanner = new Scanner(new File("Assets/random_headlines.txt"))) {
+        try (Scanner scanner = new Scanner(new File("assets/random_headlines.txt"))) {
             // Skip lines until reaching the random line index
             for (int i = 0; i < randomLineIndex; i++) {
                 if (scanner.hasNextLine()) {

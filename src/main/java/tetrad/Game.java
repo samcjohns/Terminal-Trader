@@ -336,15 +336,13 @@ public class Game {
         System.out.println(italic(center("Version 0.12 beta", MENU_WIDTH)));
 
         // main menu art
-        // determine correct file path
         String filePath;
         if (Main.NDEV) {
-            filePath = System.getenv("APPDATA") + "\\Terminal Trader\\assets\\city-skyline100.txt";
+            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline100.txt";
         }
         else {
-            filePath = "assets/city-skyline100.txt";
+            filePath = "assets\\city-skyline100.txt";
         }
-
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
