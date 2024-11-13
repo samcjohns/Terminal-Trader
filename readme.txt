@@ -4,7 +4,6 @@ Shorthand: tetrad
 
 PLAN: 
 To be ready for 1.0:
-- Transaction logs for portfolio
 
 Update Ideas:
 - More random events
@@ -32,6 +31,6 @@ FIXME:
 
 TO CREATE NEW INSTALL:
 1. When the code is ready run this in the terminal:
-    mvn clean INSTALL
+    mvn clean package
 2. Then open Inno Setup, run the installer with the proper versions and jars
 3. The finished installer will be named "Terminal-Trader-X.X-Installer.exe" on the left
