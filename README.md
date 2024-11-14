@@ -1,10 +1,10 @@
 # Terminal-Trader
 A text-based, stock trader within the terminal.
-
-Current Version: v0.12
-Game Name: Terminal Trader
-Shorthand: tetrad
-
+<br />
+Current Version: v0.12 <br />
+Game Name: Terminal Trader <br />
+Shorthand: tetrad <br />
+<br />
 TO CREATE NEW INSTALLER (For Developers):
 1. When the code is ready run this in the terminal:
 ```powershell
