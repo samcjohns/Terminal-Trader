@@ -13,7 +13,7 @@ TO CREATE NEW INSTALLER (For Developers):
 2. Use JLink for creating minimal runtime environment
 ```powershell
 jlink `
-  --module-path "C:\Program Files\Java\jdk-22.0.2\jmods" `
+  --module-path "C:\Program Files\Java\jdk-22.0.2\jmods" <#example path#>`
   --add-modules java.base `
   --output runtime `
   --compress 2 `
