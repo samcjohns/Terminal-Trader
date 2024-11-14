@@ -12,13 +12,13 @@ TO CREATE NEW INSTALLER (For Developers):
 ```
 2. Use JLink for creating minimal runtime environment
 ```powershell
-jlink \
-  --module-path "C:\Program Files\Java\jdk-22.0.2\jmods" \
-  --add-modules java.base \
-  --output runtime \
-  --compress 2 \
-  --strip-debug \
-  --no-header-files \
+jlink `
+  --module-path "C:\Program Files\Java\jdk-22.0.2\jmods" `
+  --add-modules java.base `
+  --output runtime `
+  --compress 2 `
+  --strip-debug `
+  --no-header-files `
   --no-man-pages
 ```
 2. Then open Inno Setup, run the installer with the proper versions and jars
