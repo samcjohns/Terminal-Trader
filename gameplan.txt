@@ -1,0 +1,20 @@
+Current Version: v0.12
+Game Name: Terminal Trader
+Shorthand: tetrad
+
+Update Ideas:
+- More random events
+- Settings for how the game behaves (affects constants)
+- Print something after each advance, like how much money gained or lost
+- File that holds names of all active users, can be used in the "Load Game" menu
+  - this would also solve the overwriting issue
+- History of stock purchases with time stamps
+- ChatGPT written descriptions for stocks
+- System.in.read() for instant commands rather than numbers and enter
+- Add "Command Tray" at the bottom with all possible commands for the given menu
+- Add 100 Day change to main stock menu
+- "Challenge Saves" saves that lock down at 
+
+FIXME:
+- Add Average value to main stock menu
+- Stop pushing references around, make them package private and access them from Game (game.mkt)
