@@ -1,5 +1,5 @@
 # Terminal-Trader
-A text-based, stock trader within the terminal.
+A text-based, stock trader within the terminal. <br />
 <br />
 Current Version: v0.12 <br />
 Game Name: Terminal Trader <br />
