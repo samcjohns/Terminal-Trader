@@ -19,11 +19,11 @@ package tetrad;
  */
 
 class Alert {
-    private final String headline;     // headline of alert to be displayed
-    private final int type;            // type of alert (priority)
-    private final User  relevantUser;  // user it pertains to (if applicable)
-    private final Stock relevantStock; // stock it pertains to (if applicable)
-    private int age;                   // how old the alert is
+    private final String headline;      // headline of alert to be displayed
+    private final    int type;          // type of alert (priority)
+    private final   User relevantUser;  // user it pertains to (if applicable)
+    private final  Stock relevantStock; // stock it pertains to (if applicable)
+    private          int age;           // how old the alert is
 
     // type ID's ranked by importance
     final static int  ACHIEVEMENT = 0;

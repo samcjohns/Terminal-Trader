@@ -16,10 +16,72 @@ import static tetrad.Mutil.green;
 import static tetrad.Mutil.magenta;
 import static tetrad.Mutil.red;
 
+/**
+ * A class that belongs to User that manages their achievements
+ * 
+ * @author Samuel Johns
+ * Created: November 15, 2024
+ * 
+ * Description: The Achievement class is designed to manage the achievements
+ *              of the user during gameplay. It handles checking for
+ *              achievements, saving and loading a dedicated achievements file, 
+ *              and managing awards that the User gains from each achievement.
+ */
+
+/* Titles, Descriptions, and Awards for Achievements
+* 0. Day One 
+*      - "Advance for the first time"
+*      - Blue header
+* 
+* 1. First Step 
+*      - "Buy your first share"
+*      - Green header
+* 
+* 2. ...And Done 
+*      - "Sell your first share"
+*      - Magenta Header
+* 
+* 3. Prodigy 
+*      - "Double your initial investment"
+*      - Cyan Header
+* 
+* 4. Quit Your Day Job 
+*      - "Have 10 thousand in cash"
+*      - Yellow Header
+* 
+* 5. Going Pro 
+*      - "Have 100 thousand in cash"
+*      - Yellow background header
+* 
+* 6. Hall of Fame 
+*      - "Have 1 million in cash"
+*      - Green background header
+* 
+* 7. Extraterrestrial 
+*      - "Have 1 billion in cash"
+*      - Red background header
+* 
+* 8. All In 
+*      - "Hold less than a dollar in cash"
+*      - Cyan Background Header
+* 
+* 9. Watcher 
+*      - "Advance the market while holding no stocks"
+*      - Red header
+* 
+* 10. Veteran
+*      - "Advance 100 times"
+*      - Magenta background header
+* 
+* 11. Mr. Omega
+*      - "Advance 1000 times"
+*      - Blue background header
+*/
+
 public class Achievements {
-    boolean[] acvList;         // where achievement status is stored
-    private User relevantUser; // who this belongs to
-    private News channel;      // reference to News object for pushing Alerts
+    boolean[] acvList;               // where achievement status is stored
+    private final User relevantUser; // who this belongs to
+    private final News channel;      // reference to News object for pushing Alerts
 
     // statics
     static final int ACV_AMOUNT = 12;
@@ -38,62 +100,13 @@ public class Achievements {
     static final int   ADVANCE_100_TIMES = 10;
     static final int  ADVANCE_1000_TIMES = 11;
 
-    /* Titles, Descriptions, and Awards for Achievements
-     * 0. Day One 
-     *      - "Advance for the first time"
-     *      - Blue header
-     * 
-     * 1. First Step 
-     *      - "Buy your first share"
-     *      - Green header
-     * 
-     * 2. ...And Done 
-     *      - "Sell your first share"
-     *      - Magenta Header
-     * 
-     * 3. Prodigy 
-     *      - "Double your initial investment"
-     *      - Cyan Header
-     * 
-     * 4. Quit Your Day Job 
-     *      - "Have 10 thousand in cash"
-     *      - Yellow Header
-     * 
-     * 5. Going Pro 
-     *      - "Have 100 thousand in cash"
-     *      - Yellow background header
-     * 
-     * 6. Hall of Fame 
-     *      - "Have 1 million in cash"
-     *      - Green background header
-     * 
-     * 7. Extraterrestrial 
-     *      - "Have 1 billion in cash"
-     *      - Red background header
-     * 
-     * 8. All In 
-     *      - "Hold less than a dollar in cash"
-     *      - Cyan Background Header
-     * 
-     * 9. Watcher 
-     *      - "Advance the market while holding no stocks"
-     *      - Red header
-     * 
-     * 10. Veteran
-     *      - "Advance 100 times"
-     *      - Magenta background header
-     * 
-     * 11. Mr. Omega
-     *      - "Advance 1000 times"
-     *      - Blue background header
-     */
-
     Achievements(User relevantUser, News channel) {
         this.relevantUser = relevantUser;
         this.channel = channel;
         acvList = new boolean[ACV_AMOUNT];
     }
 
+    /** Checks for any achievements gained after a stock purchase */
     void buyCheck() {
         if (!acvList[BUY_FIRST_STOCK]) {
             earnAcv(BUY_FIRST_STOCK);
@@ -102,6 +115,7 @@ public class Achievements {
             earnAcv(CASH_LT_DOLLAR);
         }
     }
+    /** Checks for any achievements gained after a stock sale */
     void sellCheck() {
         if (!acvList[SELL_FIRST_STOCK]) {
             earnAcv(SELL_FIRST_STOCK);
@@ -122,6 +136,7 @@ public class Achievements {
             earnAcv(GAIN_1B);
         }
     }
+    /** Checks for any achievements gained after an advance */
     void advanceCheck() {
         if (!acvList[FIRST_ADVANCE]) {
             earnAcv(FIRST_ADVANCE);
@@ -137,7 +152,10 @@ public class Achievements {
         }
     }
 
-    // prints full page of Achievements
+    /* Prints full page of achievements
+     * * This responsibility will soon be given to TerminalGame
+     */
+    @Deprecated
     void printPage() {
         System.out.println(magenta(center("Achievements", MENU_WIDTH, "~")));
         System.out.println(""); // spacing
@@ -159,7 +177,7 @@ public class Achievements {
         }
     }
 
-    // sets an achievement as earned and pushes the alert to the news
+    // Sets an achievement as earned and pushes an Alert to the News class
     private void earnAcv(int acv) {
         acvList[acv] = true;
         String msg = "Achievement Unlocked: ";
@@ -199,12 +217,12 @@ public class Achievements {
             case CASH_LT_DOLLAR -> "Hold less than a dollar in cash";
             case ADVANCE_W_NO_STOCKS -> "Advance while holding no stocks";
             case ADVANCE_100_TIMES -> "Advance 100 times";
-            case ADVANCE_1000_TIMES -> "Advance 1000 times"; // FIXME swapped
+            case ADVANCE_1000_TIMES -> "Advance 1000 times";
             default -> "Sam made a mistake"; // programmer error
         };
     }
 
-    // have a unique save and load method
+    /** Saves the user's achievement data to a unique file */
     void save() {
         try {
             String fileName;
@@ -240,6 +258,9 @@ public class Achievements {
             DB_LOG("ACV save(): " + e.getMessage());
         }
     }
+    /** Loads the user's achievements from file 
+     * @throws InitException if the file is not found or is corrupted/improper
+     */
     void load() throws InitException {
         String fileName;
         if (Main.NDEV) {
