@@ -115,6 +115,7 @@ public class News {
     }
 
     /** prints a whole page containing all current events */
+    @Deprecated
     void page() {
         System.out.println(""); // spacing
         System.out.println(italic(center("Mind the dust...", MENU_WIDTH)));
