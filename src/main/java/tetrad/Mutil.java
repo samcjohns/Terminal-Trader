@@ -298,19 +298,27 @@ public class Mutil {
     }
 
     /**
-     * Clears the screen using ANSI Escape Code
+     * Clears the screen and scrollback buffer using ANSI Escape Code
      */
     public static void clearScreen() {
         System.out.print("\033[H\033[2J"); // clear screen
-        System.out.println("\033[3J"); // clear scrollback buffer
+        System.out.println("\033[3J");     // clear scrollback buffer
         System.out.flush();
     }
+    /**
+     * Clears the current line on the screen
+     */
     public static void clearLine() {
         System.out.print("\033[2K");  // Clears the second line
         System.out.print("\033[1F");  // Moves the cursor up to the first line
         System.out.print("\033[2K");  // Clears the first line
         System.out.print("\033[0G");  // Move cursor back to the beginning of the line
     }
+    /**
+     * Prints the game header
+     * @deprecated WILL BE MOVED TO TERMINALGAME
+     */
+    @Deprecated
     public static void printHeader() {
         // title card
         String title = "Terminal Trader";
@@ -386,6 +394,11 @@ public class Mutil {
         System.out.println(line2);
         System.out.println(line3);
     }
+    /**
+     * Experimental function for printing taxman screen from ASCI art
+     * @deprecated WILL BE MOVED TO TERMINALGAME
+     */
+    @Deprecated
     public static void printTaxMan() {
         String filePath = "assets/taxman70.txt";
 
@@ -398,12 +411,26 @@ public class Mutil {
             System.err.println("Error reading the file: " + e.getMessage());
         }
     }
+    /**
+     * Pauses gameplay for a given amount of time
+     * @param millis amount of time to wait
+     */
     public static void pause(int millis) {
         pause(null, millis);
     }
+    /**
+     * Pauses gameplay until a new line is entered
+     * @param scanner user input scanner
+     */
     public static void pause(Scanner scanner) {
         pause(scanner, 0);
     }
+    /**
+     * Pauses gameplay for a given amount of time and then waits for a new line
+     * to be entered
+     * @param scanner user input scanner
+     * @param millis amount of time to wait
+     */
     public static void pause(Scanner scanner, int millis) {
         // so I don't have to type the try catch block ;)
         try {
@@ -419,6 +446,10 @@ public class Mutil {
     }
 
     // DEBUGGING
+    /**
+     * Outputs a message to the universal debug log file "err.txt"
+     * @param input message to be outputed
+     */
     public static void DB_LOG(String input) {
         String logPath = System.getenv("APPDATA") + "\\Terminal Trader\\err.txt";
         try (PrintWriter writer = new PrintWriter(new FileWriter(logPath, true))) {
@@ -427,11 +458,5 @@ public class Mutil {
             System.err.println("IO Error: Unable to write to " + logPath);
             e.printStackTrace(System.err);
         }
-    }
-    public static void DB_LOG(int input) {
-        DB_LOG(String.valueOf(input));
-    }
-    public static void DB_LOG(double input) {
-        DB_LOG(String.valueOf(input));
     }
 }
