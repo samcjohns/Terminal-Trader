@@ -21,6 +21,7 @@ public class Game {
         usr = new User(news, this);
     }
 
+    // do nothing for generic Game class
     public void startGame() {}
     public void doTurn() {}
     public void endGame() {}

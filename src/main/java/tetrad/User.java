@@ -21,7 +21,6 @@ import static tetrad.Mutil.dollar;
 import static tetrad.Mutil.italic;
 import static tetrad.Mutil.numColor;
 import static tetrad.Mutil.pause;
-import static tetrad.Mutil.printHeader;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.yellow;
 
@@ -143,7 +142,7 @@ class User {
         try {
             while (true) {
                 clearScreen();
-                printHeader();
+                TerminalGame.printHeader();
                 channel.roll();
 
                 System.out.println(center(" " + name + "'s Portfolio ", MENU_WIDTH, "="));
@@ -257,7 +256,7 @@ class User {
                     }
                     case ";" -> {
                         clearScreen();
-                        printHeader();
+                        TerminalGame.printHeader();
                         System.out.println(center("Transaction History", MENU_WIDTH, "="));
                         portfolio.printTransactionLogs();
                         System.out.println(""); // spacing
