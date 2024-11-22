@@ -35,7 +35,9 @@ import static tetrad.Mutil.yellowB;
 
 public class TerminalGame extends Game {
     public TerminalGame() {
-        super();
+        news = new TerminalNews();
+        mkt = new TerminalMarket();
+        usr = new TerminalUser();
     }
     
     // public control functions
