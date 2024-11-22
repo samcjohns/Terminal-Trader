@@ -141,7 +141,7 @@ public class News {
     }
 
     // coloring depending on alert type
-    private String headlineColor(String headline, int type) {
+    protected String headlineColor(String headline, int type) {
         return switch (type) {
             case ACHIEVEMENT -> bold(blue(headline));
             case BAD_STOCK -> red(headline);
@@ -154,7 +154,7 @@ public class News {
         }; 
     }
     // searches "random_headlines.txt" and returns random one
-    private String randomHeadline() {
+    protected String randomHeadline() {
         final int RHF_LENGTH = 42; // may change, file length
         Random random = new Random();
         int randomLineIndex = random.nextInt(RHF_LENGTH);
@@ -174,7 +174,7 @@ public class News {
             return "Missing 'random_headlines.txt' asset";
         }
     }
-    private void printEmptyNewsRoll(StringBuilder line) {
+    protected void printEmptyNewsRoll(StringBuilder line) {
         String emptyMsg = "No Current Headlines";
         int currentLength = "News: ".length() + emptyMsg.length();
         line.append(blue(emptyMsg));

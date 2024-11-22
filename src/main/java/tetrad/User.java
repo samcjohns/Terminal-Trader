@@ -43,9 +43,6 @@ class User {
         advances++;
         acv.advanceCheck();
     }
-    // do nothing for base User instantiation
-    String sell(Scanner scanner) { return ""; }
-    String buy(Scanner scanner, Market market, int selection) { return ""; }
     
     // getters
     String getName() { return name; }
@@ -127,4 +124,11 @@ class User {
             throw new InitException("File Not Found: " + username + ".txt");
         }
     }
+
+    // DO-NOTHINGS (not relevant for base class)
+    String buy(Scanner scn, Market mkt, int sel) { return ""; }
+    String sell(Scanner scn) { return ""; }
+    void showPortfolio(Scanner scanner) {}
+    void showAchievements() {}
+    void showStats() {}
 }

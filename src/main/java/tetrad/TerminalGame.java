@@ -34,10 +34,11 @@ import static tetrad.Mutil.yellow;
 import static tetrad.Mutil.yellowB;
 
 public class TerminalGame extends Game {
+    
     public TerminalGame() {
         news = new TerminalNews();
-        mkt = new TerminalMarket();
-        usr = new TerminalUser();
+        mkt = new TerminalMarket(news);
+        usr = new TerminalUser(news, this);
     }
     
     // public control functions

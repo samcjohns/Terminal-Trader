@@ -48,7 +48,7 @@ public class TerminalUser extends User {
                 cash += stock.getValue() * amount;
                 transactMsg = "Sold " + amount + " shares of " + stock.getName() + " for " + dollar(stock.getValue() * amount);
                 break; // won't execute if exception throws
-            } 
+            }
             catch (NoSuchElementException | NumberFormatException e) {
                 System.out.println("Invalid Input, please try again.");
                 pause(scanner);
