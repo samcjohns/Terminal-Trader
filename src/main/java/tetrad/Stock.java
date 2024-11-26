@@ -14,6 +14,19 @@ import static tetrad.Mutil.HISTORY_HEIGHT;
 import static tetrad.Mutil.HISTORY_LENGTH;
 import static tetrad.Mutil.round;
 
+/**
+ * Class for handling individual stock behavior
+ * 
+ * @author Samuel Johns
+ * Created: November 15, 2024
+ * 
+ * Description: The stock class is for representing individual stocks, each
+ *              with a name, id, value, history of values, and bevahioral
+ *              variables for simulating stock price fluctuation. Stock objects
+ *              are responsible for saving and loading themselves to and from
+ *              file. They are also responsible for determining their next own
+ *              price fluctuations.
+ */
 class Stock {
     private int id;           // unique id number
     private String name;      // name of the stock
@@ -68,29 +81,69 @@ class Stock {
     }
     
     // getters
+    /**
+     * @return id for the stock instance
+     */
     int           getID() { return id; }
+
+    /**
+     * @return name for the stock instance
+     */
     String      getName() { return name; }
+
+    /**
+     * @return current value for the stock instance
+     */
     double     getValue() { return value; }
+
+    /**
+     * @return target value for the stock instance
+     */
     double getTargetVal() { return target_value; }
+
+    /**
+     * @return current trend of the stock instance
+     */
     double     getTrend() { return trend; }
+
+    /**
+     * @return current volatility of the stock instance
+     */
     double       getVol() { return vol; }
 
     // value functions
+    /**
+     * @return previous value (before most recent advance)
+     */
     double getLast() {
         return history.recent();
     }
     
+    /**
+     * Most recent stock price fluctuation
+     * @return percent difference, rounded, between current value and previous
+     * value (before most recent advance)
+     */
     double getChange() {
         // recent change
         return round(((value - getLast()) / getLast()) * 100);
     }
     
+    /**
+     * Stock price difference between current value and 'term' days ago
+     * @param term period of change in days
+     * @return percent change, rounded, from current price and price 'term' 
+     * days ago
+     */
     double getChange(int term) {
         // change from 'term' days ago
         return round(((value - history.at(term - 1)) / getLast()) * 100);
     }
 
     // stock behavior functions
+    /**
+     * Time advancement method, used for simulating behavior after each day.
+     */
     void advance() {
         // channel for pushing alerts
         News channel = game.news;
@@ -144,11 +197,229 @@ class Stock {
             alertCooldown--;
         }
     }
+
+    /**
+     * Time advancement method, used for simulating behavior after each day.
+     * @param times number of days to advance
+     */
     void advance(int times) {
         for (int i = 0; i < times; i ++) {
             advance();
         }
     }
+    
+    /**
+     * Returns maximum value reached by the stock instance in all time
+     * @return record-high stock value
+     */
+    double getMax() {
+        // get max value in history
+        double maxVal = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < history.size(); i++) {
+            double val = history.at(i);
+            if (val > maxVal) {
+                maxVal = val;
+            }
+        }
+        if (value > maxVal) {
+            // in case current is largest
+            return value;
+        }
+        return maxVal;
+    }
+
+    /**
+     * Returns minimum value reached by the stock instance in all time
+     * @return record-low stock value
+     */
+    double getMin() {
+        // get min value in history
+        double minVal = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < history.size(); i++) {
+            double val = history.at(i);
+            if (val < minVal) {
+                minVal = val;
+            }
+        }
+        if (value < minVal) {
+            // in case current value is smallest
+            return value;
+        }
+        return minVal;
+    }
+
+    // display functions 
+    /**
+     * Prints the history of the stock performance in a well-formatted graph
+     */
+    void printHistory() {
+        final int ROWS = HISTORY_HEIGHT;       // max graph height
+        final int COLS = HISTORY_LENGTH;       // max graph length
+        char[][] array = new char[ROWS][COLS]; // for building graph
+    
+        // Fill the array with spaces
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                array[i][j] = ' ';
+            }
+        }
+
+        // Find upper and lower bounds
+        double minVal = Double.POSITIVE_INFINITY;
+        double maxVal = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < history.size(); i++) {
+            double val = history.at(i);
+            if (val > maxVal) {
+                maxVal = val;
+            }
+            if (val < minVal) {
+                minVal = val;
+            }
+        }
+
+        // Determine bins for graph height
+        double range = maxVal - minVal;
+        double binSize = range / ROWS;
+    
+        // Build graph in array
+        for (int i = 0; i < history.size(); i++) {
+            // Calculate height of the bar based on current value
+            int barHeight = (int) ((history.at(i) - minVal) / binSize);
+    
+            // Ensure barHeight is within the bounds of the array
+            barHeight = Math.min(barHeight, ROWS - 1);
+            barHeight = Math.max(barHeight, 0); // This will be at least 0
+            
+            // Fill the graph from the bottom up
+            for (int j = barHeight; j >= 0; j--) {
+                array[ROWS - j - 1][COLS - i - 1] = '█'; // Fill upwards, ensuring the lowest index is the bottom
+            }
+        }
+    
+        // Print graph
+        for (int i = 0; i < ROWS; i++) { // Print from top to bottom
+            for (int j = 0; j < COLS; j++) {
+                System.out.print(array[i][j]);
+            }
+            System.out.println();
+        }
+    }
+    
+    /**
+     * Saves the stock instance to s<id>.txt
+     */
+    void save() {
+        // saves all info about the stock to a unique file
+        try {
+            // determine correct save path 
+            String fileName;
+            if (Main.NDEV) {
+                String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+                fileName = savePath + "s" + id + ".txt";
+            }
+            else {
+                fileName = "gen/s" + id + ".txt";
+            }
+
+            PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+
+            writer.println("---STOCK-INFO---");
+            writer.println(id);
+            writer.println(name);
+
+            // attributes
+            writer.println("---ATTRIBUTES---");
+            writer.println("DATA: target_value target_vol recordHigh recordLow trend vol risk");
+            writer.print(target_value + " ");
+            writer.print(target_vol + " ");
+            writer.print(recordHigh + " ");
+            writer.print(recordLow + " ");
+            writer.print(trend + " ");
+            writer.print(vol + " ");
+            writer.print(risk + " ");
+            writer.println(""); // newline
+
+            // history
+            writer.println("---HISTORY---");
+            for (int i = history.size() - 1; i >= 0; i--) {
+                // print in reverse order for when it loads
+                writer.print(history.at(i) + " ");
+            }
+            writer.println("");
+            writer.println("---INFO-END---");
+
+            // label
+            writer.println("For Terminal Trader, a text-based stock game.");
+            writer.println("Developed and Designed by Samuel Johns");
+
+            writer.close();
+        } 
+        catch (IOException e) {
+            DB_LOG("IO Error: Stock Save Method -> " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Loads stock information from the file s<id>.txt
+     * @param id id of the current stock, determines which file to load
+     * @throws InitException if file is corrupted or missing
+     */
+    void load(int id) throws InitException {
+        // determine correct save path
+        String fileName;
+        if (Main.NDEV) {
+            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+            fileName = savePath + "s" + id + ".txt";
+        }
+        else {
+            fileName = "gen/s" + id + ".txt";
+        }
+
+        File file = new File(fileName);
+        try (Scanner scanner = new Scanner(file)) {
+            this.id = id;
+            // skip headers
+            scanner.nextLine();
+            scanner.nextLine();
+
+            name = scanner.nextLine();
+
+            // skip headers
+            scanner.nextLine();
+            scanner.nextLine();
+
+            target_value = Double.parseDouble(scanner.next());
+            target_vol = Double.parseDouble(scanner.next());
+            recordHigh = Double.parseDouble(scanner.next());
+            recordLow = Double.parseDouble(scanner.next());
+            trend = Double.parseDouble(scanner.next());
+            vol = Double.parseDouble(scanner.next());
+            risk = Integer.parseInt(scanner.next());
+            scanner.nextLine(); // consume newline char
+
+            scanner.nextLine(); // skip header
+            String token = scanner.next();
+            while (!token.equals("---INFO-END---")) {
+                history.push(Double.parseDouble(token));
+                token = scanner.next();
+            }
+
+            if (history.size() == 0) {
+                value = target_value; // init case
+            }
+            else {
+                value = history.recent();
+            }
+        }
+        catch (NoSuchElementException e) {
+            throw new InitException("Corrupted Stock Data");
+        }
+        catch (FileNotFoundException e) {
+            throw new InitException("File Not Found: " + fileName);
+        }
+    }
+
+    // private helper functions
     private void randomEvent() {
         // channel for pushing alerts
         News channel = game.news;
@@ -268,197 +539,6 @@ class Stock {
                     channel.push(alert);
                 }
             }
-        }
-    }
-    
-    double getMax() {
-        // get max value in history
-        double maxVal = Double.NEGATIVE_INFINITY;
-        for (int i = 0; i < history.size(); i++) {
-            double val = history.at(i);
-            if (val > maxVal) {
-                maxVal = val;
-            }
-        }
-        if (value > maxVal) {
-            // in case current is largest
-            return value;
-        }
-        return maxVal;
-    }
-    double getMin() {
-        // get min value in history
-        double minVal = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < history.size(); i++) {
-            double val = history.at(i);
-            if (val < minVal) {
-                minVal = val;
-            }
-        }
-        if (value < minVal) {
-            // in case current value is smallest
-            return value;
-        }
-        return minVal;
-    }
-
-    // display functions 
-    void printHistory() {
-        final int ROWS = HISTORY_HEIGHT;       // max graph height
-        final int COLS = HISTORY_LENGTH;       // max graph length
-        char[][] array = new char[ROWS][COLS]; // for building graph
-    
-        // Fill the array with spaces
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLS; j++) {
-                array[i][j] = ' ';
-            }
-        }
-
-        // Find upper and lower bounds
-        double minVal = Double.POSITIVE_INFINITY;
-        double maxVal = Double.NEGATIVE_INFINITY;
-        for (int i = 0; i < history.size(); i++) {
-            double val = history.at(i);
-            if (val > maxVal) {
-                maxVal = val;
-            }
-            if (val < minVal) {
-                minVal = val;
-            }
-        }
-
-        // Determine bins for graph height
-        double range = maxVal - minVal;
-        double binSize = range / ROWS;
-    
-        // Build graph in array
-        for (int i = 0; i < history.size(); i++) {
-            // Calculate height of the bar based on current value
-            int barHeight = (int) ((history.at(i) - minVal) / binSize);
-    
-            // Ensure barHeight is within the bounds of the array
-            barHeight = Math.min(barHeight, ROWS - 1);
-            barHeight = Math.max(barHeight, 0); // This will be at least 0
-            
-            // Fill the graph from the bottom up
-            for (int j = barHeight; j >= 0; j--) {
-                array[ROWS - j - 1][COLS - i - 1] = '█'; // Fill upwards, ensuring the lowest index is the bottom
-            }
-        }
-    
-        // Print graph
-        for (int i = 0; i < ROWS; i++) { // Print from top to bottom
-            for (int j = 0; j < COLS; j++) {
-                System.out.print(array[i][j]);
-            }
-            System.out.println();
-        }
-    }
-    
-    void save() {
-        // saves all info about the stock to a unique file
-        try {
-            // determine correct save path 
-            String fileName;
-            if (Main.NDEV) {
-                String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
-                fileName = savePath + "s" + id + ".txt";
-            }
-            else {
-                fileName = "gen/s" + id + ".txt";
-            }
-
-            PrintWriter writer = new PrintWriter(new FileWriter(fileName));
-
-            writer.println("---STOCK-INFO---");
-            writer.println(id);
-            writer.println(name);
-
-            // attributes
-            writer.println("---ATTRIBUTES---");
-            writer.println("DATA: target_value target_vol recordHigh recordLow trend vol risk");
-            writer.print(target_value + " ");
-            writer.print(target_vol + " ");
-            writer.print(recordHigh + " ");
-            writer.print(recordLow + " ");
-            writer.print(trend + " ");
-            writer.print(vol + " ");
-            writer.print(risk + " ");
-            writer.println(""); // newline
-
-            // history
-            writer.println("---HISTORY---");
-            for (int i = history.size() - 1; i >= 0; i--) {
-                // print in reverse order for when it loads
-                writer.print(history.at(i) + " ");
-            }
-            writer.println("");
-            writer.println("---INFO-END---");
-
-            // label
-            writer.println("For Terminal Trader, a text-based stock game.");
-            writer.println("Developed and Designed by Samuel Johns");
-
-            writer.close();
-        } 
-        catch (IOException e) {
-            DB_LOG("IO Error: Stock Save Method -> " + e.getMessage());
-        }
-    }
-    
-    void load(int id) throws InitException {
-        // determine correct save path
-        String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
-            fileName = savePath + "s" + id + ".txt";
-        }
-        else {
-            fileName = "gen/s" + id + ".txt";
-        }
-
-        File file = new File(fileName);
-        try (Scanner scanner = new Scanner(file)) {
-            this.id = id;
-            // skip headers
-            scanner.nextLine();
-            scanner.nextLine();
-
-            name = scanner.nextLine();
-
-            // skip headers
-            scanner.nextLine();
-            scanner.nextLine();
-
-            target_value = Double.parseDouble(scanner.next());
-            target_vol = Double.parseDouble(scanner.next());
-            recordHigh = Double.parseDouble(scanner.next());
-            recordLow = Double.parseDouble(scanner.next());
-            trend = Double.parseDouble(scanner.next());
-            vol = Double.parseDouble(scanner.next());
-            risk = Integer.parseInt(scanner.next());
-            scanner.nextLine(); // consume newline char
-
-            scanner.nextLine(); // skip header
-            String token = scanner.next();
-            while (!token.equals("---INFO-END---")) {
-                history.push(Double.parseDouble(token));
-                token = scanner.next();
-            }
-
-            if (history.size() == 0) {
-                value = target_value; // init case
-            }
-            else {
-                value = history.recent();
-            }
-        }
-        catch (NoSuchElementException e) {
-            throw new InitException("Corrupted Stock Data");
-        }
-        catch (FileNotFoundException e) {
-            throw new InitException("File Not Found: " + fileName);
         }
     }
 }
