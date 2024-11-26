@@ -41,6 +41,7 @@ public class Mutil {
             return string; // string too big, just return the whole thing
          }
     }
+
     /**
      * Formats the string in the center of a given width
      * @param string the message to be centered
@@ -50,6 +51,7 @@ public class Mutil {
     public static String center(String string, int width) {
         return center(string, width, " ");
     }
+
     /**
      * Formats the string in the center of a given width
      * @param num the int to be centered
@@ -59,6 +61,7 @@ public class Mutil {
     public static String center(int num, int width) {
         return center("" + num, width, " ");
     }
+
     /**
      * Formats the string in the center of a given width
      * @param num the double to be centered
@@ -103,6 +106,7 @@ public class Mutil {
             return red(value + "");
         }
     }
+
      /**
      * Returns a String of the number colored according to the value
      * @param value the int to be converted
@@ -111,6 +115,7 @@ public class Mutil {
     public static String numColor(int value) {
         return numColor((double) value);
     }
+
      /**
      * Returns a String of the number colored according to the value (the
      * String will be parsed for a number)
@@ -126,7 +131,6 @@ public class Mutil {
         }
     }
 
-
     /**
      * Returns the given String in italic using ANSI codes (increases real len)
      * @param str string to be converted
@@ -135,6 +139,7 @@ public class Mutil {
     public static String italic(String str) {
         return "\033[3m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String in bold using ANSI codes (increases real len)
      * @param str string to be converted
@@ -153,6 +158,7 @@ public class Mutil {
     public static String red(String str) {
         return "\033[31m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String in green using ANSI codes (increases real len)
      * @param str string to be converted
@@ -161,6 +167,7 @@ public class Mutil {
     public static String green(String str) {
         return "\033[32m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String in blue using ANSI codes (increases real len)
      * @param str string to be converted
@@ -169,6 +176,7 @@ public class Mutil {
     public static String blue(String str) {
         return "\033[34m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String in yellow using ANSI codes (increases real len)
      * @param str string to be converted
@@ -177,6 +185,7 @@ public class Mutil {
     public static String yellow(String str) {
         return "\033[33m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String in magenta using ANSI codes (increases real len)
      * @param str string to be converted
@@ -185,6 +194,7 @@ public class Mutil {
     public static String magenta(String str) {
         return "\033[35m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String in cyan using ANSI codes (increases real len)
      * @param str string to be converted
@@ -204,6 +214,7 @@ public class Mutil {
     public static String redB(String str) {
         return "\033[41m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String with a green background using ANSI codes 
      * (increases real length)
@@ -213,6 +224,7 @@ public class Mutil {
     public static String greenB(String str) {
         return "\033[42m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String with a blue background using ANSI codes 
      * (increases real length)
@@ -222,6 +234,7 @@ public class Mutil {
     public static String blueB(String str) {
         return "\033[44m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String with a yellow background using ANSI codes 
      * (increases real length)
@@ -231,6 +244,7 @@ public class Mutil {
     public static String yellowB(String str) {
         return "\033[43m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String with a magenta background using ANSI codes 
      * (increases real length)
@@ -240,6 +254,7 @@ public class Mutil {
     public static String magentaB(String str) {
         return "\033[45m" + str + "\033[0m";
     }
+
     /**
      * Returns the given String with a cyan background using ANSI codes 
      * (increases real length)
@@ -259,6 +274,7 @@ public class Mutil {
     public static double round(double value) {
         return Math.round(value * 100.0) / 100.0;
     }
+
     /**
      * Rounds the number to two decimal places using String.format()
      * @param value number to be rounded
@@ -267,6 +283,7 @@ public class Mutil {
     public static String sround(double value) {
         return String.format("%.2f", value);
     }
+
     /**
      * Returns a properly formatting String representing a given dollar value
      * Formats with the respective letter for millions, billions, and trillions
@@ -305,6 +322,7 @@ public class Mutil {
         System.out.println("\033[3J");     // clear scrollback buffer
         System.out.flush();
     }
+
     /**
      * Clears the current line on the screen
      */
@@ -314,6 +332,7 @@ public class Mutil {
         System.out.print("\033[2K");  // Clears the first line
         System.out.print("\033[0G");  // Move cursor back to the beginning of the line
     }
+
     /**
      * Clears a number of lines (current and above)
      * @param lines number of lines to clear
@@ -323,6 +342,7 @@ public class Mutil {
             clearLine();
         }
     }
+
     /**
      * Experimental function for printing taxman screen from ASCI art
      * @deprecated WILL BE MOVED TO TERMINALGAME
@@ -340,6 +360,7 @@ public class Mutil {
             System.err.println("Error reading the file: " + e.getMessage());
         }
     }
+
     /**
      * Pauses gameplay for a given amount of time
      * @param millis amount of time to wait
@@ -347,6 +368,7 @@ public class Mutil {
     public static void pause(int millis) {
         pause(null, millis);
     }
+
     /**
      * Pauses gameplay until a new line is entered
      * @param scanner user input scanner
@@ -354,6 +376,7 @@ public class Mutil {
     public static void pause(Scanner scanner) {
         pause(scanner, 0);
     }
+    
     /**
      * Pauses gameplay for a given amount of time and then waits for a new line
      * to be entered
