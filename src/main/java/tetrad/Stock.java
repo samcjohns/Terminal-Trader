@@ -35,13 +35,13 @@ class Stock {
     private double recordLow;
     private double alertCooldown;
 
-    private final News channel; // reference to news object for pushing alerts
+    private final Game game;  // reference to news object for pushing alerts
     private final Market mkt; // reference to market stock belongs to
 
     // constructors
-    Stock(Market mkt, News channel) {
+    Stock(Market mkt, Game game) {
         // for typical gameplay, call this contructor and then stock.load()
-        this.channel = channel;
+        this.game = game;
         this.mkt = mkt;
         history = new Log<>(Log.DEFAULT_SIZE);
         alertCooldown = 3; // default
@@ -49,7 +49,7 @@ class Stock {
     Stock(int id, String name, double target_value, double target_vol, int risk) throws InitException {
         // for creating dependencies, the first time the stock is made prior to save
         history = new Log<>(Log.DEFAULT_SIZE);
-        channel = null;
+        game = null;
         mkt = null;
 
         this.id = id;
@@ -92,6 +92,9 @@ class Stock {
 
     // stock behavior functions
     void advance() {
+        // channel for pushing alerts
+        News channel = game.news;
+
         // Method for determining stock price
         // Add old value to history
         history.push(round(value));
@@ -147,6 +150,9 @@ class Stock {
         }
     }
     private void randomEvent() {
+        // channel for pushing alerts
+        News channel = game.news;
+
         Random rand = new Random();
 
         int outcome = rand.nextInt(5) + 1;
@@ -192,6 +198,9 @@ class Stock {
     }
     // old behavior for stocks
     private void arcadeBehavior() {
+        // channel for pushing alerts
+        News channel = game.news;
+        
         Random rand = new Random();
 
         double percentChange = ((rand.nextDouble() * 10) * vol); // 1. Random noise
