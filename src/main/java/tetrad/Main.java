@@ -32,7 +32,7 @@ public class Main {
         
         try {
             while (!exit) {
-                TerminalGame game = new TerminalGame();
+                Game game = new Game();
                 exit = !game.startGame(scanner);
                 game.play(scanner);
                 game.endGame();
