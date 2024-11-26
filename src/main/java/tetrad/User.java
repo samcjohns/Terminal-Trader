@@ -9,33 +9,40 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
+import static tetrad.Mutil.MENU_WIDTH;
+import static tetrad.Mutil.add;
+import static tetrad.Mutil.blue;
+import static tetrad.Mutil.bold;
+import static tetrad.Mutil.center;
+import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.dollar;
-import static tetrad.Mutil.pause;
+import static tetrad.Mutil.italic;
+import static tetrad.Mutil.numColor;
+import static tetrad.Mutil.red;
+import static tetrad.Mutil.yellow;
 
 class User {
-    protected String name; // name of the user
-    protected double cash; // total amount of liquid cash
-    protected int advances; // number of advances user has done
+    private String name; // name of the user
+    private double cash; // total amount of liquid cash
+    private int advances; // number of advances user has done
     protected Portfolio portfolio; // portfolio of share holdings
 
-    protected final News channel; // reference to news object for pushing alerts
-    protected Achievements acv; // keeps track of achievements for user
-    protected Game game; // reference back to the current game for advancing while in portfolio
+    private Achievements acv; // keeps track of achievements for user
+    private Game game; // reference back to the current game for advancing while in portfolio
 
     static final double STARTING_CASH = 1000.0;
 
-    User(News channel, Game game) {
-        this("null", 0, channel, game);
+    User(Game game) {
+        this("null", 0, game);
     }
-    User(String name, double cash, News channel, Game game) {
+    User(String name, double cash, Game game) {
         this.name = name;
         this.cash = cash;
-        this.channel = channel;
         this.game = game;
         
         advances = 0;
         portfolio = new Portfolio(this);
-        acv = new Achievements(this, channel);
+        acv = new Achievements(this, game.news);
     }
     
     // gameplay functions
@@ -127,32 +134,140 @@ class User {
         }
     }
 
-    // DO-NOTHINGS (not relevant for base class)
-    String buy(Scanner scn, Market mkt, int sel) { return ""; }
-    
-    String sell(Stock stock, int amount) { 
-        String transactMsg = "";
+    String buy(Stock stock, int amount) throws InvalidSelectionException {
+        // check if user can afford purchase (throws if stock doesn't exist)
+        if (stock.getValue() * amount > cash) {
+            throw new InvalidSelectionException("Insufficient Funds");
+        }
 
-        try {
-            portfolio.remove(stock, amount); // may throw
-            cash += stock.getValue() * amount;
-            transactMsg = "Sold " + amount + " shares of " + stock.getName() + " for " + dollar(stock.getValue() * amount);
+        cash -= stock.getValue() * amount; // take cash for transaction
+        portfolio.add(stock, amount);      // add new stock to portfolio
+
+        portfolio.update(false);      // update new value for portfolio
+        acv.buyCheck();                    // check if achievements were earned
+
+        return "Bought " + amount + " shares of " + stock.getName() + " for " + dollar(stock.getValue() * amount);
+    }
+    
+    String sell(Stock stock, int amount) throws InvalidSelectionException {
+
+        portfolio.remove(stock, amount);   // may throw
+        cash += stock.getValue() * amount; // return cash from sale
+        
+        portfolio.update(false);      // update new portfolio value
+        acv.sellCheck();                   // check for achievements earned
+
+        // transaction message
+        return "Sold " + amount + " shares of " + stock.getName() + " for " + dollar(stock.getValue() * amount);
+    }
+    void showPortfolio() {
+        game.news.roll();
+
+        System.out.println(center(" " + name + "'s Portfolio ", MENU_WIDTH, "="));
+        portfolio.printHistory();
+        System.err.println("=".repeat(MENU_WIDTH));
+        
+        if (portfolio.size() == 0) {
+            System.out.println(""); // spacing
+            System.out.println("Your portfolio is currently empty,");
+            System.out.println("Head to the Stock Exchange to purchase shares!");
+            System.out.println(""); // spacing
         }
-        catch (NoSuchElementException | NumberFormatException e) {
-            System.out.println("Invalid Input, please try again.");
-            pause(1000);
-        }
-        catch (InvalidSelectionException e)  {
-            System.out.println(e.getMessage());
-            pause(1000);
+        else {
+            String header = "";
+            header += " ".repeat(5); // spacing for indexes
+            header = add(header, "Stock Name", 5);
+            header = add(header, "Amount", 25);
+            header = add(header, "Total", 38);
+            header = add(header, "Current", 48);
+            header = add(header, "Recent", 65);
+            header = add(header, "Gain", 80);
+            System.out.println(bold(header));
+
+            try {
+                // print all holdings
+                for (int i = 0; i < portfolio.size(); i++) {
+                    Stock  stock = portfolio.stockAt(i);
+                    String index  = "";
+                    String sname  = stock.getName();
+                    String amount = "";
+                    String total  = "";
+                    String current = "";
+                    String change = "";
+                    String gain = "";
+                    String line   = ""; // formatting
+
+                    // print indexes for selecting stock (if applicable)
+                    
+                    index = (i + 1) + ". ";
+                    line += index; // add to line
+
+                    // format name (max length 20)
+                    line = add(line, sname, 5);
+
+                    // format amount (max length 10)
+                    amount += center(portfolio.amountAt(i), 8);
+                    line = add(line, amount, 20); // add to line
+
+                    // format total (max length 12)
+                    total += dollar(portfolio.amountAt(i) * stock.getValue());
+                    line = add(line, total, 32);
+
+                    // format current
+                    current +=  dollar(stock.getValue());
+                    line = add(line, current, 44);
+
+                    // format percent change
+                    change += String.format("%.2f", stock.getChange());
+                    // color accordingly
+                    change = numColor(change);
+                    line = add(line, change, 60);
+
+                    // format gain
+                    gain += String.format("%.2f", portfolio.calculateGain(i));
+                    gain = numColor(gain);
+                    line = add(line, gain, 83);
+                    System.out.println(line); // output final line
+                }
+            }
+            catch(InvalidSelectionException e) {
+                DB_LOG("IVE thrown in User.showPortfolio");
+            }
         }
         
-        portfolio.update(false);
-        acv.sellCheck();
-
-        return transactMsg;
+        // print other information
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(
+            red(bold("Day " + advances)) + " | " +
+            yellow(bold("Total Cash: ") + dollar(cash)) + " | " +
+            blue(bold("Total Holdings: ") + dollar(portfolio.getValue())) + " | " +
+            cyan(bold("Net Worth: ") + dollar(getNet()))
+        );
     }
-    void showPortfolio(Scanner scanner) {}
-    void showAchievements() {}
-    void showStats() {}
+    void showAchievements() {
+        acv.printPage();
+    }
+    void showStats() {
+        String traderScore;
+        if (advances == 0) {
+            traderScore = "N/A";
+        }
+        else {
+            traderScore = "" + ((int) (getNet() - STARTING_CASH)/advances);
+        }
+
+        System.out.println(""); // spacing
+        if (Game.ARCADE_MODE) {
+            System.out.println(red(italic(center("Arcade  Mode", MENU_WIDTH))));
+        }
+        System.out.println(bold(center("Trader Score", MENU_WIDTH)));
+        System.out.println(center(traderScore, MENU_WIDTH));
+        System.out.println("");
+        System.out.println(bold(center("Advances", MENU_WIDTH)));
+        System.out.println(center(advances, MENU_WIDTH));
+        System.out.println("");
+        System.out.println(bold(center("Gains", MENU_WIDTH)));
+        System.out.println(center(dollar(getNet() - STARTING_CASH), MENU_WIDTH));
+        System.out.println(""); // spacing
+    }
 }

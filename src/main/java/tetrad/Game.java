@@ -19,7 +19,7 @@ public class Game {
     public Game() {
         news = new News();
         mkt = new Market(this);
-        usr = new User(news, this);
+        usr = new User(this);
     }
 
     // do nothing for base Game class
@@ -60,7 +60,7 @@ public class Game {
             createGen();
         }
 
-        usr = new User(username, User.STARTING_CASH, news, this);
+        usr = new User(username, User.STARTING_CASH, this);
         usr.save();
     }
 

@@ -8,12 +8,14 @@ package tetrad;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.blueB;
+import static tetrad.Mutil.bold;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.clearLine;
 import static tetrad.Mutil.clearScreen;
@@ -38,7 +40,7 @@ public class TerminalGame extends Game {
     public TerminalGame() {
         news = new News();
         mkt = new Market(this);
-        usr = new TerminalUser(news, this);
+        usr = new User(this);
     }
     
     // public control functions
@@ -144,7 +146,7 @@ public class TerminalGame extends Game {
         while (true) {
             clearScreen();
             printHeader();
-            usr.showPortfolio(scanner);
+            usr.showPortfolio();
 
             // command tray
             System.out.println("-".repeat(MENU_WIDTH));
@@ -160,7 +162,7 @@ public class TerminalGame extends Game {
                     return;
                 }
                 case "|" -> advance();
-                case "." -> doSale(scanner);
+                case "." -> doSell(scanner);
                 case ";" -> usr.portfolio.printTransactionLogs();
                 default -> System.out.println("Invalid Input");
             }
@@ -185,16 +187,7 @@ public class TerminalGame extends Game {
                 }
                 case "/" -> advance();
                 case "," -> stockView(scanner);
-                case "." -> {
-                    System.out.print("---Stock: ");
-                    int stockNum = Integer.parseInt(scanner.nextLine());
-                    clearLine();
-                    String msg = usr.buy(scanner, mkt, stockNum);
-                    if (!msg.equals("")) {
-                        System.out.println(yellow(msg));
-                        pause(2000);
-                    }
-                }
+                case "." -> doBuy(scanner);
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(2000);
@@ -244,13 +237,7 @@ public class TerminalGame extends Game {
                         view = "" + 1;
                     }
                 }
-                case "." -> {
-                    String msg = usr.buy(scanner, mkt, Integer.parseInt(view));
-                    if (!msg.equals("")) {
-                        System.out.println(yellow(msg));
-                        pause(1000);
-                    }
-                }
+                case "." -> doBuy(scanner);
                 case "/" -> {
                     advance();
                     pause(500);
@@ -308,7 +295,7 @@ public class TerminalGame extends Game {
             }
         }
     }
-    private void doSale(Scanner scanner) {
+    private void doSell(Scanner scanner) {
         try {
             System.out.println("(0 to Exit)");
             System.out.print("--Stock: ");
@@ -328,6 +315,44 @@ public class TerminalGame extends Game {
         } 
         catch (InvalidSelectionException e) {
             System.out.println(e.getMessage());
+        }
+    }
+    private void doBuy(Scanner scanner) {
+        while(true) {
+            double cash = usr.getCash();
+            try {
+                System.out.print("---Stock: ");
+                int selection = Integer.parseInt(scanner.nextLine());
+                if (selection == 0) {
+                    return; // exit case
+                }
+                clearLine();
+
+                // show cash and max buy amount
+                Stock stock = mkt.getStock(selection - 1);
+                int maxAmount = (int) (cash / stock.getValue());
+                System.out.println(yellow(bold("Total Cash: ")) + dollar(cash) + " | " 
+                + yellow(bold("Max Amount: ")) + maxAmount);
+                System.out.println("-".repeat(MENU_WIDTH));
+
+                System.out.print("---Amount: ");
+                int amount = Integer.parseInt(scanner.nextLine());
+                if (amount == 0) {
+                    return; // exit case
+                }
+                clearLine();
+
+                System.out.println(usr.buy(stock, amount));
+                break;
+            } 
+            catch (NoSuchElementException | NumberFormatException e) {
+                System.out.println("Invalid Input, please try again.");
+                pause(scanner);
+            }
+            catch (InvalidSelectionException e)  {
+                System.out.println(e.getMessage());
+                pause(scanner);
+            }
         }
     }
     // menu functions
