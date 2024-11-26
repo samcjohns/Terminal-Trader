@@ -58,7 +58,6 @@ public class News {
     }
 
     /** prints a single line of the most important headlines */
-    @Deprecated
     void roll() {
         StringBuilder line = new StringBuilder(bold(cyan("News: ")));
         int currentLength = "News: ".length();
@@ -115,7 +114,6 @@ public class News {
     }
 
     /** prints a whole page containing all current events */
-    @Deprecated
     void page() {
         System.out.println(""); // spacing
         System.out.println(italic(center("Mind the dust...", MENU_WIDTH)));
@@ -132,7 +130,7 @@ public class News {
         clear(); // clear list
     }
 
-    /** updates news after each update */
+    /** updates news after each advance */
     void update() {
         // increment age of all alerts
         for(int i = 0; i < reel.size(); i++) {
@@ -141,7 +139,7 @@ public class News {
     }
 
     // coloring depending on alert type
-    protected String headlineColor(String headline, int type) {
+    private String headlineColor(String headline, int type) {
         return switch (type) {
             case ACHIEVEMENT -> bold(blue(headline));
             case BAD_STOCK -> red(headline);
@@ -154,7 +152,7 @@ public class News {
         }; 
     }
     // searches "random_headlines.txt" and returns random one
-    protected String randomHeadline() {
+    private String randomHeadline() {
         final int RHF_LENGTH = 42; // may change, file length
         Random random = new Random();
         int randomLineIndex = random.nextInt(RHF_LENGTH);
@@ -174,7 +172,7 @@ public class News {
             return "Missing 'random_headlines.txt' asset";
         }
     }
-    protected void printEmptyNewsRoll(StringBuilder line) {
+    private void printEmptyNewsRoll(StringBuilder line) {
         String emptyMsg = "No Current Headlines";
         int currentLength = "News: ".length() + emptyMsg.length();
         line.append(blue(emptyMsg));

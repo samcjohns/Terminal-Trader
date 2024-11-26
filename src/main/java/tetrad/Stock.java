@@ -109,11 +109,11 @@ class Stock {
         else {
             double percentChange = ((rand.nextDouble() * 5) * (1 + vol));  // 1. Random noise
             percentChange *= (rand.nextInt() % 2 == 0) ? -1 : 1;           // 2. Determine up or down
-            percentChange += trend;                                        // 3. Incorporate overall trend
+            percentChange += trend + mkt.getTrend();                       // 3. Incorporate overall trend
             value += (value * (percentChange / 100));                      // 4. Apply change
             value = round(value);                                          // 5. Round to dollar value
 
-            // trend show only have a small effect, not driving force
+            // trend should only have a small effect, not driving force
             trend /= 2;                                                              // incorporate previous trend
             trend += ((target_value - value)/target_value) * rand.nextDouble() * 10; // Adjust trend toward target_value
             trend = Math.max(-5, Math.min(trend, 5));                                // cap trend
@@ -200,7 +200,7 @@ class Stock {
     private void arcadeBehavior() {
         // channel for pushing alerts
         News channel = game.news;
-        
+
         Random rand = new Random();
 
         double percentChange = ((rand.nextDouble() * 10) * vol); // 1. Random noise

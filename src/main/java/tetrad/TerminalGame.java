@@ -36,7 +36,7 @@ import static tetrad.Mutil.yellowB;
 public class TerminalGame extends Game {
     
     public TerminalGame() {
-        news = new TerminalNews();
+        news = new News();
         mkt = new Market(this);
         usr = new TerminalUser(news, this);
     }
@@ -148,8 +148,7 @@ public class TerminalGame extends Game {
             clearScreen();
             printHeader();
             news.roll();
-
-            
+            mkt.print();
 
             // command tray
             System.out.println(cyan("Enter - Exit | '/' - Advance | ',' - View | '.' - Buy"));
