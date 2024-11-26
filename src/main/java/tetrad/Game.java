@@ -1,5 +1,6 @@
 package tetrad;
 
+import static tetrad.Mutil.DB_LOG;
 import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.clearScreen;
 import static tetrad.Mutil.dollar;
@@ -17,7 +18,7 @@ public class Game {
 
     public Game() {
         news = new News();
-        mkt = new Market(news);
+        mkt = new Market(this);
         usr = new User(news, this);
     }
 
@@ -66,11 +67,11 @@ public class Game {
     // dev tools
     protected void createGen() {
         // builds save files for stocks and market
-        mkt = new Market(news);
+        mkt = new Market(this);
 
         // prep market
         mkt.setTrend(0); // for now FIXME
-        mkt.setNumStocks(10);
+        mkt.setNUM_STOCKS(10); 
 
         try {
             Stock s0 = new Stock(0, "Burley Buns", 18.24, 0.7, 2);
@@ -103,14 +104,13 @@ public class Game {
             s9.save();
         } 
         catch (InitException e) {
-            System.err.println("Exception In: createGen()");
-            System.err.println("This: " + e.getMessage());
+            DB_LOG("Exception In: createGen(), THIS: " + e.getMessage());
         }
 
         mkt.save();
 
         try { 
-            mkt.load(); // mkt should look for s0-9 because i set numStocks to 10
+            mkt.load(); // mkt will now look for the stocks created above.
         } 
         catch (InitException e) { 
             System.err.println(e.getMessage());

@@ -105,10 +105,10 @@ class Stock {
         // operate with traditional stock behavior
         else {
             double percentChange = ((rand.nextDouble() * 5) * (1 + vol));  // 1. Random noise
-            percentChange *= (rand.nextInt() % 2 == 0) ? -1 : 1;     // 2. Determine up or down
-            percentChange += trend;                                  // 3. Incorporate overall trend
-            value += (value * (percentChange / 100));                // 4. Apply change
-            value = round(value);                                    // 5. Round to dollar value
+            percentChange *= (rand.nextInt() % 2 == 0) ? -1 : 1;           // 2. Determine up or down
+            percentChange += trend;                                        // 3. Incorporate overall trend
+            value += (value * (percentChange / 100));                      // 4. Apply change
+            value = round(value);                                          // 5. Round to dollar value
 
             // trend show only have a small effect, not driving force
             trend /= 2;                                                              // incorporate previous trend
