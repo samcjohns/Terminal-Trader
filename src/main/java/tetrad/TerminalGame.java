@@ -1,8 +1,3 @@
-/**
- * Child class of Game designed for terminal use. Child methods handle output
- * and formatting. Parent class, Game, should have not print methods. This will
- * help with further developement.
- */
 package tetrad;
 
 import java.io.BufferedReader;
@@ -35,6 +30,20 @@ import static tetrad.Mutil.redB;
 import static tetrad.Mutil.yellow;
 import static tetrad.Mutil.yellowB;
 
+/**
+ * Game child-class designed for terminal use.
+ * 
+ * @author Samuel Johns
+ * Created: November 15, 2024
+ * 
+ * Description: A child class of Game that handles terminal output and user 
+ *              input from the terminal. It is entirely responsible for the
+ *              gameplay control flow and user input is not handled by any
+ *              other class. It has a Market reference which holds all the 
+ *              stocks, a News reference for events that occur ingame, and a
+ *              User reference to keep track of important information for the
+ *              current user.
+ */
 public class TerminalGame extends Game {
     
     public TerminalGame() {
@@ -43,7 +52,12 @@ public class TerminalGame extends Game {
         usr = new User(this);
     }
     
-    // public control functions
+    /**
+     * Top-level initialization function; Functions as the main menu and
+     * handles new game creation or loading from an existing file.
+     * @param scanner user input scanner
+     * @return false if the user selects to exit the program
+     */
     public boolean startGame(Scanner scanner) {
         while(true) {
             showMainMenu();
@@ -87,56 +101,69 @@ public class TerminalGame extends Game {
             }
         }
     }
-    public boolean doTurn(Scanner scanner) {
-        showTurnMenu();
-        System.out.print("---Select: ");
-        String input = scanner.nextLine();
-        switch (input) {
-            case "1" -> portfolioMenu(scanner); // show portfolio
-            case "2" -> marketMenu(scanner);    // show stock exchange
-            case "3" -> {
-                // user stats
-                clearScreen();
-                printHeader();
-                usr.showStats();
-                pause(scanner);
-            }
-            case "4" -> {
-                // achievements
-                clearScreen();
-                printHeader();
-                usr.showAchievements();
-                pause(scanner);
-            }
-            case "5" -> {
-                clearScreen();
-                printHeader();
-                news.page();
-                pause(scanner);
-            }
-            case "6" -> {
-                saveGame();
-                return true;
-            }
+    /**
+     * Main gameplay function, handles all gameplay until the user chooses to
+     * exit. Use this method after calling startGame(). 
+     * @param scanner user input scanner
+     */
+    public void play(Scanner scanner) {
+        while (true) {
+            clearScreen();
+            printHeader();
+            showPlayMenu();
+            System.out.print("---Select: ");
+            String input = scanner.nextLine();
+            switch (input) {
+                case "1" -> portfolioMenu(scanner); // show portfolio
+                case "2" -> marketMenu(scanner);    // show stock exchange
+                case "3" -> {
+                    // user stats
+                    clearScreen();
+                    printHeader();
+                    usr.showStats();
+                    pause(scanner);
+                }
+                case "4" -> {
+                    // achievements
+                    clearScreen();
+                    printHeader();
+                    usr.showAchievements();
+                    pause(scanner);
+                }
+                case "5" -> {
+                    clearScreen();
+                    printHeader();
+                    news.page();
+                    pause(scanner);
+                }
+                case "6" -> {
+                    saveGame();
+                }
+                case "7" -> {
+                    break;
+                }
 
-            // cheat codes :)
-            // enter command, then enter value
-            case "adv" -> {
-                input = scanner.nextLine();
-                advance(Integer.parseInt(input));
-            }
-            case "give" -> {
-                input = scanner.nextLine();
-                usr.setCash(Integer.parseInt(input) + usr.getCash());
-            }
-            default -> {
-                // help case
-                System.out.println("Invalid Selection");
-                pause(scanner);
+                // cheat codes :)
+                // enter command, then enter value
+                case "adv" -> {
+                    input = scanner.nextLine();
+                    advance(Integer.parseInt(input));
+                }
+                case "give" -> {
+                    input = scanner.nextLine();
+                    usr.setCash(Integer.parseInt(input) + usr.getCash());
+                }
+                default -> {
+                    // help case
+                    System.out.println("Invalid Selection");
+                    pause(scanner);
+                }
             }
         }
-        return false;
     }
+    /**
+     * Exit method, used for cleanup.
+     */
     public void endGame() {
         // doesn't do anything yet, used for cleanup
     }
@@ -158,9 +185,7 @@ public class TerminalGame extends Game {
 
             String command = scanner.nextLine();
             switch (command) {
-                case "" -> {
-                    return;
-                }
+                case "" -> { return; }
                 case "/" -> advance();
                 case "." -> doSell(scanner);
                 case ";" -> usr.portfolio.printTransactionLogs();
@@ -399,7 +424,7 @@ public class TerminalGame extends Game {
         System.out.println("-".repeat(MENU_WIDTH));
         System.out.print("Please make a selection: ");
     }
-    private void showTurnMenu() {
+    private void showPlayMenu() {
         clearScreen();
         printHeader();
         news.roll();
