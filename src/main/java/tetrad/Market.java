@@ -143,7 +143,7 @@ class Market {
 
             // load all stocks
             for (int i = 0; i < NUM_STOCKS; i++) {
-                Stock stock = new Stock(this, game.news);
+                Stock stock = new Stock(this, game);
                 stock.load(i);
                 stocks[i] = stock;
             }

@@ -38,7 +38,7 @@ public class TerminalGame extends Game {
     
     public TerminalGame() {
         news = new TerminalNews();
-        mkt = new Market(news);
+        mkt = new Market(this);
         usr = new TerminalUser(news, this);
     }
     
@@ -95,13 +95,7 @@ public class TerminalGame extends Game {
                 // show portfolio
                 usr.showPortfolio(scanner);
             }
-            case "2" -> {
-                // show stock exchange
-                clearScreen();
-                printHeader();
-                mkt.print(true);
-                marketView(scanner);
-            }
+            case "2" -> marketMenu(scanner); // show stock exchange
             case "3" -> {
                 // user stats
                 clearScreen();
@@ -127,7 +121,7 @@ public class TerminalGame extends Game {
                 return true;
             }
 
-            // debug codes :)
+            // cheat codes :)
             // enter command, then enter value
             case "adv" -> {
                 input = scanner.nextLine();
@@ -150,7 +144,7 @@ public class TerminalGame extends Game {
     }
 
     // private gameplay functions
-    private void marketView(Scanner scanner) {
+    private void marketMenu(Scanner scanner) {
         while (true) {
             clearScreen();
             printHeader();
@@ -266,7 +260,7 @@ public class TerminalGame extends Game {
                     return;
                 }
                 case "," -> {
-                    if (Integer.parseInt(view) < Market.MAX_STOCKS) {
+                    if (Integer.parseInt(view) < Market.NUM_STOCKS) {
                         view = "" + (Integer.parseInt(view) + 1);
                     }
                     else {
