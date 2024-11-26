@@ -62,16 +62,41 @@ class Market {
     }
 
     // getters
+    /**
+     * @return market trend
+     */
     double      getTrend() { return trend; }
+    /**
+     * @return market volatility
+     */
     double        getVol() { return vol; }
+    /**
+     * @param id stock id
+     * @return stock with given id
+     */
     Stock getStock(int id) { return stocks[id]; }
 
     // setters
+    /**
+     * Sets market trend
+     * @param trend new market trend
+     */
     void    setTrend(int trend) { this.trend = trend; }
+    /**
+     * Sets market volatility
+     * @param vol new market volatility
+     */
     void        setVol(int vol) { this.vol = vol; }
+    /**
+     * Sets static number of ingame stocks
+     * @param num new total number of stocks
+     */
     void setNUM_STOCKS(int num) { NUM_STOCKS = num; }
 
     // save functions
+    /**
+     * Saves market to "mkt.txt"
+     */
     void save() {
         // saves all info about the market to a unique file
         try {
@@ -118,6 +143,10 @@ class Market {
             s.save();
         }
     }
+    /**
+     * Loads market from "mkt.txt"
+     * @throws InitException if file is corrupted or missing
+     */
     void load() throws InitException {
         // determine correct save path
         String fileName;
