@@ -46,18 +46,24 @@ public class News {
         this.reel = new LinkedList<>();
     }
 
+    /**
+     * clears all alerts in the reel
+     */
     void clear() {
         reel.clear();
     }
 
-    /** Adds a new Alert to the reel
+    /** 
+     * adds a new Alert to the reel
      * @param newAlert is the Alert to be pushed to the reel
      */
     void push(Alert newAlert) {
         reel.addFirst(newAlert);
     }
 
-    /** prints a single line of the most important headlines */
+    /** 
+     * prints a single line of the most important headlines 
+     */
     void roll() {
         StringBuilder line = new StringBuilder(bold(cyan("News: ")));
         int currentLength = "News: ".length();
@@ -113,7 +119,9 @@ public class News {
         System.out.println(line.toString());
     }
 
-    /** prints a whole page containing all current events */
+    /** 
+     * prints a whole page containing all current events 
+     */
     void page() {
         System.out.println(""); // spacing
         System.out.println(italic(center("Mind the dust...", MENU_WIDTH)));
@@ -130,7 +138,9 @@ public class News {
         clear(); // clear list
     }
 
-    /** updates news after each advance */
+    /** 
+     * updates age of alerts after each advance 
+     */
     void update() {
         // increment age of all alerts
         for(int i = 0; i < reel.size(); i++) {
