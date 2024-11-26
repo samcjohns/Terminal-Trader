@@ -26,6 +26,8 @@ import static tetrad.Mutil.red;
  *              of the user during gameplay. It handles checking for
  *              achievements, saving and loading a dedicated achievements file, 
  *              and managing awards that the User gains from each achievement.
+ * 
+ * @see User
  */
 
 /* Titles, Descriptions, and Awards for Achievements

@@ -37,6 +37,8 @@ import static tetrad.Mutil.yellow;
  *              their type. The News class producing a "headline" string to 
  *              displaying the most important events and a "page" of events
  *              that TerminalGame prints to screen.
+ * 
+ * @see Alert
  */
 
 public class News {

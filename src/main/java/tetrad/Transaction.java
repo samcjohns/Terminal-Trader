@@ -7,6 +7,9 @@ package tetrad;
  * 
  * @author Samuel Johns
  * Created: November 15, 2024
+ * 
+ * @see Stock
+ * @see Portfolio
  */
 public class Transaction {
     private Stock stock;

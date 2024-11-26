@@ -45,6 +45,10 @@ import static tetrad.Mutil.yellowB;
  *              stocks, a News reference for events that occur ingame, and a
  *              User reference to keep track of important information for the
  *              current user.
+ * 
+ * @see User
+ * @see Market
+ * @see News
  */
 
 public class Game {

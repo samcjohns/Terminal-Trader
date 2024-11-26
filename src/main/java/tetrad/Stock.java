@@ -26,6 +26,9 @@ import static tetrad.Mutil.round;
  *              are responsible for saving and loading themselves to and from
  *              file. They are also responsible for determining their next own
  *              price fluctuations.
+ * 
+ * @see Market
+ * @see Log
  */
 class Stock {
     private int id;           // unique id number

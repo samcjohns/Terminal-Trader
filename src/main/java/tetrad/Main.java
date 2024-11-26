@@ -9,8 +9,10 @@ import java.util.Scanner;
  * Top-level functionality class
  * @author Samuel Johns
  * Created: November 15, 2024
+ * 
+ * @see Game
  */
-// FIXME: is this class necessary?
+
 public class Main {    
     static boolean NDEV = false; // false when testing in VSCode
     static boolean INIT = false; // true for first start only
