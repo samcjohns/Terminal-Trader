@@ -315,6 +315,15 @@ public class Mutil {
         System.out.print("\033[0G");  // Move cursor back to the beginning of the line
     }
     /**
+     * Clears a number of lines (current and above)
+     * @param lines number of lines to clear
+     */
+    public static void clearLine(int lines) {
+        for (int i = 0; i < lines; i++) {
+            clearLine();
+        }
+    }
+    /**
      * Experimental function for printing taxman screen from ASCI art
      * @deprecated WILL BE MOVED TO TERMINALGAME
      */

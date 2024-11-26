@@ -117,7 +117,7 @@ class Portfolio {
      * @throws InvalidSelectionException if the given index is invalid
      */
     Stock stockAt(int i) throws InvalidSelectionException {
-        if (i < stocks.length) {
+        if (i < size) {
             return stocks[i];
         }
         else {
@@ -160,6 +160,7 @@ class Portfolio {
             }
         }
 
+        // Case 2: Stock does not exist in portfolio
         stocks[size] = newStock;
         amounts[size] = addAmount;
         prices[size] = price; // Store the purchase price as the initial price
@@ -436,7 +437,7 @@ class Portfolio {
             System.out.println();
         }
     }
-    
+
     // helper functions
     private void sort() {
         for (int i = 0; i < size; i++) {

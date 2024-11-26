@@ -304,6 +304,7 @@ public class TerminalGame extends Game {
                 if (selection == 0) {
                     return; // exit case
                 }
+                clearLine();
                 Stock stock = usr.portfolio.stockAt(selection - 1);
 
                 System.out.print("---Amount: ");
@@ -311,6 +312,7 @@ public class TerminalGame extends Game {
                 if (amount == 0) {
                     return; // exit case
                 }
+                clearLine();
 
                 System.out.println(usr.sell(stock, amount));
                 pause(2000);
@@ -318,6 +320,8 @@ public class TerminalGame extends Game {
             } 
             catch (InvalidSelectionException e) {
                 System.out.println(e.getMessage());
+                pause(1000); // wait one second
+                clearLine(2); // clear error message
             }
         }
     }
