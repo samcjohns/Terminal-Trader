@@ -19,7 +19,18 @@ public class Transaction {
         this.price = price;
     }
 
+    /**
+     * @return relevant stock in the transaction
+     */
     Stock  getStock() { return stock; }
+
+    /**
+     * @return amount of stock purchased or sold (negative for a sale)
+     */
     int   getAmount() { return amount; }
+
+    /**
+     * @return returns purchase price of the stock purchased
+     */
     double getPrice() { return price; }
 }
