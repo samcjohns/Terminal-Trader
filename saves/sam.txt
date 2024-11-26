@@ -1,7 +1,7 @@
 ---USER-INFO---
 sam
-1000.0
-0
+884.5
+5711
 ---INFO-END---
 For Terminal Trader, a text-based stock game.
 Developed and Designed by Samuel Johns

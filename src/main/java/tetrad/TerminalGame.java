@@ -161,10 +161,13 @@ public class TerminalGame extends Game {
                 case "" -> {
                     return;
                 }
-                case "|" -> advance();
+                case "/" -> advance();
                 case "." -> doSell(scanner);
                 case ";" -> usr.portfolio.printTransactionLogs();
-                default -> System.out.println("Invalid Input");
+                default -> {
+                    System.out.println("Invalid Input");
+                    pause(1000);
+                }
             }
         }
     }
@@ -314,7 +317,7 @@ public class TerminalGame extends Game {
                 }
                 clearLine();
 
-                System.out.println(usr.sell(stock, amount));
+                System.out.println(yellow(usr.sell(stock, amount)));
                 pause(2000);
                 break;
             } 
@@ -350,7 +353,7 @@ public class TerminalGame extends Game {
                 }
                 clearLine();
 
-                System.out.println(usr.buy(stock, amount));
+                System.out.println(yellow(usr.buy(stock, amount)));
                 pause(2000);
                 break;
             } 

@@ -207,26 +207,26 @@ class User {
 
                     // format amount (max length 10)
                     amount += center(portfolio.amountAt(i), 8);
-                    line = add(line, amount, 20); // add to line
+                    line = add(line, amount, 25); // add to line
 
                     // format total (max length 12)
                     total += dollar(portfolio.amountAt(i) * stock.getValue());
-                    line = add(line, total, 32);
+                    line = add(line, total, 37);
 
                     // format current
                     current +=  dollar(stock.getValue());
-                    line = add(line, current, 44);
+                    line = add(line, current, 49);
 
                     // format percent change
                     change += String.format("%.2f", stock.getChange());
                     // color accordingly
                     change = numColor(change);
-                    line = add(line, change, 60);
+                    line = add(line, change, 65);
 
                     // format gain
                     gain += String.format("%.2f", portfolio.calculateGain(i));
                     gain = numColor(gain);
-                    line = add(line, gain, 83);
+                    line = add(line, gain, 88);
                     System.out.println(line); // output final line
                 }
             }
