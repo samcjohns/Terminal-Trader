@@ -5,14 +5,14 @@ import java.io.FileNotFoundException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import static tetrad.Mutil.pause;
-
 /**
  * Top-level functionality class
  * @author Samuel Johns
  * Created: November 15, 2024
+ * 
+ * @see Game
  */
-// FIXME: is this class necessary?
+
 public class Main {    
     static boolean NDEV = false; // false when testing in VSCode
     static boolean INIT = false; // true for first start only
@@ -32,22 +32,11 @@ public class Main {
 
         Scanner scanner = getSource(DEBUG, DEBUG_MODE);
         
-        // outer loop: main menu
-        // inner loop: in-game
         try {
             while (!exit) {
-                TerminalGame game = new TerminalGame();
+                Game game = new Game();
                 exit = !game.startGame(scanner);
-                boolean back = false;
-                while (!back && !exit) {
-                    try {
-                        back = game.doTurn(scanner);
-                    } 
-                    catch (NumberFormatException e) {
-                        System.out.println("Invalid Input");
-                        pause(1000);
-                    }
-                }
+                game.play(scanner);
                 game.endGame();
             }
             scanner.close();

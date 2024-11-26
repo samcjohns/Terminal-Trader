@@ -26,6 +26,8 @@ import static tetrad.Mutil.numColor;
  *              behvavioral variables for stock advances. When the market saves
  *              and loads, it is responsible for calling each stock save and
  *              load method as well.
+ * 
+ * @see Stock
  */
 
 class Market {

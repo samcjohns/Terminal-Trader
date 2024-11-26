@@ -16,6 +16,8 @@ package tetrad;
  *              have a type which signifies the kind of event and how it will
  *              be displaying by the News class. It also has an age attribute.
  *              to track how old the alert is.
+ * 
+ * @see News
  */
 
 class Alert {

@@ -2,9 +2,19 @@ package tetrad;
 
 import java.util.LinkedList;
 
+/**
+ * Limited-size, log for storing item in order
+ * 
+ * @author Samuel Johns
+ * Created: November 15, 2024
+ * 
+ * Description: Fixed-size, linked list generic for storing items in order.
+ *              The Log has a maxSize, when the size is exceeded, the oldest
+ *              is removed and the next item is added.
+ */
 public class Log<T> {
-    private final int maxSize; // Maximum size of the log
-    private final LinkedList<T> log; // Data structure to hold the elements
+    private final int maxSize;       // maximum size of the log
+    private final LinkedList<T> log; // data structure to hold the elements
 
     public static final int DEFAULT_SIZE = 100;
 
@@ -14,7 +24,10 @@ public class Log<T> {
         this.log = new LinkedList<>();
     }
 
-    // Add a new item to the front
+    /**
+     * Adds a new item to the front of the log
+     * @param item item to be pushed
+     */
     public void push(T item) {
         // Add the new value to the front
         log.addFirst(item);
@@ -25,7 +38,10 @@ public class Log<T> {
         }
     }
 
-    // Get the most recent value
+    /**
+     * Gets the most recent item from the log
+     * @return most recent item, T
+     */
     public T recent() {
         if (log.isEmpty()) {
             throw new IllegalStateException("Log is empty.");
@@ -33,7 +49,11 @@ public class Log<T> {
         return log.getFirst();
     }
 
-    // Get the ith most recent value
+    /**
+     * Returns the item at i
+     * @param i index of the item to be returned
+     * @return the item at index i
+     */
     public T at(int i) {
         if (i < 0 || i >= log.size()) {
             throw new IndexOutOfBoundsException("Index out of bounds: " + i);
@@ -41,7 +61,10 @@ public class Log<T> {
         return log.get(i);
     }
 
-    // Get the current size of the log
+    /**
+     * Returns the size of the log
+     * @return size of this Log
+     */
     public int size() {
         return log.size();
     }

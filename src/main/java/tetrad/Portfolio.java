@@ -24,6 +24,10 @@ import static tetrad.Mutil.round;
  *              about stocks owned, overall performance, transaction history, 
  *              total valuation. Originally designed to behave as a Stock-Int
  *              pair, but has been given more functionality over time.
+ * 
+ * @see User
+ * @see Stock
+ * @see Log
  */
 
 class Portfolio {
