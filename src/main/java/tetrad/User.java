@@ -21,6 +21,21 @@ import static tetrad.Mutil.numColor;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.yellow;
 
+/**
+ * Class for representing and storing information about the player.
+ * 
+ * @author Samuel Johns
+ * Created: November 15, 2024
+ * 
+ * Description: The User class is for representing the player and handling
+ *              behavior ingame. It stores the username, cash held, number of
+ *              advances taken, the players Portfolio, the relevant
+ *              Achievements instance, and the relevant game instance.
+ * 
+ * @see Portfolio
+ * @see Achievements
+ * @see Game
+ */
 class User {
     private String name; // name of the user
     private double cash; // total amount of liquid cash
@@ -46,7 +61,10 @@ class User {
     }
     
     // gameplay functions
-    // updates values after a game advance
+    /**
+     * Increments the number of advances, updates the porfolio, and checks for
+     * achievements.
+     */
     void update() {
         portfolio.update();
         advances++;
@@ -54,18 +72,48 @@ class User {
     }
     
     // getters
+    /**
+     * @return username of the user
+     */
     String getName() { return name; }
+
+    /**
+     * @return cash held by the user
+     */
     double getCash() { return cash; }
+
+    /**
+     * @return net worth of the user
+     */
     double getNet() { return portfolio.getValue() + cash; }
+
+    /**
+     * @return number of advances of the user
+     */
     int    getAdvances() { return advances; }
+
+    /**
+     * @return a referece to the Portfolio of the user
+     */
     Portfolio getPortfolio() { return portfolio; }
 
     // setters
+    /**
+     * Sets the username of the user
+     * @param name new username
+     */
     void setName(String name) { this.name = name; }
+
+    /**
+     * Sets the cash held by the user
+     * @param cash new amount of cash held
+     */
     void setCash(double cash) { this.cash = cash; }
-    void setAdvances(int adv) { advances = adv; }
 
     // save functions
+    /**
+     * Saves the information of the user to <username>.txt
+     */
     void save() {
         // determine correct save path
         String fileName;
@@ -101,6 +149,14 @@ class User {
         portfolio.save();
         acv.save();
     }
+
+    /**
+     * Loads the information of the user from <username>.txt
+     * @param username User's name and the file from which to load from
+     * @param market Market instance containing the stocks that User's
+     * portfolio contains
+     * @throws InitException if file is corrupted or missing
+     */
     void load(String username, Market market) throws InitException {
         // determine correct save path
         String fileName;
@@ -134,6 +190,15 @@ class User {
         }
     }
 
+    /**
+     * Simulates a purchase made by the user, adds a number of shares to the 
+     * user's portfolio and removes purchase price from the user's cash.
+     * @param stock stock to be purchased
+     * @param amount number of stocks to be purchased
+     * @return a transaction message of the successful purchase
+     * @throws InvalidSelectionException if the stock is invalid or if the user
+     * does not have enough cash.
+     */
     String buy(Stock stock, int amount) throws InvalidSelectionException {
         // check if user can afford purchase (throws if stock doesn't exist)
         if (stock.getValue() * amount > cash) {
@@ -149,6 +214,14 @@ class User {
         return "Bought " + amount + " shares of " + stock.getName() + " for " + dollar(stock.getValue() * amount);
     }
     
+    /**
+     * Simulates a sale made by the user, removes a number of shares from the
+     * user's portfolio and returns sale price to the user's cash.
+     * @param stock
+     * @param amount
+     * @return
+     * @throws InvalidSelectionException
+     */
     String sell(Stock stock, int amount) throws InvalidSelectionException {
 
         portfolio.remove(stock, amount);   // may throw
@@ -160,6 +233,11 @@ class User {
         // transaction message
         return "Sold " + amount + " shares of " + stock.getName() + " for " + dollar(stock.getValue() * amount);
     }
+
+    /**
+     * Prints a page showing the portfolio, a graph of performance, and 
+     * information about the user.
+     */
     void showPortfolio() {
         game.news.roll();
 
@@ -244,9 +322,17 @@ class User {
             cyan(bold("Net Worth: ") + dollar(getNet()))
         );
     }
+
+    /**
+     * Prints a page showing achievements locked and unlocked for the user.
+     */
     void showAchievements() {
         acv.printPage();
     }
+
+    /**
+     * Prints a page showing the stats of the user.
+     */
     void showStats() {
         String traderScore;
         if (advances == 0) {
