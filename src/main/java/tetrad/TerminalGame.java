@@ -12,7 +12,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.MENU_WIDTH;
-import static tetrad.Mutil.add;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.blueB;
 import static tetrad.Mutil.center;
@@ -150,51 +149,7 @@ public class TerminalGame extends Game {
             printHeader();
             news.roll();
 
-            // print all stocks and info
-            // header
-            System.out.println(center("Market", MENU_WIDTH, "~"));
-            System.out.println("");
-
-            // Print the header
-            String header = "";
             
-            header = add(header, "ID", 0);
-            header = add(header, "Stock Name", 10);
-            header = add(header, "Current Price", 30);
-            header = add(header, "Recent", 50);
-            header = add(header, "10-Day", 65);
-
-            System.out.println(header);
-            System.out.println(""); // spacing
-
-            // Print each stock's information
-            for (int i = 0; i < Market.NUM_STOCKS; i++) {
-                Stock stock = mkt.getStock(i);
-                if (stock != null) {
-                    String line = "";
-                    line += (i + 1) + ". ";
-
-                    try {
-                        // Add formatted stock details
-                        line = add(line, stock.getName(), 10); // Stock Name
-                        line = add(line, String.format("$%.2f", stock.getValue()), 30); // Current Price
-                        line = add(line, numColor(String.format("%.2f", stock.getChange())), 50); // Recent Change
-                        line = add(line, numColor(String.format("%.2f", stock.getChange(10))), 74); // 10-Day Change
-                    }
-                    catch (IllegalArgumentException e) {
-                        // some number is unexpectedly large
-                        // stop printing line
-                    }
-                    
-                    System.out.println(line); // Output the line for each stock
-                } 
-                else {
-                    System.out.println("Stock information not available.");
-                }
-            }
-
-            System.out.println(""); // spacing
-            System.out.println("~".repeat(MENU_WIDTH));
 
             // command tray
             System.out.println(cyan("Enter - Exit | '/' - Advance | ',' - View | '.' - Buy"));
