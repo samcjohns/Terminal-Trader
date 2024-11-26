@@ -7,6 +7,12 @@ import java.util.Scanner;
 
 import static tetrad.Mutil.pause;
 
+/**
+ * Top-level functionality class
+ * @author Samuel Johns
+ * Created: November 15, 2024
+ */
+// FIXME: is this class necessary?
 public class Main {    
     static boolean NDEV = false; // false when testing in VSCode
     static boolean INIT = false; // true for first start only
@@ -30,7 +36,7 @@ public class Main {
         // inner loop: in-game
         try {
             while (!exit) {
-                Game game = new Game();
+                TerminalGame game = new TerminalGame();
                 exit = !game.startGame(scanner);
                 boolean back = false;
                 while (!back && !exit) {

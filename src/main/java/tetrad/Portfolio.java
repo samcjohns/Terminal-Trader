@@ -1,13 +1,3 @@
-/**
- * Class: Portfolio
- * Summary: Data Structure for Stocks Owned 
- * 
- * @Author: Samuel Johns
- * @Date: October 29, 2024
- * 
- * Description: A data structure for storing a Stock-Int pair, with some added
- *              functionality. Pair is stored by total valuation.
- */
 package tetrad;
 
 import java.io.File;
@@ -18,29 +8,41 @@ import java.io.PrintWriter;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import static tetrad.Market.MAX_STOCKS;
+import static tetrad.Market.NUM_STOCKS;
 import static tetrad.Mutil.DB_LOG;
 import static tetrad.Mutil.HISTORY_HEIGHT;
 import static tetrad.Mutil.dollar;
 import static tetrad.Mutil.round;
 
+/**
+ * Specialized container for storing information about owned stocks
+ * 
+ * @author Samuel Johns
+ * Created: October 29, 2024
+ * 
+ * Description: The Portfolio class is a specialized container that stores data
+ *              about stocks owned, overall performance, transaction history, 
+ *              total valuation. Originally designed to behave as a Stock-Int
+ *              pair, but has been given more functionality over time.
+ */
+
 class Portfolio {
-    private final User owner; // owner of this portfolio
-    private final Stock[] stocks;
-    private final int[] amounts;
-    private final double[] prices; // original prices
+    protected final      User owner; // owner of this portfolio
+    protected final  Stock[] stocks; // all stocks currently owned
+    protected final   int[] amounts; // amount of each stock owner
+    protected final double[] prices; // original prices of stocks owned
 
-    private double value; // total valuation of all stocks
-    private Log<Double> history; 
-    private Log<Transaction> transactions; // history of transactions
+    protected           double        value; // total valuation of all stocks
+    protected      Log<Double>      history; // history of value
+    protected Log<Transaction> transactions; // history of transactions
 
-    private int size; // amount of unique stocks owned
+    protected int size; // amount of unique stocks currently owned
 
     Portfolio(User usr) {
         owner = usr;
-        stocks = new Stock[MAX_STOCKS];
-        amounts = new int[MAX_STOCKS];
-        prices = new double[MAX_STOCKS];
+        stocks = new Stock[NUM_STOCKS];
+        amounts = new int[NUM_STOCKS];
+        prices = new double[NUM_STOCKS];
         history = new Log<>(Log.DEFAULT_SIZE);
         transactions = new Log<>(Log.DEFAULT_SIZE);
         
@@ -48,17 +50,42 @@ class Portfolio {
         size = 0;
     }
 
+    /**
+     * @return number of unique stocks
+     */
     int size() { return size; }
+
+    /**
+     * @return true if no stocks are currently owned
+     */
     boolean isEmpty() { return size == 0; }
+
+    /**
+     * @return total valuation of the portfolio
+     */
     double getValue() { return value; }
+
+    /**
+     * @return total valuation of the portfolio yesterday
+     * (before the most recent advance)
+     */
     double getLast() { return history.at(history.size()-1); }
 
-    // returns recent change in value (total portfolio)
+    /**
+     * @return the difference between the current valuation and the valuation
+     * of the previous day (before the most recent advance)
+     */
     double getChange() {
         return round(((value - getLast()) / getLast()) * 100);
     }
 
-    // updates valuations and history
+    /**
+     * Updates values, current valuation, and history
+     * Used to keep the portfolio up-to-date
+     * @param push a boolean that determines whether the previous value is
+     * pushed to the history. push=true if updating after a advance.
+     * push=false if updating after a transaction.
+     */
     void update(boolean push) {
         // push = true for advancing the game
         // push = false for updating after transaction
@@ -74,19 +101,37 @@ class Portfolio {
         value = round(value); // for cleanliness
         sort();
     }
+    
+    /**
+     * Updates total valuation, does not push previous value to history. Use
+     * after a transaction.
+     */
     void update() {
         this.update(true);
     }
 
-    // helps find stock in sorted array
+    /**
+     * Returns the stock at the given position in the portfolio
+     * @param i the index of the stock
+     * @return the stock at the given index
+     * @throws InvalidSelectionException if the given index is invalid
+     */
     Stock stockAt(int i) throws InvalidSelectionException {
-        if (i < stocks.length) {
+        if (i < size) {
             return stocks[i];
         }
         else {
             throw new InvalidSelectionException("Stock not present.");
         }
     }
+
+    /** 
+     * Returns an int corresponding to the amount of stocks owned at the given
+     * position in the portfolio
+     * @param i the index of the stock
+     * @return the amount of the stock owned
+     * @throws InvalidSelectionException if the given index is invalid
+    */
     int amountAt(int i) throws InvalidSelectionException { 
         if (i < amounts.length) {
             return amounts[i];
@@ -96,7 +141,12 @@ class Portfolio {
         }
     }
 
-    // Adds stock after purchase
+    /**
+     * Adds a new holding to the portfolio
+     * @param newStock new stock to be added
+     * @param addAmount amount of stock to be added
+     * @param price purchase price of the stock
+     */
     void add(Stock newStock, int addAmount, double price) {
         // Search for stock
         for (int i = 0; i < size; i++) {
@@ -110,6 +160,7 @@ class Portfolio {
             }
         }
 
+        // Case 2: Stock does not exist in portfolio
         stocks[size] = newStock;
         amounts[size] = addAmount;
         prices[size] = price; // Store the purchase price as the initial price
@@ -120,10 +171,22 @@ class Portfolio {
         Transaction trn = new Transaction(newStock, addAmount, price);
         transactions.push(trn);
     }
+
+    /**
+     * Adds a new holding to the portfolio, assumes purchase price is current
+     * @param newStock stock to be added
+     * @param addAmount amount of stock to be added
+     */
     void add(Stock newStock, int addAmount) {
         this.add(newStock, addAmount, newStock.getValue());
     }
-    // Removes stock after sale
+
+    /**
+     * Removes a given amount of shares of a stock from the portfolio
+     * @param stock stock to be removed
+     * @param amount amount of shares to be removed
+     * @throws InvalidSelectionException if stock is not present is portfolio
+     */
     void remove(Stock stock, int amount) throws InvalidSelectionException {
         // Search for stock
         for (int i = 0; i < size; i++) {
@@ -153,45 +216,12 @@ class Portfolio {
         throw new InvalidSelectionException("Invalid Stock Selected");
     }
 
-    // helper functions
-    private void sort() {
-        for (int i = 0; i < size; i++) {
-            double maxValue = -1;
-            int maxIndex = -1;
-            for (int j = i; j < size; j++) {
-                if (stocks[j].getValue() > maxValue) {
-                    maxValue = stocks[j].getValue();
-                    maxIndex = j;
-                }
-            }
-            move(maxIndex, i);
-        }
-    }
-    private void removeStock(int i) {
-        stocks[i] = null;
-        amounts[i] = -1;
-        prices[i] = 0;
-        move(i, --size); // swap with last item to fill hole
-    }
-    private void move(int index, int newIndex) {
-        if (index == newIndex) {
-            return;
-        }
-
-        // swap index and newIndex
-        Stock tempStock = stocks[newIndex];
-        int tempAmount = amounts[newIndex];
-        double tempPrice = prices[newIndex];
-
-        stocks[newIndex] = stocks[index];
-        amounts[newIndex] = amounts[index];
-        prices[newIndex] = prices[index];
-
-        stocks[index] = tempStock;
-        amounts[index] = tempAmount;
-        prices[index] = tempPrice;
-    }
-    // Calculate gain or loss for each stock
+    /** 
+     * Returns percent gain or loss on a particular investment
+     * @param index index of the relevant stock
+     * @return the percent gain or loss on the stock given by index
+     * @throws InvalidSelectionException if index is invalid
+    */
     double calculateGain(int index) throws InvalidSelectionException {
         if (index < size) {
             double currentValue = stocks[index].getValue(); // Get the current value of the stock
@@ -210,66 +240,10 @@ class Portfolio {
         }
     }
 
-    void printTransactionLogs() {
-        for (int i = 0; i < transactions.size(); i++) {
-            System.out.println(""); // spacing
-            System.out.println("Stock: " + transactions.at(i).getStock().getName());
-            System.out.println("Amount: " + transactions.at(i).getAmount());
-            System.out.println("At: " + dollar(transactions.at(i).getPrice()));
-        }
-    }
-    void printHistory() {
-        final int ROWS = HISTORY_HEIGHT;       // max graph height
-        final int COLS = history.size();       // max graph length
-        char[][] array = new char[ROWS][COLS]; // for building graph
-    
-        // Fill the array with spaces
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLS; j++) {
-                array[i][j] = ' ';
-            }
-        }
-
-        // Find upper and lower bounds
-        double minVal = Double.POSITIVE_INFINITY;
-        double maxVal = Double.NEGATIVE_INFINITY;
-        for (int i = 0; i < history.size(); i++) {
-            double val = history.at(i);
-            if (val > maxVal) {
-                maxVal = val;
-            }
-            if (val < minVal) {
-                minVal = val;
-            }
-        }
-
-        // Determine bins for graph height
-        double range = maxVal - minVal;
-        double binSize = range / ROWS;
-    
-        // Build graph in array
-        for (int i = 0; i < history.size(); i++) {
-            // Calculate height of the bar based on current value
-            int barHeight = (int) ((history.at(i) - minVal) / binSize);
-    
-            // Ensure barHeight is within the bounds of the array
-            barHeight = Math.min(barHeight, ROWS - 1);
-            barHeight = Math.max(barHeight, 0); // This will be at least 0
-            
-            // Fill the graph from the bottom up
-            for (int j = barHeight; j >= 0; j--) {
-                array[ROWS - j - 1][COLS - i - 1] = '█'; // Fill upwards, ensuring the lowest index is the bottom
-            }
-        }
-    
-        // Print graph
-        for (int i = 0; i < ROWS; i++) { // Print from top to bottom
-            for (int j = 0; j < COLS; j++) {
-                System.out.print(array[i][j]);
-            }
-            System.out.println();
-        }
-    }
+    // save functions
+    /**
+     * Saves the portfolio to <username>_p.txt
+     */
     void save() {
         // determine correct save path
         String fileName;
@@ -328,6 +302,11 @@ class Portfolio {
             DB_LOG("IO Error: Portfolio Save Method -> " + e.getMessage());
         }
     }
+    /**
+     * Loads the portfolio from <username>_p.txt
+     * @param market relevant market instance for locating stocks
+     * @throws InitException if file is corrupted or missing
+     */
     void load(Market market) throws InitException {
         // determine correct save path
         String fileName;
@@ -388,5 +367,113 @@ class Portfolio {
         catch (FileNotFoundException e) {
             throw new InitException("File Not Found: " + fileName);
         }
+    }
+
+    // text functions
+    /**
+     * Prints all transactions to the terminal
+     */
+    void printTransactionLogs() {
+        for (int i = 0; i < transactions.size(); i++) {
+            System.out.println(""); // spacing
+            System.out.println("Stock: " + transactions.at(i).getStock().getName());
+            System.out.println("Amount: " + transactions.at(i).getAmount());
+            System.out.println("At: " + dollar(transactions.at(i).getPrice()));
+        }
+    }
+    
+    /**
+     * Prints a graph displaying the history of the portfolio valuation
+     */
+    void printHistory() {
+        final int ROWS = HISTORY_HEIGHT;       // max graph height
+        final int COLS = history.size();       // max graph length
+        char[][] array = new char[ROWS][COLS]; // for building graph
+    
+        // Fill the array with spaces
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                array[i][j] = ' ';
+            }
+        }
+
+        // Find upper and lower bounds
+        double minVal = Double.POSITIVE_INFINITY;
+        double maxVal = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < history.size(); i++) {
+            double val = history.at(i);
+            if (val > maxVal) {
+                maxVal = val;
+            }
+            if (val < minVal) {
+                minVal = val;
+            }
+        }
+
+        // Determine bins for graph height
+        double range = maxVal - minVal;
+        double binSize = range / ROWS;
+    
+        // Build graph in array
+        for (int i = 0; i < history.size(); i++) {
+            // Calculate height of the bar based on current value
+            int barHeight = (int) ((history.at(i) - minVal) / binSize);
+    
+            // Ensure barHeight is within the bounds of the array
+            barHeight = Math.min(barHeight, ROWS - 1);
+            barHeight = Math.max(barHeight, 0); // This will be at least 0
+            
+            // Fill the graph from the bottom up
+            for (int j = barHeight; j >= 0; j--) {
+                array[ROWS - j - 1][COLS - i - 1] = '█'; // Fill upwards, ensuring the lowest index is the bottom
+            }
+        }
+    
+        // Print graph
+        for (int i = 0; i < ROWS; i++) { // Print from top to bottom
+            for (int j = 0; j < COLS; j++) {
+                System.out.print(array[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    // helper functions
+    private void sort() {
+        for (int i = 0; i < size; i++) {
+            double maxValue = -1;
+            int maxIndex = -1;
+            for (int j = i; j < size; j++) {
+                if (stocks[j].getValue() > maxValue) {
+                    maxValue = stocks[j].getValue();
+                    maxIndex = j;
+                }
+            }
+            move(maxIndex, i);
+        }
+    }
+    private void removeStock(int i) {
+        stocks[i] = null;
+        amounts[i] = -1;
+        prices[i] = 0;
+        move(i, --size); // swap with last item to fill hole
+    }
+    private void move(int index, int newIndex) {
+        if (index == newIndex) {
+            return;
+        }
+
+        // swap index and newIndex
+        Stock tempStock = stocks[newIndex];
+        int tempAmount = amounts[newIndex];
+        double tempPrice = prices[newIndex];
+
+        stocks[newIndex] = stocks[index];
+        amounts[newIndex] = amounts[index];
+        prices[newIndex] = prices[index];
+
+        stocks[index] = tempStock;
+        amounts[index] = tempAmount;
+        prices[index] = tempPrice;
     }
 }

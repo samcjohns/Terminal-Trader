@@ -24,6 +24,21 @@ import static tetrad.Mutil.magenta;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.yellow;
 
+/**
+ * News class for holding, preparing, and displaying Alert events
+ * 
+ * @author Samuel Johns
+ * Created: November 15, 2024
+ * 
+ * Description: The News class is designed to hold alerts and report them
+ *              properly. It interprets the Alerts sent by the various classes
+ *              and displays stories for the player to predict stock behavior.
+ *              It is responsible for keeping track of Alerts, their age, and
+ *              their type. The News class producing a "headline" string to 
+ *              displaying the most important events and a "page" of events
+ *              that TerminalGame prints to screen.
+ */
+
 public class News {
     LinkedList<Alert> reel; // current alerts to be posted
 
@@ -35,12 +50,14 @@ public class News {
         reel.clear();
     }
 
-    // adds a new alert to the reel
+    /** Adds a new Alert to the reel
+     * @param newAlert is the Alert to be pushed to the reel
+     */
     void push(Alert newAlert) {
         reel.addFirst(newAlert);
     }
 
-    // prints a single line up to MENU_WIDTH length
+    /** prints a single line of the most important headlines */
     void roll() {
         StringBuilder line = new StringBuilder(bold(cyan("News: ")));
         int currentLength = "News: ".length();
@@ -96,7 +113,7 @@ public class News {
         System.out.println(line.toString());
     }
 
-    // prints a whole page containing all current events
+    /** prints a whole page containing all current events */
     void page() {
         System.out.println(""); // spacing
         System.out.println(italic(center("Mind the dust...", MENU_WIDTH)));
@@ -113,7 +130,7 @@ public class News {
         clear(); // clear list
     }
 
-    // updates news after each update
+    /** updates news after each advance */
     void update() {
         // increment age of all alerts
         for(int i = 0; i < reel.size(); i++) {
@@ -134,7 +151,6 @@ public class News {
             default -> headline; // don't color
         }; 
     }
-
     // searches "random_headlines.txt" and returns random one
     private String randomHeadline() {
         final int RHF_LENGTH = 42; // may change, file length

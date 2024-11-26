@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
@@ -14,98 +15,92 @@ import static tetrad.Mutil.add;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.numColor;
 
+/**
+ * A specialized container for stock objects
+ * 
+ * @author Samuel Johns
+ * Created: November 15, 2024
+ *
+ * Description: The Market class is responsible for storing each stock object.
+ *              Since there can be market wide behavior, the market has
+ *              behvavioral variables for stock advances. When the market saves
+ *              and loads, it is responsible for calling each stock save and
+ *              load method as well.
+ */
+
 class Market {
-    private final Stock[] stocks;
-    private int trend;
-    private int numStocks; // number of stocks that will be loaded from file
-    private final News channel; // reference to news object for pushing alerts
+    private final Stock[] stocks; // all stocks objects
+    static int NUM_STOCKS = 10;   // number of stocks on the market
+    private final Game game;      // reference to current game instance
 
-    // the total possible amount of stocks, >= numStocks
-    static final int MAX_STOCKS = 10;
+    // behavioral variables for market
+    private double trend; // current trend
+    private double vol;   // current volatility
 
-    Market(News channel) {
+    Market(Game game) {
         // call load() method to init rest
-        stocks = new Stock[MAX_STOCKS];
-        this.channel = channel;
+        stocks = new Stock[NUM_STOCKS];
+        this.game = game;
     }
 
     // gameplay functions
+    /**
+     * Advances market state to next day
+     * updates trend, volatility, and calls advance methods for each stock
+     */
     void advance() {
-        for (int i = 0; i < numStocks; i++) {
+        Random rand = new Random();
+        
+        vol += rand.nextDouble() * 0.1;           // slightly adjust volatility
+
+        double change = rand.nextDouble() / 10;   // get a random number between 0 and 0.1
+        change *= vol;                            // incorporate market volatility
+        change += (-trend) * 0.1;                 // correct trend with factor of 0.1
+        trend += change;                          // incorporate change
+        trend = Math.min(3, Math.max(trend, -3)); // limit trend
+    
+        // advance all stocks
+        for (int i = 0; i < NUM_STOCKS; i++) {
             stocks[i].advance();
         }
     }
 
-    // display functions
-    void print(boolean isSelect) {
-        System.out.println(center("Market", MENU_WIDTH, "~"));
-        System.out.println("");
-
-        // Check if there are stocks to display
-        if (numStocks == 0) {
-            System.out.println("No stocks available in the market.");
-            return;
-        }
-
-        // Print the header
-        String header = "";
-        int offset = isSelect ? 5 : 0; // Offset for selection index
-        if (isSelect) {
-            header = add(header, "ID", 0);
-        }
-        header = add(header, "Stock Name", 5 + offset);
-        header = add(header, "Current Price", 25 + offset);
-        header = add(header, "Recent", 45 + offset);
-        header = add(header, "10-Day", 60 + offset);
-        System.out.println(header);
-        System.out.println(""); // spacing
-
-        // Print each stock's information
-        for (int i = 0; i < numStocks; i++) {
-            Stock stock = stocks[i];
-            if (stock != null) {
-                String line = "";
-
-                // Add index if applicable
-                if (isSelect) {
-                    line += (i + 1) + ". ";
-                }
-
-                try {
-                    // Add formatted stock details
-                    line = add(line, stock.getName(), 5 + offset); // Stock Name
-                    line = add(line, String.format("$%.2f", stock.getValue()), 25 + offset); // Current Price
-                    line = add(line, numColor(String.format("%.2f", stock.getChange())), 45 + offset); // Recent Change
-                    line = add(line, numColor(String.format("%.2f", stock.getChange(10))), 69 + offset); // 10-Day Change
-                } 
-                catch (IllegalArgumentException e) {
-                    // some number is unexpectedly large
-                    // stop printing line
-                }
-                
-                System.out.println(line); // Output the line for each stock
-            } 
-            else {
-                System.out.println("Stock information not available.");
-            }
-        }
-
-        System.out.println(""); // spacing
-        System.out.println("~".repeat(MENU_WIDTH));
-    }
-    void print() {
-        print(false);
-    }
-
     // getters
-    int getTrend() { return trend; }
+    /**
+     * @return market trend
+     */
+    double      getTrend() { return trend; }
+    /**
+     * @return market volatility
+     */
+    double        getVol() { return vol; }
+    /**
+     * @param id stock id
+     * @return stock with given id
+     */
     Stock getStock(int id) { return stocks[id]; }
 
     // setters
-    void setTrend(int trend) { this.trend = trend; }
-    void setNumStocks(int num) { this.numStocks = num; }
+    /**
+     * Sets market trend
+     * @param trend new market trend
+     */
+    void    setTrend(int trend) { this.trend = trend; }
+    /**
+     * Sets market volatility
+     * @param vol new market volatility
+     */
+    void        setVol(int vol) { this.vol = vol; }
+    /**
+     * Sets static number of ingame stocks
+     * @param num new total number of stocks
+     */
+    void setNUM_STOCKS(int num) { NUM_STOCKS = num; }
 
     // save functions
+    /**
+     * Saves market to "mkt.txt"
+     */
     void save() {
         // saves all info about the market to a unique file
         try {
@@ -125,9 +120,10 @@ class Market {
 
             // attributes
             writer.println("---ATTRIBUTES---");
-            writer.println("DATA: trend number_of_stocks");
+            writer.println("DATA: trend vol number_of_stocks");
             writer.print(trend + " ");
-            writer.print(numStocks + " ");
+            writer.print(vol + " ");
+            writer.print(NUM_STOCKS + " ");
             writer.println(""); // newline
             writer.println("---INFO-END---");
 
@@ -151,6 +147,10 @@ class Market {
             s.save();
         }
     }
+    /**
+     * Loads market from "mkt.txt"
+     * @throws InitException if file is corrupted or missing
+     */
     void load() throws InitException {
         // determine correct save path
         String fileName;
@@ -169,13 +169,14 @@ class Market {
             scanner.nextLine();
             scanner.nextLine();
 
-            trend = Integer.parseInt(scanner.next());
-            numStocks = Integer.parseInt(scanner.next());
+            trend = Double.parseDouble(scanner.next());
+            vol = Double.parseDouble(scanner.next());
+            NUM_STOCKS = Integer.parseInt(scanner.next());
             scanner.nextLine(); // consume newline char
 
             // load all stocks
-            for (int i = 0; i < numStocks; i++) {
-                Stock stock = new Stock(this, channel);
+            for (int i = 0; i < NUM_STOCKS; i++) {
+                Stock stock = new Stock(this, game);
                 stock.load(i);
                 stocks[i] = stock;
             }
@@ -186,5 +187,56 @@ class Market {
         catch (FileNotFoundException e) {
             throw new InitException("File Not Found: " + file);
         }
+    }
+
+    // text functions
+    /**
+     * Prints info about the whole market, previews about stock prices, etc.
+     */
+    void print() {
+        // header
+        System.out.println(center("Market", MENU_WIDTH, "~"));
+        System.out.println("");
+
+        // Print the header
+        String header = "";
+        
+        header = add(header, "ID", 0);
+        header = add(header, "Stock Name", 10);
+        header = add(header, "Current Price", 30);
+        header = add(header, "Recent", 50);
+        header = add(header, "10-Day", 65);
+
+        System.out.println(header);
+        System.out.println(""); // spacing
+
+        // Print each stock's information
+        for (int i = 0; i < Market.NUM_STOCKS; i++) {
+            Stock stock = stocks[i];
+            if (stock != null) {
+                String line = "";
+                line += (i + 1) + ". ";
+
+                try {
+                    // Add formatted stock details
+                    line = add(line, stock.getName(), 10); // Stock Name
+                    line = add(line, String.format("$%.2f", stock.getValue()), 30); // Current Price
+                    line = add(line, numColor(String.format("%.2f", stock.getChange())), 50); // Recent Change
+                    line = add(line, numColor(String.format("%.2f", stock.getChange(10))), 74); // 10-Day Change
+                }
+                catch (IllegalArgumentException e) {
+                    // some number is unexpectedly large
+                    // stop printing line
+                }
+                
+                System.out.println(line); // Output the line for each stock
+            } 
+            else {
+                System.out.println("Stock information not available.");
+            }
+        }
+
+        System.out.println(""); // spacing
+        System.out.println("~".repeat(MENU_WIDTH));
     }
 }
