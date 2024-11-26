@@ -296,25 +296,29 @@ public class TerminalGame extends Game {
         }
     }
     private void doSell(Scanner scanner) {
-        try {
-            System.out.println("(0 to Exit)");
-            System.out.print("--Stock: ");
-            int selection = Integer.parseInt(scanner.nextLine());
-            if (selection == 0) {
-                return; // exit case
-            }
-            Stock stock = usr.portfolio.stockAt(selection - 1);
+        while (true) {
+            try {
+                System.out.println("(0 to Exit)");
+                System.out.print("--Stock: ");
+                int selection = Integer.parseInt(scanner.nextLine());
+                if (selection == 0) {
+                    return; // exit case
+                }
+                Stock stock = usr.portfolio.stockAt(selection - 1);
 
-            System.out.print("---Amount: ");
-            int amount = Integer.parseInt(scanner.nextLine());
-            if (amount == 0) {
-                return; // exit case
-            }
+                System.out.print("---Amount: ");
+                int amount = Integer.parseInt(scanner.nextLine());
+                if (amount == 0) {
+                    return; // exit case
+                }
 
-            System.out.println(usr.sell(stock, amount));
-        } 
-        catch (InvalidSelectionException e) {
-            System.out.println(e.getMessage());
+                System.out.println(usr.sell(stock, amount));
+                pause(2000);
+                break;
+            } 
+            catch (InvalidSelectionException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
     private void doBuy(Scanner scanner) {
@@ -343,6 +347,7 @@ public class TerminalGame extends Game {
                 clearLine();
 
                 System.out.println(usr.buy(stock, amount));
+                pause(2000);
                 break;
             } 
             catch (NoSuchElementException | NumberFormatException e) {
