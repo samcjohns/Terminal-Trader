@@ -9,6 +9,8 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
+import static tetrad.Mutil.dollar;
+import static tetrad.Mutil.pause;
 
 class User {
     protected String name; // name of the user
@@ -127,7 +129,29 @@ class User {
 
     // DO-NOTHINGS (not relevant for base class)
     String buy(Scanner scn, Market mkt, int sel) { return ""; }
-    String sell(Scanner scn) { return ""; }
+    
+    String sell(Stock stock, int amount) { 
+        String transactMsg = "";
+
+        try {
+            portfolio.remove(stock, amount); // may throw
+            cash += stock.getValue() * amount;
+            transactMsg = "Sold " + amount + " shares of " + stock.getName() + " for " + dollar(stock.getValue() * amount);
+        }
+        catch (NoSuchElementException | NumberFormatException e) {
+            System.out.println("Invalid Input, please try again.");
+            pause(1000);
+        }
+        catch (InvalidSelectionException e)  {
+            System.out.println(e.getMessage());
+            pause(1000);
+        }
+        
+        portfolio.update(false);
+        acv.sellCheck();
+
+        return transactMsg;
+    }
     void showPortfolio(Scanner scanner) {}
     void showAchievements() {}
     void showStats() {}

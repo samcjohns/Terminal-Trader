@@ -90,11 +90,8 @@ public class TerminalGame extends Game {
         System.out.print("---Select: ");
         String input = scanner.nextLine();
         switch (input) {
-            case "1" -> {
-                // show portfolio
-                usr.showPortfolio(scanner);
-            }
-            case "2" -> marketMenu(scanner); // show stock exchange
+            case "1" -> portfolioMenu(scanner); // show portfolio
+            case "2" -> marketMenu(scanner);    // show stock exchange
             case "3" -> {
                 // user stats
                 clearScreen();
@@ -143,6 +140,32 @@ public class TerminalGame extends Game {
     }
 
     // private gameplay functions
+    private void portfolioMenu(Scanner scanner) {
+        while (true) {
+            clearScreen();
+            printHeader();
+            usr.showPortfolio(scanner);
+
+            // command tray
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println(cyan("Enter - Exit") + " | " 
+            + cyan("'/' - Advance") + " | " 
+            + cyan("'.' - Sell") + " | "
+            + cyan("; - History"));
+            System.out.println("-".repeat(MENU_WIDTH));
+
+            String command = scanner.nextLine();
+            switch (command) {
+                case "" -> {
+                    return;
+                }
+                case "|" -> advance();
+                case "." -> doSale(scanner);
+                case ";" -> usr.portfolio.printTransactionLogs();
+                default -> System.out.println("Invalid Input");
+            }
+        }
+    }
     private void marketMenu(Scanner scanner) {
         while (true) {
             clearScreen();
@@ -283,6 +306,28 @@ public class TerminalGame extends Game {
                 }
                 default -> System.out.println("Invalid Input");
             }
+        }
+    }
+    private void doSale(Scanner scanner) {
+        try {
+            System.out.println("(0 to Exit)");
+            System.out.print("--Stock: ");
+            int selection = Integer.parseInt(scanner.nextLine());
+            if (selection == 0) {
+                return; // exit case
+            }
+            Stock stock = usr.portfolio.stockAt(selection - 1);
+
+            System.out.print("---Amount: ");
+            int amount = Integer.parseInt(scanner.nextLine());
+            if (amount == 0) {
+                return; // exit case
+            }
+
+            System.out.println(usr.sell(stock, amount));
+        } 
+        catch (InvalidSelectionException e) {
+            System.out.println(e.getMessage());
         }
     }
     // menu functions
