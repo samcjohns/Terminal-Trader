@@ -15,6 +15,7 @@ import static tetrad.Mutil.bold;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.clearLine;
 import static tetrad.Mutil.clearScreen;
+import static tetrad.Mutil.cursorUp;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.cyanB;
 import static tetrad.Mutil.dollar;
@@ -91,7 +92,11 @@ public class Game {
                         System.out.println(redB(e.getMessage()));
                         System.out.println("User: '" + username + "' cannot be accessed...");
                         System.out.println(italic("Try making a new save if this is your first time! :)"));
+                        printMenuArt(2);
+                        System.out.println("-".repeat(MENU_WIDTH));
                         System.out.println("");
+                        System.out.println("-".repeat(MENU_WIDTH));
+                        cursorUp(2);
                         pause(scanner);
                         // error, so repeat
                     }
@@ -125,7 +130,7 @@ public class Game {
             clearScreen();
             printHeader();
             showPlayMenu();
-            System.out.print("---Select: ");
+            System.out.print("---[Select]: ");
             String input = scanner.nextLine();
             switch (input) {
                 case "1" -> portfolioMenu(scanner); // show portfolio
@@ -312,7 +317,7 @@ public class Game {
      * @param scanner user input scanner
      */
     private void stockView(Scanner scanner) {
-        System.out.print("---Stock: ");
+        System.out.print("---[Stock]: ");
         String view = scanner.nextLine();
         while(!view.equals("")) {
             clearScreen();
@@ -373,19 +378,17 @@ public class Game {
     private void doExtras(Scanner scanner) {
         clearScreen();
         printHeader();
-        System.out.println(center("Extras", MENU_WIDTH, "~"));
-        System.out.println(""); // spacing
-        System.out.println("1. Settings");
-        System.out.println("2. Developer Tools");
-        System.out.println("3. Help");
-        System.out.println("4. Mini Games!");
-        System.out.println("5. Credits");
-        System.out.println("6. Back");
-        System.out.println(""); // spacing
+        System.out.println();
+        System.out.println(center("<~~~~{ Extras }~~~~>", MENU_WIDTH));
 
+        printMenuArt(0);
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(cyan("1. Settings | 2. Developer Tools | 3. Help | 4. Mini Games! | 5. Credits | 6. Back"));
+        System.out.println("-".repeat(MENU_WIDTH));
+        
         String input;
         while (true) {
-            System.out.print("---Select: ");
+            System.out.print("---[Select]: ");
             input = scanner.nextLine();
             clearLine();
             switch (input) {
@@ -412,7 +415,11 @@ public class Game {
                 case "6" -> {
                     return;
                 }
-                default -> System.out.println("Invalid Input");
+                default -> {
+                    System.out.println("Invalid Input");
+                    pause(1000);
+                    clearLine();
+                }
             }
         }
     }
@@ -426,7 +433,7 @@ public class Game {
         while (true) {
             try {
                 System.out.println("(0 to Exit)");
-                System.out.print("--Stock: ");
+                System.out.print("--[Stock]: ");
                 int selection = Integer.parseInt(scanner.nextLine());
                 if (selection == 0) {
                     return; // exit case
@@ -434,7 +441,7 @@ public class Game {
                 clearLine();
                 Stock stock = usr.getPortfolio().stockAt(selection - 1);
 
-                System.out.print("---Amount: ");
+                System.out.print("---[Amount]: ");
                 int amount = Integer.parseInt(scanner.nextLine());
                 if (amount == 0) {
                     return; // exit case
@@ -462,7 +469,7 @@ public class Game {
         while(true) {
             double cash = usr.getCash();
             try {
-                System.out.print("---Stock: ");
+                System.out.print("---[Stock]: ");
                 int selection = Integer.parseInt(scanner.nextLine());
                 if (selection == 0) {
                     return; // exit case
@@ -476,7 +483,7 @@ public class Game {
                 + yellow(bold("Max Amount: ")) + maxAmount);
                 System.out.println("-".repeat(MENU_WIDTH));
 
-                System.out.print("---Amount: ");
+                System.out.print("---[Amount]: ");
                 int amount = Integer.parseInt(scanner.nextLine());
                 if (amount == 0) {
                     return; // exit case
@@ -517,7 +524,7 @@ public class Game {
         System.out.println("-".repeat(MENU_WIDTH));
         System.out.println(cyan("1. Load Game | 2. New Game | 3. Extras | 4. Exit"));
         System.out.println("-".repeat(MENU_WIDTH));
-        System.out.print("Please make a selection: ");
+        System.out.print("---[Select]: ");
     }
 
     /**
@@ -646,7 +653,7 @@ public class Game {
             System.out.println(center("Enter to Exit", MENU_WIDTH));
             System.out.println("");
 
-            System.out.print("---Select: ");
+            System.out.print("---[Select]: ");
             String input = scanner.nextLine();
             clearLine();
             
@@ -781,7 +788,7 @@ public class Game {
             System.out.println(redB("1. Repair Asset Files"));
             System.out.println(redB("2. Stock Walk"));
             System.out.println(""); // spacing
-            System.out.print("---Select: ");
+            System.out.print("---[Select]: ");
 
             String input = "";
             
@@ -798,12 +805,12 @@ public class Game {
                 }
                 case "2" -> {
                     while (true) {
-                        System.out.print("---Stock: ");
+                        System.out.print("---[Stock]: ");
                         try {
                             // get selection
                             int stockID = Integer.parseInt(scanner.nextLine());
                             clearLine();
-                            System.out.print("---Times: ");
+                            System.out.print("---[Times]: ");
                             input = scanner.nextLine();
 
                             // load mkt assets
