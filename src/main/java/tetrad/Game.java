@@ -74,7 +74,7 @@ public class Game {
      */
     public boolean startGame(Scanner scanner) {
         SoundPlayer theme = new SoundPlayer("assets/tetrad-theme.wav");
-        theme.play();
+        // theme.play();
         while(true) {
             showMainMenu();
             String choice = scanner.nextLine();
@@ -301,6 +301,7 @@ public class Game {
             System.out.println(cyan("Enter - Exit | '/' - Advance | ',' - View | '.' - Buy"));
             System.out.println("-".repeat(MENU_WIDTH));  
             
+            System.out.print("---[Select]: ");
             String command = scanner.nextLine();
             clearLine();
             switch (command) {
@@ -339,6 +340,7 @@ public class Game {
                 blue(italic("Now: ")) + dollar(stock.getValue()) + " | " +
                 red(italic("Min: ")) + dollar(stock.getMin()) + " | " +
                 green(italic("Max: ")) + dollar(stock.getMax()) + " | " +
+                cyan(italic("Average: ")) + dollar(stock.getAverage(120)) + " | " +
                 yellow(italic("Recent: ")) + numColor(stock.getChange()) + " | " +
                 yellow(italic("10-Day: ")) + numColor(stock.getChange(10)) + " | " +
                 yellow(italic("100-Day: ")) + numColor(stock.getChange(100))
@@ -365,7 +367,7 @@ public class Game {
                         view = "" + 1;
                     }
                 }
-                case "." -> doBuy(scanner);
+                case "." -> doBuy(scanner, Integer.parseInt(view));
                 case "/" -> {
                     advance();
                     pause(500);
@@ -474,7 +476,6 @@ public class Game {
      */
     private void doBuy(Scanner scanner) {
         while(true) {
-            double cash = usr.getCash();
             try {
                 System.out.print("---[Stock]: ");
                 int selection = Integer.parseInt(scanner.nextLine());
@@ -483,6 +484,26 @@ public class Game {
                 }
                 clearLine();
 
+                doBuy(scanner, selection);
+            } 
+            catch (NoSuchElementException | NumberFormatException e) {
+                System.out.println("Invalid Input, please try again.");
+                pause(scanner);
+            }
+        }
+    }
+
+    /**
+     * Buy method, gets amount of stock given by selection to be bought and 
+     * makes sale. Handles errors appropriately and returns when user is 
+     * finished.
+     * @param scanner user input scanner
+     * @param selection stock selected
+     */
+    private void doBuy(Scanner scanner, int selection) {
+        while(true) {
+            double cash = usr.getCash();
+            try {
                 // show cash and max buy amount
                 Stock stock = mkt.getStock(selection - 1);
                 int maxAmount = (int) (cash / stock.getValue());
@@ -938,7 +959,7 @@ public class Game {
 
         // prep market
         mkt.setTrend(1); // start market a tad promising
-        mkt.setNUM_STOCKS(15); 
+        mkt.setNUM_STOCKS(20); 
 
         try {
             Stock s0 = new Stock(0, "Burley Buns", 18.24, 0.7, 2);
@@ -957,7 +978,13 @@ public class Game {
             Stock s11 = new Stock(11, "Jenna Gyms", 140.00, 2, 2);
             Stock s12 = new Stock(12, "Rockford Mine", 13000.00, 1, 3);
             Stock s13 = new Stock(13, "Colin Call-Center", 240.00, 2.9, 3);
-            Stock s14 = new Stock(14, "Dave's Diner", 150.00, 1, 1);
+            Stock s14 = new Stock(14, "Dave's Drive-In", 150.00, 1, 1);
+            
+            Stock s15 = new Stock(15, "Woolworth's Diner", 750.00, 1, 3);
+            Stock s16 = new Stock(16, "Ben Medical", 11000.00, 2, 1);
+            Stock s17 = new Stock(17, "Clanton Power", 1400.00, 1, 1);
+            Stock s18 = new Stock(18, "Alfred & Harrell", 670000.00, 3, 2);
+            Stock s19 = new Stock(19, "TYLO", 1900000.00, 1, 3);
 
             s0.save();
             s1.save();
@@ -974,6 +1001,11 @@ public class Game {
             s12.save();
             s13.save();
             s14.save();
+            s15.save();
+            s16.save();
+            s17.save();
+            s18.save();
+            s19.save();
         } 
         catch (InitException e) {
             DB_LOG("Exception In: createGen(), THIS: " + e.getMessage());

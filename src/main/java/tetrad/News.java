@@ -106,21 +106,57 @@ public class News {
     /**
      * Prints a whole page containing all current events.
      */
-    void page() {
-        System.out.println(""); // Spacing
-        System.out.println(italic(center("Mind the dust...", MENU_WIDTH)));
-        System.out.println(""); // Spacing
-        for (int i = 0; i < reel.size(); i++) {
-            int age = reel.get(i).getAge();
-            switch (age) {
-                case 0 -> System.out.print(cyan("Today: "));
-                case 1 -> System.out.print(cyan("Yesterday: "));
-                default -> System.out.print(cyan(age + " Days Ago: "));
+    public void page() {
+        int linesPerPage = 36;
+        int currentPage = 0;
+        int totalPages = (int) Math.ceil(reel.size() / (double) linesPerPage);
+
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n" + italic(center("Mind the dust...", MENU_WIDTH)) + "\n");
+
+            // Display current page of alerts
+            for (int i = currentPage * linesPerPage; i < Math.min(reel.size(), (currentPage + 1) * linesPerPage); i++) {
+                int age = reel.get(i).getAge();
+                switch (age) {
+                    case 0 -> System.out.print(cyan("Today: "));
+                    case 1 -> System.out.print(cyan("Yesterday: "));
+                    default -> System.out.print(cyan(age + " Days Ago: "));
+                }
+                System.out.println(headlineColor(reel.get(i).getHeadline(), reel.get(i).getType()) + "\n");
             }
-            System.out.println(headlineColor(reel.get(i).getHeadline(), reel.get(i).getType()) + "\n");
+
+            // Display page navigation options
+            System.out.println("Page " + (currentPage + 1) + " of " + totalPages);
+            System.out.print("[n] Next Page | [p] Previous Page | [q] Quit: ");
+
+            String input = scanner.nextLine().trim().toLowerCase();
+            switch (input) {
+                case "n":
+                    if (currentPage < totalPages - 1) {
+                        currentPage++;
+                    } else {
+                        System.out.println("You're already on the last page.");
+                    }
+                    break;
+                case "p":
+                    if (currentPage > 0) {
+                        currentPage--;
+                    } else {
+                        System.out.println("You're already on the first page.");
+                    }
+                    break;
+                case "q":
+                    clear(); // Clear the list if exiting
+                    System.out.println("Exiting pagination...");
+                    return; // Exit the method
+                default:
+                    System.out.println("Invalid input. Please enter 'n', 'p', or 'q'.");
+            }
         }
-        clear(); // Clear list
     }
+
 
     /**
      * Updates the age of alerts after each advance.

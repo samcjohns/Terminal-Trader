@@ -143,7 +143,20 @@ class Stock {
      */
     double getChange(int term) {
         // change from 'term' days ago
-        return round(((value - history.at(term - 1)) / getLast()) * 100);
+        return round(((value - history.at(term - 1)) /  history.at(term - 1)) * 100);
+    }
+
+    /**
+     * Average price over term
+     * @param term
+     * @return after price across the term
+     */
+    double getAverage(int term) {
+        double total = 0;
+        for (int i = 0; i < term; i++) {
+            total += history.at(i);
+        }
+        return round(total/term);
     }
 
     // stock behavior functions
