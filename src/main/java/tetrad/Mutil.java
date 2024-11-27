@@ -24,7 +24,7 @@ public class Mutil {
     // MAY CHANGE LATER WITH A SETTINGS UPDATE
 
     /** total width of the menu on screen */
-    public static final int     MENU_WIDTH = 100;
+    public static final int     MENU_WIDTH = 120;
 
     /** total number of lines on screen */
     public static final int    MENU_HEIGHT = 40;
