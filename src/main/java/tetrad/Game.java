@@ -561,7 +561,7 @@ public class Game {
         System.out.println("-".repeat(MENU_WIDTH));
         System.out.println("New Account Name: ");
         System.out.println("-".repeat(MENU_WIDTH));
-
+        // test
         // moves the cursor up and forward for typing
         Mutil.cursorUp(2);
         Mutil.cursorRight("New Account Name: ".length());
