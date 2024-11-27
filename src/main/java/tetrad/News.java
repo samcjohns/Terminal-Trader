@@ -49,85 +49,67 @@ public class News {
     }
 
     /**
-     * clears all alerts in the reel
+     * Clears all alerts in the reel.
      */
     void clear() {
         reel.clear();
     }
 
-    /** 
-     * adds a new Alert to the reel
-     * @param newAlert is the Alert to be pushed to the reel
+    /**
+     * Adds a new Alert to the reel.
      */
     void push(Alert newAlert) {
         reel.addFirst(newAlert);
     }
 
-    /** 
-     * prints a single line of the most important headlines 
+    /**
+     * Prints a single line of the most important headlines.
      */
     void roll() {
         StringBuilder line = new StringBuilder(bold(cyan("News: ")));
         int currentLength = "News: ".length();
 
-        // in case of no news
-        if (reel.isEmpty()) {
-            printEmptyNewsRoll(line);
-            return;
-        }
-    
+        // Add reel headlines until space is exhausted or reel is empty
         for (Alert alert : reel) {
             String headline = alert.getHeadline();
             String separator = currentLength > "News: ".length() ? " | " : "";
             int additionalLength = separator.length() + headline.length();
-    
-            // Check if adding the full headline would exceed the MENU_WIDTH limit
+
             if (currentLength + additionalLength > MENU_WIDTH) {
-                // Calculate remaining length for the partial headline, minus 3 for "..."
-                int remainingLength = MENU_WIDTH - currentLength - separator.length() - 3;
-    
-                if (remainingLength > 0) {
-                    // Find the cut-off index: the last space within the remaining length
-                    int cutOffIndex = remainingLength;
-    
-                    // Move back to find the last space
-                    while (cutOffIndex > 0 && headline.charAt(cutOffIndex - 1) != ' ') {
-                        cutOffIndex--;
-                    }
-    
-                    // If there's no space found, cut off at the maximum allowed length
-                    if (cutOffIndex == 0) {
-                        cutOffIndex = remainingLength; // Fallback to cutting off at remaining length
-                    }
-
-                    // color according to type
-                    String truncStr = headline.substring(0, cutOffIndex);
-                    truncStr = headlineColor(truncStr, alert.getType());
-
-                    // Add the separator first if needed
-                    line.append(separator).append(truncStr).append("...");
-                }
-                break; // Stop after adding the partial headline
+                appendTruncated(line, headline, currentLength, separator, alert.getType());
+                return;
             }
-    
-            // Apply color based on the alert type after length check
-            headline = headlineColor(alert.getHeadline(), alert.getType());
-    
-            // Add the separator and the colored headline to the line
-            line.append(separator).append(headline);
+
+            // Append colored headline with separator
+            line.append(separator).append(headlineColor(headline, alert.getType()));
             currentLength += additionalLength;
         }
-    
+
+        // If space is left after reel, fill with random headlines
+        while (currentLength < MENU_WIDTH) {
+            String headline = randomHeadline();
+            String separator = currentLength > "News: ".length() ? " | " : "";
+            int additionalLength = separator.length() + headline.length();
+
+            if (currentLength + additionalLength > MENU_WIDTH) {
+                appendTruncated(line, headline, currentLength, separator, -1); // Random headlines have no type color
+                break;
+            }
+
+            line.append(separator).append(magenta(headline));
+            currentLength += additionalLength;
+        }
+
         System.out.println(line.toString());
     }
 
-    /** 
-     * prints a whole page containing all current events 
+    /**
+     * Prints a whole page containing all current events.
      */
     void page() {
-        System.out.println(""); // spacing
+        System.out.println(""); // Spacing
         System.out.println(italic(center("Mind the dust...", MENU_WIDTH)));
-        System.out.println(""); // spacing
+        System.out.println(""); // Spacing
         for (int i = 0; i < reel.size(); i++) {
             int age = reel.get(i).getAge();
             switch (age) {
@@ -137,20 +119,22 @@ public class News {
             }
             System.out.println(headlineColor(reel.get(i).getHeadline(), reel.get(i).getType()) + "\n");
         }
-        clear(); // clear list
+        clear(); // Clear list
     }
 
-    /** 
-     * updates age of alerts after each advance 
+    /**
+     * Updates the age of alerts after each advance.
      */
     void update() {
-        // increment age of all alerts
-        for(int i = 0; i < reel.size(); i++) {
+        for (int i = 0; i < reel.size(); i++) {
             reel.get(i).incrementAge();
         }
     }
 
-    // coloring depending on alert type
+    /**
+     * Returns colored headlines based on the alert type.
+     * @return headline in the proper color
+     */
     private String headlineColor(String headline, int type) {
         return switch (type) {
             case ACHIEVEMENT -> bold(blue(headline));
@@ -160,69 +144,48 @@ public class News {
             case BAD_MARKET -> bold(red(headline));
             case GOOD_MARKET -> bold(green(headline));
             case ALERT_MARKET -> bold(yellow(headline));
-            default -> headline; // don't color
-        }; 
+            default -> headline; // No color
+        };
     }
-    // searches "random_headlines.txt" and returns random one
+
+    /**
+     * Searches "random_headlines.txt" and returns a random one.
+     * @return string containing a random headline
+     */
     private String randomHeadline() {
-        final int RHF_LENGTH = 42; // may change, file length
+        final int RHF_LENGTH = 46; // May change, file length
         Random random = new Random();
         int randomLineIndex = random.nextInt(RHF_LENGTH);
 
         try (Scanner scanner = new Scanner(new File("assets/random_headlines.txt"))) {
-            // Skip lines until reaching the random line index
             for (int i = 0; i < randomLineIndex; i++) {
                 if (scanner.hasNextLine()) {
                     scanner.nextLine();
                 }
             }
-
-            // Return the next line
-            return scanner.hasNextLine() ? scanner.nextLine() : null;
+            return scanner.hasNextLine() ? scanner.nextLine() : "No random headline available";
         } catch (FileNotFoundException e) {
             e.printStackTrace(System.err);
             return "Missing 'random_headlines.txt' asset";
         }
     }
-    private void printEmptyNewsRoll(StringBuilder line) {
-        String emptyMsg = "No Current Headlines";
-        int currentLength = "News: ".length() + emptyMsg.length();
-        line.append(blue(emptyMsg));
 
-        // add random headlines until its full
-        while(true) {
-            String headline = randomHeadline();
-            String separator = currentLength > "News: ".length() ? " | " : "";
-            int additionalLength = separator.length() + headline.length();
-    
-            // Check if adding the full headline would exceed the MENU_WIDTH limit
-            if (currentLength + additionalLength > MENU_WIDTH) {
-                // Calculate remaining length for the partial headline, minus 3 for "..."
-                int remainingLength = MENU_WIDTH - currentLength - separator.length() - 3;
-    
-                if (remainingLength > 0) {
-                    // Find the cut-off index: the last space within the remaining length
-                    int cutOffIndex = remainingLength;
-    
-                    // Move back to find the last space
-                    while (cutOffIndex > 0 && headline.charAt(cutOffIndex - 1) != ' ') {
-                        cutOffIndex--;
-                    }
-    
-                    // If there's no space found, cut off at the maximum allowed length
-                    if (cutOffIndex == 0) {
-                        cutOffIndex = remainingLength; // Fallback to cutting off at remaining length
-                    }
-
-                    // color according to type
-                    String truncStr = magenta(headline.substring(0, cutOffIndex));
-
-                    // Add the separator first if needed
-                    line.append(separator).append(truncStr).append("...");
-                }
-                break; // Stop after adding the partial headline
+     /**
+     * Appends a truncated headline with a separator if necessary.
+     */
+    private void appendTruncated(StringBuilder line, String headline, int currentLength, String separator, int type) {
+        int remainingLength = MENU_WIDTH - currentLength - separator.length() - 3; // Leave space for "..."
+        if (remainingLength > 0) {
+            int cutOffIndex = Math.min(remainingLength, headline.length());
+            while (cutOffIndex > 0 && headline.charAt(cutOffIndex - 1) != ' ') {
+                cutOffIndex--;
             }
+            if (cutOffIndex == 0) cutOffIndex = remainingLength;
+
+            // Append truncated headline with "..."
+            String truncStr = headline.substring(0, cutOffIndex);
+            truncStr = type == -1 ? magenta(truncStr) : headlineColor(truncStr, type);
+            line.append(separator).append(truncStr).append("...");
         }
-        System.out.println(line.toString());
     }
 }

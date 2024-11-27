@@ -104,7 +104,17 @@ class User {
     /**
      * @return number of advances of the user
      */
-    int    getAdvances() { return advances; }
+    int getAdvances() { return advances; }
+
+    /**
+     * @return user's Trader Score
+     */
+    int getScore() { 
+        if (advances == 0) {
+            return 0;
+        }
+        return ((int) (getNet() - STARTING_CASH)/advances); 
+    }
 
     /**
      * @return a referece to the Portfolio of the user
@@ -366,7 +376,7 @@ class User {
             traderScore = "N/A";
         }
         else {
-            traderScore = "" + ((int) (getNet() - STARTING_CASH)/advances);
+            traderScore = "" + getScore();
         }
 
         System.out.println(""); // spacing

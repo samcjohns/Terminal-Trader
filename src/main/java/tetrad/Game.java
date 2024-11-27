@@ -501,6 +501,7 @@ public class Game {
     // menu functions
     /**
      * Prints main menu
+     * Height: 36 lines
      */
     private void showMainMenu() {
         clearScreen();
@@ -508,26 +509,26 @@ public class Game {
 
         // main menu options
         System.out.println(center("Welcome to the show!", MENU_WIDTH));
-        System.out.println(italic(center("Version 0.12 beta", MENU_WIDTH)));
+        System.out.println(italic(center("Version 1.0", MENU_WIDTH)));
 
         // main menu art
         String filePath;
         if (Main.NDEV) {
-            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline100.txt";
+            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline-120.txt";
         }
         else {
-            filePath = "assets\\city-skyline100.txt";
+            filePath = "assets\\city-skyline-120.txt";
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(center(line, MENU_WIDTH));
+                System.out.println(cyan(center(line, MENU_WIDTH)));
             }
         } catch (IOException e) {
             System.err.println("Error reading the file: " + e.getMessage());
         }
 
-        // the rest
+        // command tray
         System.out.println("-".repeat(MENU_WIDTH));
         System.out.println(cyan("1. Load Game | 2. New Game | 3. Extras | 4. Exit"));
         System.out.println("-".repeat(MENU_WIDTH));
@@ -536,6 +537,7 @@ public class Game {
 
     /**
      * Prints play menu
+     * Height: 36 lines
      */
     private void showPlayMenu() {
         clearScreen();
@@ -543,12 +545,41 @@ public class Game {
         news.roll();
         System.out.println("-".repeat(MENU_WIDTH));
 
-        System.out.println("1. Your Portfolio");
-        System.out.println("2. Stock Exchange");
-        System.out.println("3. Your Stats");
-        System.out.println("4. Achievements");
-        System.out.println("5. News Feed");
-        System.out.println("6. Save and Exit");
+        // compressed menu art
+        String filePath;
+        if (Main.NDEV) {
+            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline-120.txt";
+        }
+        else {
+            filePath = "assets\\city-skyline-120.txt";
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            // skip two lines for height requirement
+            reader.readLine();
+            reader.readLine();
+
+            // print out art
+            while ((line = reader.readLine()) != null) {
+                System.out.println(cyan(center(line, MENU_WIDTH)));
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
+
+        // user quick stats
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.print(red("Day: " + usr.getAdvances()) + " | ");
+        System.out.print(yellow("Cash: " + dollar(usr.getCash())) + " | ");
+        System.out.print(yellow("Net Worth: " + dollar(usr.getNet())) + " | ");
+        System.out.print(green("Trader Score: " + usr.getScore()) + " | ");
+        System.out.println(blue("Recent Performance: ") + numColor(usr.getPortfolio().getChange()));
+
+        // command tray
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(cyan("1. Your Portfolio | 2. Stock Exchange | 3. Your Stats | 4. Achievements | 5. News Feed | 6. Save and Exit"));
+        System.out.println("-".repeat(MENU_WIDTH));
     }
 
     /**
@@ -872,8 +903,8 @@ public class Game {
         mkt = new Market(this);
 
         // prep market
-        mkt.setTrend(0); // for now FIXME
-        mkt.setNUM_STOCKS(10); 
+        mkt.setTrend(1); // start market a tad promising
+        mkt.setNUM_STOCKS(15); 
 
         try {
             Stock s0 = new Stock(0, "Burley Buns", 18.24, 0.7, 2);
@@ -888,11 +919,11 @@ public class Game {
             Stock s9 = new Stock(9, "The Rip", 420.00, 2.7, 3);
 
             // new!
-            Stock s10 = new Stock(9, "Samuel's Johns", 420.00, 2.7, 3);
-            Stock s11 = new Stock(9, "Jenna Gyms", 420.00, 2.7, 3);
-            Stock s12 = new Stock(9, "Rockford Mine", 420.00, 2.7, 3);
-            Stock s13 = new Stock(9, "Colin Call-Center", 420.00, 2.7, 3);
-            Stock s14 = new Stock(9, "Dave's Diner", 420.00, 2.7, 3);
+            Stock s10 = new Stock(10, "Sam's Johns", 67.00, 1, 1);
+            Stock s11 = new Stock(11, "Jenna Gyms", 140.00, 2, 2);
+            Stock s12 = new Stock(12, "Rockford Mine", 13000.00, 1, 3);
+            Stock s13 = new Stock(13, "Colin Call-Center", 240.00, 2.9, 3);
+            Stock s14 = new Stock(14, "Dave's Diner", 150.00, 1, 1);
 
             s0.save();
             s1.save();
@@ -904,6 +935,11 @@ public class Game {
             s7.save();
             s8.save();
             s9.save();
+            s10.save();
+            s11.save();
+            s12.save();
+            s13.save();
+            s14.save();
         } 
         catch (InitException e) {
             DB_LOG("Exception In: createGen(), THIS: " + e.getMessage());
@@ -919,8 +955,8 @@ public class Game {
             e.printStackTrace(System.err);
         }
 
-        // advance time to generate histories
-        advance(100);
+        // advance time to generate histories so early game graphs aren't empty
+        advance(120);
 
         // save files
         mkt.save();

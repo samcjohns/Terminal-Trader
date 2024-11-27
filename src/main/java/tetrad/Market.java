@@ -32,7 +32,7 @@ import static tetrad.Mutil.numColor;
 
 class Market {
     private final Stock[] stocks; // all stocks objects
-    static int NUM_STOCKS = 10;   // number of stocks on the market
+    static int NUM_STOCKS = 15;   // number of stocks on the market
     private final Game game;      // reference to current game instance
 
     // behavioral variables for market

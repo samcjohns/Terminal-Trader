@@ -73,7 +73,12 @@ class Portfolio {
      * @return total valuation of the portfolio yesterday
      * (before the most recent advance)
      */
-    double getLast() { return history.at(history.size()-1); }
+    double getLast() { 
+        if (history.size() == 0) {
+            return 0.0;
+        }
+        return history.at(history.size()-1); 
+    }
 
     /**
      * @return the difference between the current valuation and the valuation

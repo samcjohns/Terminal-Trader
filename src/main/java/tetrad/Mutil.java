@@ -20,20 +20,46 @@ import java.util.Scanner;
 
 public class Mutil {
 
-    /* Terminal Format Constants */
-    // MAY CHANGE LATER WITH A SETTINGS UPDATE
-
     /** total width of the menu on screen */
     public static final int     MENU_WIDTH = 120;
 
     /** total number of lines on screen */
-    public static final int    MENU_HEIGHT = 40;
+    public static final int    MENU_HEIGHT = 36;
 
     /** default width of history graphs */
-    public static final int HISTORY_LENGTH = 100;
+    public static final int HISTORY_LENGTH = 120;
 
     /** default height of history graphs */
-    public static final int HISTORY_HEIGHT = 15;
+    public static final int HISTORY_HEIGHT = 25;
+
+    /**
+     * Clears the screen and scrollback buffer using ANSI Escape Code
+     */
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J"); // clear screen
+        System.out.println("\033[3J");     // clear scrollback buffer
+        System.out.flush();
+    }
+
+    /**
+     * Clears the current line on the screen
+     */
+    public static void clearLine() {
+        System.out.print("\033[2K");  // Clears the second line
+        System.out.print("\033[1F");  // Moves the cursor up to the first line
+        System.out.print("\033[2K");  // Clears the first line
+        System.out.print("\033[0G");  // Move cursor back to the beginning of the line
+    }
+
+    /**
+     * Clears a number of lines (current and above)
+     * @param lines number of lines to clear
+     */
+    public static void clearLine(int numLines) {
+        for (int i = 0; i < numLines; i++) {
+            clearLine();
+        }
+    }
 
     /** 
      * Formats the string in the center of a given width
@@ -321,35 +347,6 @@ public class Mutil {
      */
     public static double change(double previous, double current) {
         return ((current - previous) / previous) * 100;
-    }
-
-    /**
-     * Clears the screen and scrollback buffer using ANSI Escape Code
-     */
-    public static void clearScreen() {
-        System.out.print("\033[H\033[2J"); // clear screen
-        System.out.println("\033[3J");     // clear scrollback buffer
-        System.out.flush();
-    }
-
-    /**
-     * Clears the current line on the screen
-     */
-    public static void clearLine() {
-        System.out.print("\033[2K");  // Clears the second line
-        System.out.print("\033[1F");  // Moves the cursor up to the first line
-        System.out.print("\033[2K");  // Clears the first line
-        System.out.print("\033[0G");  // Move cursor back to the beginning of the line
-    }
-
-    /**
-     * Clears a number of lines (current and above)
-     * @param lines number of lines to clear
-     */
-    public static void clearLine(int lines) {
-        for (int i = 0; i < lines; i++) {
-            clearLine();
-        }
     }
 
     /**
