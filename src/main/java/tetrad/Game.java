@@ -73,6 +73,8 @@ public class Game {
      * @return false if the user selects to exit the program
      */
     public boolean startGame(Scanner scanner) {
+        SoundPlayer theme = new SoundPlayer("assets/tetrad-theme.wav");
+        theme.play();
         while(true) {
             showMainMenu();
             String choice = scanner.nextLine();
@@ -109,6 +111,7 @@ public class Game {
                 }
                 case "3" -> doExtras(scanner);
                 case "4" -> {
+                    theme.close();
                     return false; // exit program
                 }
                 default -> {
@@ -140,6 +143,10 @@ public class Game {
                     clearScreen();
                     printHeader();
                     usr.showStats();
+                    printMenuArt(8);
+                    System.out.println("-".repeat(MENU_WIDTH));
+                    System.out.println(italic(center("Thank you for playing Terminal Trader", MENU_WIDTH)));
+                    System.out.println("-".repeat(MENU_WIDTH));
                     pause(scanner);
                 }
                 case "4" -> {
@@ -842,8 +849,13 @@ public class Game {
     public static void printHeader() {
         // title card
         String title = "Terminal Trader";
+        int tlen = title.length();
+        if (headerSetting == -1) {
+            title = blue(title);
+        }
+
         String line1 = "-".repeat(MENU_WIDTH);
-        String line2 = "~ ".repeat((MENU_WIDTH - title.length())/4) + title + " ~".repeat((MENU_WIDTH - title.length())/4) + " ";
+        String line2 = "~ ".repeat((MENU_WIDTH - tlen)/4) + title + " ~".repeat((MENU_WIDTH - tlen)/4) + " ";
         String line3 = "-".repeat(MENU_WIDTH);
 
         switch (headerSetting) {
