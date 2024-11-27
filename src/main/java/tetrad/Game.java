@@ -152,9 +152,7 @@ public class Game {
                 }
                 case "6" -> {
                     saveGame();
-                }
-                case "7" -> {
-                    break;
+                    return;
                 }
 
                 // cheat codes :)
@@ -688,10 +686,17 @@ public class Game {
         printHeader();
         System.out.println(center(" Mini Games ", MENU_WIDTH, "!"));
         System.out.println("");
-        System.out.println(italic(center("Coming soon!", MENU_WIDTH)));
+        System.out.println("1. Coin Toss");
         System.out.println("");
         System.out.println(""); // spacing
-        pause(scanner);
+        
+        String choice = scanner.nextLine();
+        switch (choice) {
+            case "1" -> {
+                System.out.println(MiniGames.coinToss(scanner, 100));
+                pause(scanner);
+            }
+        }
     }
 
     /**

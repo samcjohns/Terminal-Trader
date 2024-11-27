@@ -362,6 +362,16 @@ public class Mutil {
     }
 
     /**
+     * Takes a String and prints it as a header
+     * @param title String to be used for header
+     */
+    public static void header(String title) {
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("~ ".repeat((MENU_WIDTH - title.length())/4) + title + " ~".repeat((MENU_WIDTH - title.length())/4) + " ");
+        System.out.println("-".repeat(MENU_WIDTH));
+    }
+
+    /**
      * Pauses gameplay for a given amount of time
      * @param millis amount of time to wait
      */
