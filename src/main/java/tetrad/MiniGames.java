@@ -133,6 +133,7 @@ public class MiniGames {
                 switch (choice.toUpperCase()) {
                     case "N" -> {
                         userCashout(scanner, cashout);
+                        return;
                     }
                     case "Y" -> {
                         // play again
