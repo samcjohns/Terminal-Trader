@@ -511,22 +511,7 @@ public class Game {
         System.out.println(center("Welcome to the show!", MENU_WIDTH));
         System.out.println(italic(center("Version 1.0", MENU_WIDTH)));
 
-        // main menu art
-        String filePath;
-        if (Main.NDEV) {
-            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline-120.txt";
-        }
-        else {
-            filePath = "assets\\city-skyline-120.txt";
-        }
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(cyan(center(line, MENU_WIDTH)));
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading the file: " + e.getMessage());
-        }
+        printMenuArt(0);
 
         // command tray
         System.out.println("-".repeat(MENU_WIDTH));
@@ -546,27 +531,7 @@ public class Game {
         System.out.println("-".repeat(MENU_WIDTH));
 
         // compressed menu art
-        String filePath;
-        if (Main.NDEV) {
-            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline-120.txt";
-        }
-        else {
-            filePath = "assets\\city-skyline-120.txt";
-        }
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-
-            // skip two lines for height requirement
-            reader.readLine();
-            reader.readLine();
-
-            // print out art
-            while ((line = reader.readLine()) != null) {
-                System.out.println(cyan(center(line, MENU_WIDTH)));
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading the file: " + e.getMessage());
-        }
+        printMenuArt(2);
 
         // user quick stats
         System.out.println("-".repeat(MENU_WIDTH));
@@ -588,10 +553,18 @@ public class Game {
     private void showNewGameMenu() {
         clearScreen();
         printHeader();
-        System.out.println("");
+        System.out.println();
         System.out.println(italic(center("<----------New Game---------->", MENU_WIDTH)));
-        System.out.println("");
-        System.out.print(" ".repeat(30) + "Select a username: ");
+
+        // print main menu, but clear command tray
+        printMenuArt(0);
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("New Account Name: ");
+        System.out.println("-".repeat(MENU_WIDTH));
+
+        // moves the cursor up and forward for typing
+        Mutil.cursorUp(2);
+        Mutil.cursorRight("New Account Name: ".length());
     }
 
     /**
@@ -600,17 +573,59 @@ public class Game {
     private void showLoadGameMenu() {
         clearScreen();
         printHeader();
-        
+        System.out.println();
+        System.out.println(italic(center("<----------Load Game---------->", MENU_WIDTH)));
+
         // funny bit for now
         Random rand = new Random();
         if (rand.nextInt(100) == 1) {
             System.out.println("");
             printTaxMan();
         }
-        System.out.println("");
-        System.out.println(italic(center("<----------Load Game---------->", MENU_WIDTH)));
-        System.out.println("");
-        System.out.print(" ".repeat(30) + "Select a username: ");
+        else {
+            // print main menu, but clear command tray
+            printMenuArt(0);
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println("Account Name: ");
+            System.out.println("-".repeat(MENU_WIDTH));
+
+            // moves the cursor up and forward for typing
+            Mutil.cursorUp(2);
+            Mutil.cursorRight("Account Name: ".length());
+        }
+    }
+
+    /**
+     * Prints the main menu ASCII art
+     * @param less The amount that the art will be shortened to fit in the
+     * current screen
+     */
+    private void printMenuArt(int less) {
+        // main menu art
+        String filePath;
+        if (Main.NDEV) {
+            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline-120.txt";
+        }
+        else {
+            filePath = "assets\\city-skyline-120.txt";
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            // truncate for less
+            for (int i = 0; i < 27; i++) {
+                if (less != 0) {
+                    reader.readLine(); // skip current line
+                    less--;
+                }
+            }
+
+            while ((line = reader.readLine()) != null) {
+                System.out.println(cyan(center(line, MENU_WIDTH)));
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
     }
 
     // extras

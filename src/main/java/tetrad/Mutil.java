@@ -413,6 +413,43 @@ public class Mutil {
         }
     }
 
+    // cursor commands
+    /**
+     * Moves the cursor up using ANSI Escape Codes, if there is text in from of
+     * the cursor when it prints, it will be overwritten.
+     * @param num number of lines up
+     */
+    public static void cursorUp(int num) {
+        System.out.print("\033[" + num + "A");
+    }
+
+    /**
+     * Moves the cursor down using ANSI Escape Codes, if there is text in from of
+     * the cursor when it prints, it will be overwritten.
+     * @param num number of lines down
+     */
+    public static void cursorDown(int num) {
+        System.out.print("\033[" + num + "B");
+    }
+
+    /**
+     * Moves the cursor right using ANSI Escape Codes, if there is text in from of
+     * the cursor when it prints, it will be overwritten.
+     * @param num number of characters right
+     */
+    public static void cursorRight(int num) {
+        System.out.print("\033[" + num + "C");
+    }
+
+    /**
+     * Moves the cursor down using ANSI Escape Codes, if there is text in from of
+     * the cursor when it prints, it will be overwritten.
+     * @param num number of characters left
+     */
+    public static void cursorLeft(int num) {
+        System.out.print("\033[" + num + "D");
+    }
+
     // DEBUGGING
     /**
      * Outputs a message to the universal debug log file "err.txt"
