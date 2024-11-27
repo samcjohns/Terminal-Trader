@@ -17,15 +17,81 @@ import static tetrad.Mutil.pause;
  */
 public class MiniGames {
     /**
+     * Gets user input to load a desired profile and take a wager from the
+     * user. Will take the cash from the user's account and return that value
+     * as a double. User save loads from file.
+     * @param scanner user input scanner
+     * @return amount of money the user would like to wager
+     */
+    public static double userWager(Scanner scanner) {
+        // loop until valid outcome
+        while (true) {
+            System.out.println("Username: ");
+            String un = scanner.nextLine();
+            User usr = new User();
+            try {
+                usr.load(un);
+
+                clearLine();
+                System.out.print("Amount to wager (Max = " + usr.getCash() + "): ");
+                double wager = Double.parseDouble(scanner.nextLine());
+
+                if (wager > 0 && wager <= usr.getCash()) {
+                    usr.setCash(usr.getCash() - wager);
+                    usr.save();
+                    return wager;
+                }
+                else {
+                    System.out.println("Invalid Amount");
+                }
+            }
+            catch (InitException e) {
+                System.out.println(e.getMessage());
+                pause(scanner);
+                clearLine();
+            }
+            catch (NumberFormatException e) {
+                clearLine();
+                System.out.println("Invalid Input");
+                pause(scanner);
+            }
+        }
+    }
+
+    /**
+     * Returns cash back to the user after a mini game 
+     * @param cashout cash to be returned
+     */
+    public static void userCashout(Scanner scanner, double cashout) {
+        User usr = new User();
+        // loop until valid outcome
+        while (true) {
+            System.out.println("Username: ");
+            String un = scanner.nextLine();
+            try {
+                usr.load(un);
+                break;
+            }
+            catch (InitException e) {
+                System.out.println("Invalid Account");
+                pause(scanner);
+                clearLine(2);
+            }
+        }
+        usr.setCash(usr.getCash() + cashout);
+        usr.save();
+    }
+
+    /**
      * Coin toss minigame, the player makes a wager, and there is a 50/50
      * chance they double their wager or lose it all.
      * @param scanner user input scanner
      * @param cash amount of money to brought into the game
      * @return cash after playing the game
      */
-    public static double coinToss(Scanner scanner, double cash) {
+    public static void coinToss(Scanner scanner) {
         // amount of cash to be returned
-        double cashout = cash;
+        double cashout = userWager(scanner);
 
         while (true) {
             clearScreen();
@@ -66,13 +132,17 @@ public class MiniGames {
                 String choice = scanner.nextLine();
                 switch (choice.toUpperCase()) {
                     case "N" -> {
-                        return cashout;
+                        userCashout(scanner, cashout);
                     }
                     case "Y" -> {
                         // play again
                         break INNER;
                     }
-                    default -> System.out.println("Invalid Answer.");
+                    default -> {
+                        System.out.println("Invalid Input");
+                        pause(scanner);
+                        clearLine(2);
+                    }
                 }
             }
         }

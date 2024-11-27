@@ -265,7 +265,7 @@ public class Game {
                 case "" -> { return; }
                 case "/" -> advance();
                 case "." -> doSell(scanner);
-                case ";" -> usr.portfolio.printTransactionLogs();
+                case ";" -> usr.getPortfolio().printTransactionLogs();
                 default -> {
                     System.out.println("Invalid Input");
                     pause(1000);
@@ -432,7 +432,7 @@ public class Game {
                     return; // exit case
                 }
                 clearLine();
-                Stock stock = usr.portfolio.stockAt(selection - 1);
+                Stock stock = usr.getPortfolio().stockAt(selection - 1);
 
                 System.out.print("---Amount: ");
                 int amount = Integer.parseInt(scanner.nextLine());
@@ -693,7 +693,7 @@ public class Game {
         String choice = scanner.nextLine();
         switch (choice) {
             case "1" -> {
-                System.out.println(MiniGames.coinToss(scanner, 100));
+                MiniGames.coinToss(scanner);
                 pause(scanner);
             }
         }

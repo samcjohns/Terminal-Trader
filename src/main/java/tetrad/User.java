@@ -36,17 +36,30 @@ import static tetrad.Mutil.yellow;
  * @see Achievements
  * @see Game
  */
+
 class User {
     private String name; // name of the user
     private double cash; // total amount of liquid cash
     private int advances; // number of advances user has done
-    protected Portfolio portfolio; // portfolio of share holdings
+    private Portfolio portfolio; // portfolio of share holdings
+
+    /**
+     * <p> True - if user is loaded in main game.
+     * <p> False - if user is loaded in environment where market or news cannot
+     * be initialized.
+     */
+    private boolean main;
 
     private Achievements acv; // keeps track of achievements for user
     private Game game; // reference back to the current game for advancing while in portfolio
 
     static final double STARTING_CASH = 1000.0;
 
+    User() {
+        this.name = "null";
+        main = false;
+        acv = new Achievements(this, null);
+    }
     User(Game game) {
         this("null", 0, game);
     }
@@ -55,6 +68,7 @@ class User {
         this.cash = cash;
         this.game = game;
         
+        main = true;
         advances = 0;
         portfolio = new Portfolio(this);
         acv = new Achievements(this, game.news);
@@ -131,9 +145,6 @@ class User {
             writer.println(name);
             writer.println(cash);
             writer.println(advances);
-    
-            // portfolio
-            portfolio.save();
             writer.println("---INFO-END---");
     
             // label
@@ -146,15 +157,17 @@ class User {
             DB_LOG("IO Error: User Save Method -> " + e.getMessage());
         }
         
-        portfolio.save();
         acv.save();
+        if (main) {
+            portfolio.save();
+        }
     }
 
     /**
      * Loads the information of the user from <username>.txt
      * @param username User's name and the file from which to load from
      * @param market Market instance containing the stocks that User's
-     * portfolio contains
+     * portfolio containS
      * @throws InitException if file is corrupted or missing
      */
     void load(String username, Market market) throws InitException {
@@ -177,10 +190,13 @@ class User {
             cash = Double.parseDouble(scanner.nextLine());
             advances = Integer.parseInt(scanner.nextLine());
 
-            portfolio.load(market);
             acv.load();
 
-            portfolio.update(false); // update value for init
+            // won't load portfolio if market is null (in case of minigames)
+            if (main) {
+                portfolio.load(market);
+                portfolio.update(false); // update value for init
+            }
         }
         catch (NoSuchElementException e) {
             throw new InitException("Corrupted Stock Data");
@@ -188,6 +204,17 @@ class User {
         catch (FileNotFoundException e) {
             throw new InitException("File Not Found: " + username + ".txt");
         }
+    }
+
+    /**
+     * Loads the information of the user from <username>.txt, does not load
+     * portfolio. Not to be used in main gameplay, however, it is helpful
+     * for use with mini games.
+     * @param username User's name and the file from which to load from
+     * @throws InitException if file is corrupted or missing
+     */
+    void load(String username) throws InitException {
+        this.load(username, null);
     }
 
     /**
