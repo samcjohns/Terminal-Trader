@@ -22,8 +22,17 @@ public class Mutil {
 
     /* Terminal Format Constants */
     // MAY CHANGE LATER WITH A SETTINGS UPDATE
-    public static final int     MENU_WIDTH = 100; // total width of the menu on screen
-    public static final int HISTORY_LENGTH = 100; // variables for printing history graph
+
+    /** total width of the menu on screen */
+    public static final int     MENU_WIDTH = 100;
+
+    /** total number of lines on screen */
+    public static final int    MENU_HEIGHT = 40;
+
+    /** default width of history graphs */
+    public static final int HISTORY_LENGTH = 100;
+
+    /** default height of history graphs */
     public static final int HISTORY_HEIGHT = 15;
 
     /** 
