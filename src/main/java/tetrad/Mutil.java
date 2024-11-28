@@ -408,7 +408,7 @@ public class Mutil {
         }
         if (scanner != null) {
             // display message
-            System.out.println(italic("Press Enter to Continue..."));
+            System.out.print(italic("Press Enter to Continue..."));
             scanner.nextLine();
         }
     }

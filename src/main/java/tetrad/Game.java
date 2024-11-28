@@ -116,6 +116,8 @@ public class Game {
                 }
                 default -> {
                     System.out.println("Invalid Selection");
+                    pause(1000);
+                    clearLine();
                     pause(scanner);
                     // error, so repeat
                 }
@@ -169,6 +171,8 @@ public class Game {
                 default -> {
                     // help case
                     System.out.println("Invalid Selection");
+                    pause(1000);
+                    clearLine();
                     pause(scanner);
                 }
             }
@@ -271,6 +275,7 @@ public class Game {
                 default -> {
                     System.out.println("Invalid Input");
                     pause(1000);
+                    clearLine();
                 }
             }
         }
@@ -305,7 +310,8 @@ public class Game {
                 }
                 default -> {
                     System.out.println(red("Invalid Command"));
-                    pause(2000);
+                    pause(1000);
+                    clearLine();
                 }
             }
         }
@@ -359,6 +365,7 @@ public class Game {
                 default ->  {
                     System.out.println("Invalid Input");
                     pause(1000);
+                    clearLine();
                 }
             }
         }
@@ -475,6 +482,7 @@ public class Game {
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(1000);
+                    clearLine();
                 }
             }
         }
@@ -588,6 +596,8 @@ public class Game {
             } 
             catch (NoSuchElementException | NumberFormatException e) {
                 System.out.println("Invalid Input, please try again.");
+                pause(1000);
+                clearLine();
                 pause(scanner);
             }
         }
@@ -626,6 +636,8 @@ public class Game {
             } 
             catch (NoSuchElementException | NumberFormatException e) {
                 System.out.println("Invalid Input, please try again.");
+                pause(1000);
+                clearLine();
                 pause(scanner);
             }
             catch (InvalidSelectionException e)  {
@@ -822,6 +834,8 @@ public class Game {
                 } 
                 catch (NumberFormatException e) {
                     System.out.println("Invalid Input");
+                    pause(1000);
+                    clearLine();
                     pause(scanner);
                 }
             }
@@ -956,11 +970,17 @@ public class Game {
                         } 
                         catch (NumberFormatException e) {
                             System.out.println("Invalid Input");
+                            pause(1000);
+                            clearLine();
                             pause(scanner);
                         }
                     }
                 }
-                default -> System.out.println("Invalid Input");
+                default -> {
+                    System.out.println("Invalid Input");
+                    pause(1000);
+                    clearLine();
+                }
             }   
         }
     }
