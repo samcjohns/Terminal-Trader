@@ -856,6 +856,9 @@ public class Game {
     private void eHelp(Scanner scanner) {
         clearScreen();
         printHeader();
+        System.out.print("\n\n"); // spacing
+        printMenuArt(0);
+        cursorUp(29);
         System.out.println(center(" Help ", MENU_WIDTH, "#"));
         System.out.println("");
         System.out.println(italic(center("Terminal Trader is a text-based, terminal stock trading simulator. Stock purchases", MENU_WIDTH)));
@@ -873,6 +876,11 @@ public class Game {
         System.out.println(green(italic(center("Samuel Johns at samueljohns@cedarville.edu ", MENU_WIDTH))));
         System.out.println("");
         System.out.println(""); // spacing
+        cursorDown(12);
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("");
+        System.out.println("-".repeat(MENU_WIDTH));
+        cursorUp(2);
         pause(scanner);
     }
 
