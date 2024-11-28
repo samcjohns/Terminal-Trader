@@ -16,10 +16,8 @@ import static tetrad.Alert.GOOD_STOCK;
 import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.bold;
-import static tetrad.Mutil.center;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.green;
-import static tetrad.Mutil.italic;
 import static tetrad.Mutil.magenta;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.yellow;
@@ -43,6 +41,8 @@ import static tetrad.Mutil.yellow;
 
 public class News {
     LinkedList<Alert> reel; // current alerts to be posted
+
+    private final int alertsPerPage = 12; // number of alerts per page in news feed
 
     News() {
         this.reel = new LinkedList<>();
@@ -75,88 +75,82 @@ public class News {
             String separator = currentLength > "News: ".length() ? " | " : "";
             int additionalLength = separator.length() + headline.length();
 
+            // Check if adding the next headline would overflow the MENU_WIDTH
             if (currentLength + additionalLength > MENU_WIDTH) {
+                // If it would, truncate and exit the method
                 appendTruncated(line, headline, currentLength, separator, alert.getType());
+                System.out.println("Breaking after truncating headline: " + headline);  // Debugging line
                 return;
             }
 
-            // Append colored headline with separator
+            // Append the headline with the separator, update current length after appending
             line.append(separator).append(headlineColor(headline, alert.getType()));
             currentLength += additionalLength;
         }
 
-        // If space is left after reel, fill with random headlines
+        // If space is left after the reel, fill with random headlines
         while (currentLength < MENU_WIDTH) {
             String headline = randomHeadline();
             String separator = currentLength > "News: ".length() ? " | " : "";
             int additionalLength = separator.length() + headline.length();
 
+            // Check if adding the random headline will overflow the MENU_WIDTH
             if (currentLength + additionalLength > MENU_WIDTH) {
                 appendTruncated(line, headline, currentLength, separator, -1); // Random headlines have no type color
                 break;
             }
 
+            // Append random headline and update current length
             line.append(separator).append(magenta(headline));
             currentLength += additionalLength;
         }
 
+        // Finally, print the built line
         System.out.println(line.toString());
     }
 
+
     /**
-     * Prints a whole page containing all current events.
+     * Prints the specified page of current events.
+     *
+     * @param page The page number to display (1-based index).
      */
-    public void page() {
-        int linesPerPage = 36;
-        int currentPage = 0;
-        int totalPages = (int) Math.ceil(reel.size() / (double) linesPerPage);
+    public void page(int page) {
+        int alertsPerPage = 12;
+        int totalPages = (int) Math.ceil(reel.size() / (double) alertsPerPage);
 
-        Scanner scanner = new Scanner(System.in);
-
-        while (true) {
-            System.out.println("\n" + italic(center("Mind the dust...", MENU_WIDTH)) + "\n");
-
-            // Display current page of alerts
-            for (int i = currentPage * linesPerPage; i < Math.min(reel.size(), (currentPage + 1) * linesPerPage); i++) {
-                int age = reel.get(i).getAge();
-                switch (age) {
-                    case 0 -> System.out.print(cyan("Today: "));
-                    case 1 -> System.out.print(cyan("Yesterday: "));
-                    default -> System.out.print(cyan(age + " Days Ago: "));
-                }
-                System.out.println(headlineColor(reel.get(i).getHeadline(), reel.get(i).getType()) + "\n");
-            }
-
-            // Display page navigation options
-            System.out.println("Page " + (currentPage + 1) + " of " + totalPages);
-            System.out.print("[n] Next Page | [p] Previous Page | [q] Quit: ");
-
-            String input = scanner.nextLine().trim().toLowerCase();
-            switch (input) {
-                case "n":
-                    if (currentPage < totalPages - 1) {
-                        currentPage++;
-                    } else {
-                        System.out.println("You're already on the last page.");
-                    }
-                    break;
-                case "p":
-                    if (currentPage > 0) {
-                        currentPage--;
-                    } else {
-                        System.out.println("You're already on the first page.");
-                    }
-                    break;
-                case "q":
-                    clear(); // Clear the list if exiting
-                    System.out.println("Exiting pagination...");
-                    return; // Exit the method
-                default:
-                    System.out.println("Invalid input. Please enter 'n', 'p', or 'q'.");
-            }
+        // Check if the page number is within the valid range (1-based index)
+        if (page < 1 || page > totalPages) {
+            return;
         }
+
+        // Convert 1-based page number to 0-based index for internal processing
+        int zeroBasedPage = page - 1;
+
+        // Display the specified page of alerts
+        for (int i = zeroBasedPage * alertsPerPage; i < Math.min(reel.size(), (zeroBasedPage + 1) * alertsPerPage); i++) {
+            int age = reel.get(i).getAge();
+            switch (age) {
+                case 0 -> System.out.print(cyan("Today: "));
+                case 1 -> System.out.print(cyan("Yesterday: "));
+                default -> System.out.print(cyan(age + " Days Ago: "));
+            }
+            System.out.println(headlineColor(reel.get(i).getHeadline(), reel.get(i).getType()) + "\n");
+        }
+
+        // Display footer with page number (1-based index)
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("Page " + page + " of " + totalPages);
+        System.out.println("-".repeat(MENU_WIDTH));
     }
 
+
+    /**
+     * @return number of pages in the News Feed
+     */
+    int pages() {
+        return reel.size() / alertsPerPage + 1;
+    }
 
     /**
      * Updates the age of alerts after each advance.

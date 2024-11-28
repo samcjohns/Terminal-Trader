@@ -156,12 +156,7 @@ public class Game {
                     usr.showAchievements();
                     pause(scanner);
                 }
-                case "5" -> {
-                    clearScreen();
-                    printHeader();
-                    news.page();
-                    pause(scanner);
-                }
+                case "5" -> newsFeedMenu(scanner);
                 case "6" -> {
                     saveGame();
                     return;
@@ -314,6 +309,54 @@ public class Game {
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(2000);
+                }
+            }
+        }
+    }
+
+    /**
+     * Shows the alerts in the news reel, allowing the user to navigate each 
+     * page. Will return when the user is finished.
+     * @param scanner user input scanner
+     */
+    private void newsFeedMenu(Scanner scanner) {
+        int currentPage = 1;
+        while (true) {
+            // keep circular pages
+            if (currentPage < 1) {
+                currentPage = news.pages();
+            }
+            else if (currentPage > news.pages()) {
+                currentPage = 1;
+            }
+
+            clearScreen();
+            printHeader();
+            System.out.println(""); // spacing
+            System.out.println(italic(center("<~~~{ News Feed }~~~>", MENU_WIDTH)));
+            System.out.println("");
+            news.page(currentPage);
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.print(italic("Page " + currentPage + " of " + news.pages() + " | "));
+            System.out.println(cyan("[/] - Next Page | [.] - Last Page | [,] - Clear Feed | [ENTER] - Exit"));
+            System.out.println("-".repeat(MENU_WIDTH));
+
+            System.out.print("---[Select]: ");
+            
+            String choice = scanner.nextLine();
+            clearLine();
+            switch (choice) {
+                case "/" -> currentPage++;
+                case "." -> currentPage--;
+                case "," -> {
+                    news.clear();
+                }
+                case "" -> {
+                    return;
+                }
+                default ->  {
+                    System.out.println("Invalid Input");
+                    pause(1000);
                 }
             }
         }
