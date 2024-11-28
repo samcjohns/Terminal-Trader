@@ -921,7 +921,8 @@ public class Game {
         System.out.println(blue(italic(center("Logan J Burley", MENU_WIDTH))));
         System.out.println(red(italic(center("Colin Burley", MENU_WIDTH))));
         System.out.println(green(italic(center("Jaden Butler", MENU_WIDTH))));
-        cursorDown(21);
+        System.out.println(magenta((italic(center("Isaac Lloyd", MENU_WIDTH)))));
+        cursorDown(20);
         System.out.println("-".repeat(MENU_WIDTH));
         System.out.println("");
         System.out.println("-".repeat(MENU_WIDTH));
