@@ -15,6 +15,7 @@ import static tetrad.Mutil.bold;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.clearLine;
 import static tetrad.Mutil.clearScreen;
+import static tetrad.Mutil.cursorDown;
 import static tetrad.Mutil.cursorUp;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.cyanB;
@@ -909,6 +910,9 @@ public class Game {
     private void eCredits(Scanner scanner) {
         clearScreen();
         printHeader();
+        System.out.print("\n\n"); // spacing
+        printMenuArt(0);
+        cursorUp(29);
         System.out.println(center(" Credits ", MENU_WIDTH, "#"));
         System.out.println("");
         System.out.println(italic(center("'Terminal Trader' was designed, implemented, and produced by Samuel Johns, 2024", MENU_WIDTH)));
@@ -917,8 +921,11 @@ public class Game {
         System.out.println(blue(italic(center("Logan J Burley", MENU_WIDTH))));
         System.out.println(red(italic(center("Colin Burley", MENU_WIDTH))));
         System.out.println(green(italic(center("Jaden Butler", MENU_WIDTH))));
+        cursorDown(21);
+        System.out.println("-".repeat(MENU_WIDTH));
         System.out.println("");
-        System.out.println(""); // spacing
+        System.out.println("-".repeat(MENU_WIDTH));
+        cursorUp(2);
         pause(scanner);
     }
 
