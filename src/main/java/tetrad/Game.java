@@ -74,8 +74,8 @@ public class Game {
      * @return false if the user selects to exit the program
      */
     public boolean startGame(Scanner scanner) {
-        SoundPlayer theme = new SoundPlayer("assets/tetrad-theme.wav");
-        // theme.play();
+        SoundPlayer theme = new SoundPlayer("tetrad-theme");
+        theme.play();
         while(true) {
             showMainMenu();
             String choice = scanner.nextLine();

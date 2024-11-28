@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import static tetrad.Mutil.pause;
+
 /**
  * Top-level functionality class
  * @author Samuel Johns
@@ -18,37 +20,44 @@ public class Main {
     static boolean INIT = false; // true for first start only
     
     public static void main(String[] args) {
-        if (args.length > 0) {
-            NDEV = args[0].equals("-NDEV");
-            if (args.length > 1) {
-                INIT = args[1].equals("-INIT");
-            }
-        }
-
-        boolean exit = false;
-
-        // DEBUG: edit me
-        boolean DEBUG = false;
-        int DEBUG_MODE = 8;
-
-        Scanner scanner = getSource(DEBUG, DEBUG_MODE);
-        
         try {
-            while (true) {
-                Game game = new Game();
-                // exits if user selects exit
-                if (!game.startGame(scanner)) {
-                    scanner.close();
-                    return;
+            if (args.length > 0) {
+                NDEV = args[0].equals("-NDEV");
+                if (args.length > 1) {
+                    INIT = args[1].equals("-INIT");
                 }
-                game.play(scanner);
-                game.endGame();
+            }
+
+            boolean exit = false;
+
+            // DEBUG: edit me
+            boolean DEBUG = false;
+            int DEBUG_MODE = 8;
+
+            Scanner scanner = getSource(DEBUG, DEBUG_MODE);
+            
+            try {
+                while (true) {
+                    Game game = new Game();
+                    // exits if user selects exit
+                    if (!game.startGame(scanner)) {
+                        scanner.close();
+                        return;
+                    }
+                    game.play(scanner);
+                    game.endGame();
+                }
+            }
+            catch (NoSuchElementException e) {
+                // DEBUG
+                scanner.close();
+                while(true) {} //suspend prog
             }
         }
-        catch (NoSuchElementException e) {
-            // DEBUG
-            scanner.close();
-            while(true) {} //suspend prog
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            pause(10000);
         }
     }
 

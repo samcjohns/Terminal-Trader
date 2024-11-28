@@ -9,6 +9,8 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import static tetrad.Mutil.DB_LOG;
+
 /**
  * Dedicated audio class for starting and stopping audio playback.
  * 
@@ -24,15 +26,26 @@ public class SoundPlayer {
      *
      * @param filePath The path to the sound file (.wav format).
      */
-    public SoundPlayer(String filePath) {
+    public SoundPlayer(String fileName) {
+
+        // determine correct save path
+        String filePath;
+        if (Main.NDEV) {
+            filePath = System.getenv("APPDATA") + "\\Terminal Trader\\assets\\";
+            filePath += fileName + ".wav";
+        }
+        else {
+            filePath = "assets/" + fileName + ".wav";
+        }
+
         try {
             File audioFile = new File(filePath);
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
             clip = AudioSystem.getClip();
             clip.open(audioStream);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            e.printStackTrace();
-            System.err.println("Error loading sound file: " + filePath);
+            e.printStackTrace(System.err);
+            DB_LOG("Error loading sound file: " + filePath + " (" + e.getMessage() + ")");
         }
     }
 
@@ -82,19 +95,6 @@ public class SoundPlayer {
      */
     public boolean isPlaying() {
         return clip != null && clip.isRunning();
-    }
-
-    public static void main(String[] args) {
-        // Example usage
-        SoundPlayer player = new SoundPlayer("path_to_your_sound.wav");
-
-        player.play(); // Play sound
-        try {
-            Thread.sleep(5000); // Wait for 5 seconds while sound plays
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        player.stop(); // Stop sound
     }
 }
 
