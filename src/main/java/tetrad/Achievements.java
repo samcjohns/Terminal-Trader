@@ -9,12 +9,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
-import static tetrad.Mutil.MENU_WIDTH;
-import static tetrad.Mutil.bold;
-import static tetrad.Mutil.center;
-import static tetrad.Mutil.green;
-import static tetrad.Mutil.magenta;
-import static tetrad.Mutil.red;
 
 /**
  * A class that belongs to User that manages their achievements
@@ -159,24 +153,7 @@ public class Achievements {
      */
     @Deprecated
     void printPage() {
-        System.out.println(magenta(center("Achievements", MENU_WIDTH, "~")));
-        System.out.println(""); // spacing
-        System.out.println(green("Completed"));
-        System.out.println(red("Uncompleted"));
-        System.out.println(""); // spacing
-
-        // print all achievments
-        for(int i = 0; i < ACV_AMOUNT; i++) {
-            if (acvList[i]) {
-                System.out.println(bold(green(getAcvTitle(i))));
-                System.out.println(green(getAvcDesc(i)));
-            }
-            else {
-                System.out.println(bold(red(getAcvTitle(i))));
-                System.out.println(red(getAvcDesc(i)));
-            }
-            System.out.println(""); // spacing
-        }
+        
     }
 
     // Sets an achievement as earned and pushes an Alert to the News class
@@ -188,7 +165,7 @@ public class Achievements {
         channel.push(acvAlert);
     }
     // title for the given achievement
-    private String getAcvTitle(int acv) {
+    protected String getAcvTitle(int acv) {
         return switch (acv) {
             case FIRST_ADVANCE -> "Day One";
             case BUY_FIRST_STOCK -> "First Step";
@@ -206,7 +183,7 @@ public class Achievements {
         };
     }
     // description for the given achievement
-    private String getAvcDesc(int acv) {
+    protected String getAvcDesc(int acv) {
         return switch (acv) {
             case FIRST_ADVANCE -> "Advance for the first time";
             case BUY_FIRST_STOCK -> "Buy your first share";

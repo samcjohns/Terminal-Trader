@@ -149,13 +149,7 @@ public class Game {
                     System.out.println("-".repeat(MENU_WIDTH));
                     pause(scanner);
                 }
-                case "4" -> {
-                    // achievements
-                    clearScreen();
-                    printHeader();
-                    usr.showAchievements();
-                    pause(scanner);
-                }
+                case "4" -> acvMenu(scanner);
                 case "5" -> newsFeedMenu(scanner);
                 case "6" -> {
                     saveGame();
@@ -334,15 +328,20 @@ public class Game {
             printHeader();
             System.out.println(""); // spacing
             System.out.println(italic(center("<~~~{ News Feed }~~~>", MENU_WIDTH)));
-            System.out.println("");
+            System.out.print("\n\n"); // spacing
             news.page(currentPage);
+            System.out.println(""); // spacing
+           
+            // command tray
             System.out.println("-".repeat(MENU_WIDTH));
-            System.out.print(italic("Page " + currentPage + " of " + news.pages() + " | "));
-            System.out.println(cyan("[/] - Next Page | [.] - Last Page | [,] - Clear Feed | [ENTER] - Exit"));
+            System.out.print(italic("Page " + currentPage + " of " + news.pages()) + " | ");
+            System.out.print(cyan("[/] Next Page") + " | ");
+            System.out.print(cyan("[.] Last Page") + " | ");
+            System.out.print(cyan("[,] Clear Feed") + " | ");
+            System.out.println(cyan("[ENTER] Exit") + " | ");
             System.out.println("-".repeat(MENU_WIDTH));
 
             System.out.print("---[Select]: ");
-            
             String choice = scanner.nextLine();
             clearLine();
             switch (choice) {
@@ -351,6 +350,47 @@ public class Game {
                 case "," -> {
                     news.clear();
                 }
+                case "" -> {
+                    return;
+                }
+                default ->  {
+                    System.out.println("Invalid Input");
+                    pause(1000);
+                }
+            }
+        }
+    }
+
+    /**
+     * Shows the achievements for the user, allowing the user to navigate each
+     * page. Will return when the user is finished.
+     * @param scanner user input scanner
+     */
+    private void acvMenu(Scanner scanner) {
+        int currentPage = 1;
+        while (true) {
+            clearScreen();
+            printHeader();
+            System.out.println(""); // spacing
+            System.out.println(italic(center("<~~~{ Achievements }~~~>", MENU_WIDTH)));
+            System.out.println(""); // spacing
+            usr.showAchievements(currentPage);
+            System.out.println(""); // spacing
+           
+            // command tray
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.print(italic("Page " + currentPage + " of " + (Achievements.ACV_AMOUNT / 7 + 1)) + " | ");
+            System.out.print(cyan("[/] Next Page") + " | ");
+            System.out.print(cyan("[.] Last Page") + " | ");
+            System.out.println(cyan("[ENTER] Exit") + " | ");
+            System.out.println("-".repeat(MENU_WIDTH));
+
+            System.out.print("---[Select]: ");
+            String choice = scanner.nextLine();
+            clearLine();
+            switch (choice) {
+                case "/" -> currentPage++;
+                case "." -> currentPage--;
                 case "" -> {
                     return;
                 }

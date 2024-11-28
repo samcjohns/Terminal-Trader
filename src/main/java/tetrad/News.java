@@ -16,10 +16,8 @@ import static tetrad.Alert.GOOD_STOCK;
 import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.bold;
-import static tetrad.Mutil.center;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.green;
-import static tetrad.Mutil.italic;
 import static tetrad.Mutil.magenta;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.yellow;
@@ -122,19 +120,8 @@ public class News {
         int alertsPerPage = 12;
         int totalPages = (int) Math.ceil(reel.size() / (double) alertsPerPage);
 
-        if (totalPages == 0) {
-            for (int i = 0; i < pageHeight; i++) {
-                if (i == pageHeight/2) {
-                    System.out.println(italic(center("No Recent Events, Come Back Later!", MENU_WIDTH)));
-                }
-                else {
-                    System.out.println();
-                }
-            }
-        }
-
         // Check if the page number is within the valid range (1-based index)
-        if (page < 1 || page > totalPages) {
+        if (page < 1 || (page > totalPages && totalPages != 0)) {
             return;
         }
 

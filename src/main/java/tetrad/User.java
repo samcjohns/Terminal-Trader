@@ -16,6 +16,7 @@ import static tetrad.Mutil.bold;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.dollar;
+import static tetrad.Mutil.green;
 import static tetrad.Mutil.italic;
 import static tetrad.Mutil.numColor;
 import static tetrad.Mutil.red;
@@ -362,10 +363,43 @@ class User {
 
     /**
      * Prints a page showing achievements locked and unlocked for the user.
+     * @param page current page of achievements
      */
-    void showAchievements() {
-        acv.printPage();
+    void showAchievements(int page) {
+        System.out.println(""); // spacing
+        System.out.println(green("Completed"));
+        System.out.println(red("Uncompleted"));
+        System.out.println(""); // spacing
+    
+        int acvPerPage = 7;
+        int totalPages = (int) Math.ceil(Achievements.ACV_AMOUNT / (double) acvPerPage);
+    
+        // Check if the page number is within the valid range (1-based index)
+        if (page < 1 || page > totalPages) {
+            return;
+        }
+    
+        // Display the specified page of achievements
+        int acvOnPage = 0;
+        for (int i = (page - 1) * acvPerPage; i < page * acvPerPage && i < Achievements.ACV_AMOUNT; i++) {
+            if (acv.acvList[i]) {
+                System.out.println(bold(green(acv.getAcvTitle(i))));
+                System.out.println(green(acv.getAvcDesc(i)));
+            } else {
+                System.out.println(bold(red(acv.getAcvTitle(i))));
+                System.out.println(red(acv.getAvcDesc(i)));
+            }
+            System.out.println(""); // spacing
+            acvOnPage++;
+        }
+    
+        // Add space to fit the rest of the page
+        for (int i = acvOnPage; i < acvPerPage; i++) {
+            System.out.print("\n\n\n");
+        }
     }
+    
+    
 
     /**
      * Prints a page showing the stats of the user.
