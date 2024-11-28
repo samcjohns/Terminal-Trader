@@ -2,7 +2,7 @@
 <pre>
 A text-based, stock trader within the terminal.
 
-Current Version: v0.12
+Current Version: v1.0.0
 Game Name: Terminal Trader
 Shorthand: tetrad
 </pre>
@@ -23,4 +23,4 @@ jlink `
   --no-man-pages
 ```
 2. Then open Inno Setup, run the installer with the proper versions and jars
-3. The finished installer will be named "Terminal-Trader-X.X-Installer.exe" on the left
+3. The finished installer will be named "Terminal-Trader-X.X.X-Installer.exe" on the left

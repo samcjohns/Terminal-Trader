@@ -661,7 +661,7 @@ public class Game {
 
         // main menu options
         System.out.println(center("Welcome to the show!", MENU_WIDTH));
-        System.out.println(italic(center("Version 1.0", MENU_WIDTH)));
+        System.out.println(italic(center("Version 1.0.0", MENU_WIDTH)));
 
         printMenuArt(0);
 
@@ -790,13 +790,17 @@ public class Game {
         while (true) { 
             clearScreen();
             printHeader();
-            System.out.println(center("Settings", MENU_WIDTH, "="));
-            System.out.println(italic(center("Changes only affect current session", MENU_WIDTH)));
-            System.out.println(""); // spacing
-            System.out.println(center("1. Arcade Stock Behavior", MENU_WIDTH));
-            System.out.println(center("2. Change Header Color", MENU_WIDTH));
-            System.out.println(center("Enter to Exit", MENU_WIDTH));
+
+            clearScreen();
+            printHeader();
+            System.out.println(center(" Settings ", MENU_WIDTH, "="));
             System.out.println("");
+            
+            printMenuArt(0);
+            
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println(green("[ENTER] Exit | 1. Arcade Stock Behavior | 2. Change Header Color"));
+            System.out.println("-".repeat(MENU_WIDTH));
 
             System.out.print("---[Select]: ");
             String input = scanner.nextLine();
@@ -809,17 +813,19 @@ public class Game {
 
                 if (input.toUpperCase().equals("Y")) {
                     Game.ARCADE_MODE = true;
-                    System.out.println("Arcade Mode Activated.");
-                    pause(scanner);
+                    System.out.print("Arcade Mode Activated.");
+                    pause(1000);
+                    return;
                 }
                 else if (input.toUpperCase().equals("N")) {
                     Game.ARCADE_MODE = false;
-                    System.out.println("Arcade Mode Deactivated.");
-                    pause(scanner);
+                    System.out.print("Arcade Mode Deactivated.");
+                    pause(1000);
+                    return;
                 }
                 else {
                     System.out.println("Invalid Input");
-                    pause(scanner);
+                    pause(1000);
                 }
             }
             else if (input.equals("2")) {
@@ -948,12 +954,18 @@ public class Game {
             clearScreen();
             printHeader();
 
-            System.out.println(center(" Developer Tools ", MENU_WIDTH, "#"));
-            System.out.println(""); // spacing
-            System.out.println("0. Back");
-            System.out.println(redB("1. Repair Asset Files"));
-            System.out.println(redB("2. Stock Walk"));
-            System.out.println(""); // spacing
+            clearScreen();
+            printHeader();
+            System.out.println(center(" Developer Tools ", MENU_WIDTH, "~"));
+            System.out.println("");
+            
+            printMenuArt(0);
+            
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println(cyan("[ENTER] Exit") + " | " + redB("1. Repair Generated Assets") + " | " + redB("2. Stock Walk" ));
+            System.out.println("-".repeat(MENU_WIDTH));
+            
+
             System.out.print("---[Select]: ");
 
             String input = "";
@@ -961,7 +973,7 @@ public class Game {
             input = scanner.nextLine();
             clearLine();
             switch (input) {
-                case "0" -> {
+                case "" -> {
                     return;
                 }
                 case "1" -> {
