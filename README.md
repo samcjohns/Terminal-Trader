@@ -15,7 +15,7 @@ Creating New Installer (Current Method):
 ```powershell
 jlink `
   --module-path "C:\Program Files\Java\jdk-22.0.2\jmods" <#example path#>`
-  --add-modules java.base `
+  --add-modules java.base,java.desktop `
   --output runtime `
   --compress 2 `
   --strip-debug `
