@@ -16,8 +16,10 @@ import static tetrad.Alert.GOOD_STOCK;
 import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.bold;
+import static tetrad.Mutil.center;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.green;
+import static tetrad.Mutil.italic;
 import static tetrad.Mutil.magenta;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.yellow;
@@ -79,7 +81,7 @@ public class News {
             if (currentLength + additionalLength > MENU_WIDTH) {
                 // If it would, truncate and exit the method
                 appendTruncated(line, headline, currentLength, separator, alert.getType());
-                System.out.println("Breaking after truncating headline: " + headline);  // Debugging line
+                System.out.println(line.toString());
                 return;
             }
 
@@ -116,19 +118,29 @@ public class News {
      * @param page The page number to display (1-based index).
      */
     public void page(int page) {
+        int pageHeight = 26;
         int alertsPerPage = 12;
         int totalPages = (int) Math.ceil(reel.size() / (double) alertsPerPage);
+
+        if (totalPages == 0) {
+            for (int i = 0; i < pageHeight; i++) {
+                if (i == pageHeight/2) {
+                    System.out.println(italic(center("No Recent Events, Come Back Later!", MENU_WIDTH)));
+                }
+                else {
+                    System.out.println();
+                }
+            }
+        }
 
         // Check if the page number is within the valid range (1-based index)
         if (page < 1 || page > totalPages) {
             return;
         }
 
-        // Convert 1-based page number to 0-based index for internal processing
-        int zeroBasedPage = page - 1;
-
         // Display the specified page of alerts
-        for (int i = zeroBasedPage * alertsPerPage; i < Math.min(reel.size(), (zeroBasedPage + 1) * alertsPerPage); i++) {
+        int alertsOnPage = 0;
+        for (int i = (page - 1) * alertsPerPage; i < Math.min(reel.size(), page * alertsPerPage); i++) {
             int age = reel.get(i).getAge();
             switch (age) {
                 case 0 -> System.out.print(cyan("Today: "));
@@ -136,12 +148,20 @@ public class News {
                 default -> System.out.print(cyan(age + " Days Ago: "));
             }
             System.out.println(headlineColor(reel.get(i).getHeadline(), reel.get(i).getType()) + "\n");
+            alertsOnPage++;
         }
 
-        // Display footer with page number (1-based index)
-        System.out.println("-".repeat(MENU_WIDTH));
-        System.out.println("Page " + page + " of " + totalPages);
-        System.out.println("-".repeat(MENU_WIDTH));
+        // fill rest of page with random headlines
+        if (alertsOnPage != alertsPerPage) {
+            for (int i = 0; i < (alertsPerPage - alertsOnPage); i++) {
+                switch (i) {
+                    case 0 -> System.out.print(cyan("Today: "));
+                    case 1 -> System.out.print(cyan("Yesterday: "));
+                    default -> System.out.print(cyan(i + " Days Ago: "));
+                }
+                System.out.println(magenta(randomHeadline()) + "\n");
+            }
+        }
     }
 
 
