@@ -885,10 +885,14 @@ public class Game {
         printHeader();
         System.out.println(center(" Mini Games ", MENU_WIDTH, "!"));
         System.out.println("");
-        System.out.println("1. Coin Toss");
-        System.out.println("");
-        System.out.println(""); // spacing
         
+        printMenuArt(0);
+        
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(cyan("[ENTER] Exit | 1. Coin Toss | " + italic("Many More to Come!")));
+        System.out.println("-".repeat(MENU_WIDTH));
+        
+        System.err.print("---[Select]: ");
         String choice = scanner.nextLine();
         switch (choice) {
             case "1" -> {
