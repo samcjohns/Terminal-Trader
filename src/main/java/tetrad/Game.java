@@ -300,7 +300,9 @@ public class Game {
                 }
                 case "/" -> advance();
                 case "," -> stockView(scanner);
-                case "." -> doBuy(scanner);
+                case "." -> {
+                    doBuy(scanner);
+                }
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(2000);
@@ -602,6 +604,7 @@ public class Game {
         while(true) {
             double cash = usr.getCash();
             try {
+                clearLine(2);
                 // show cash and max buy amount
                 Stock stock = mkt.getStock(selection - 1);
                 int maxAmount = (int) (cash / stock.getValue());
@@ -618,6 +621,7 @@ public class Game {
 
                 System.out.println(yellow(usr.buy(stock, amount)));
                 pause(2000);
+                clearLine();
                 break;
             } 
             catch (NoSuchElementException | NumberFormatException e) {
