@@ -80,7 +80,7 @@ class Portfolio {
         if (history.size() == 0) {
             return 0.0;
         }
-        return history.at(history.size()-1); 
+        return history.recent(); 
     }
 
     /**
@@ -88,7 +88,7 @@ class Portfolio {
      * of the previous day (before the most recent advance)
      */
     double getChange() {
-        return round(((value - getLast()) / getLast()) * 100);
+        return round(((value + owner.getCash() - getLast()) / getLast()) * 100);
     }
 
     /**
@@ -398,7 +398,7 @@ class Portfolio {
      * Prints a graph displaying the history of the portfolio valuation
      */
     void printHistory() {
-        int compress = size;
+        int compress = size + 2;
         if (size == 0) {
             compress = 5;
         }

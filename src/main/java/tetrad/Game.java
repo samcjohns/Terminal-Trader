@@ -273,6 +273,7 @@ public class Game {
                 case "." -> doSell(scanner);
                 case ";" -> usr.getPortfolio().printTransactionLogs();
                 default -> {
+                    clearLine();
                     System.out.println("Invalid Input");
                     pause(1000);
                     clearLine();
@@ -549,8 +550,7 @@ public class Game {
     private void doSell(Scanner scanner) {
         while (true) {
             try {
-                System.out.println("(0 to Exit)");
-                System.out.print("--[Stock]: ");
+                System.out.print("--[Stock (0 to Exit)]: ");
                 int selection = Integer.parseInt(scanner.nextLine());
                 if (selection == 0) {
                     return; // exit case
@@ -565,8 +565,9 @@ public class Game {
                 }
                 clearLine();
 
-                System.out.println(yellow(usr.sell(stock, amount)));
+                System.out.print(yellow(usr.sell(stock, amount)));
                 pause(2000);
+                clearLine();
                 break;
             } 
             catch (InvalidSelectionException e) {
@@ -583,16 +584,16 @@ public class Game {
      * @param scanner user input scanner
      */
     private void doBuy(Scanner scanner) {
+        int selection;
         while(true) {
             try {
                 System.out.print("---[Stock]: ");
-                int selection = Integer.parseInt(scanner.nextLine());
+                selection = Integer.parseInt(scanner.nextLine());
                 if (selection == 0) {
                     return; // exit case
                 }
                 clearLine();
-
-                doBuy(scanner, selection);
+                break;
             } 
             catch (NoSuchElementException | NumberFormatException e) {
                 System.out.println("Invalid Input, please try again.");
@@ -601,6 +602,7 @@ public class Game {
                 pause(scanner);
             }
         }
+        doBuy(scanner, selection);
     }
 
     /**
@@ -629,10 +631,10 @@ public class Game {
                 }
                 clearLine();
 
-                System.out.println(yellow(usr.buy(stock, amount)));
+                System.out.print(yellow(usr.buy(stock, amount)));
                 pause(2000);
                 clearLine();
-                break;
+                return;
             } 
             catch (NoSuchElementException | NumberFormatException e) {
                 System.out.println("Invalid Input, please try again.");
