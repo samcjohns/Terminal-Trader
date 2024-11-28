@@ -261,6 +261,7 @@ public class Game {
             + cyan("; - History"));
             System.out.println("-".repeat(MENU_WIDTH));
 
+            System.out.print("---[Select]: ");
             String command = scanner.nextLine();
             switch (command) {
                 case "" -> { return; }
@@ -367,22 +368,35 @@ public class Game {
      * @param scanner user input scanner
      */
     private void acvMenu(Scanner scanner) {
+        int pages = Achievements.ACV_AMOUNT / 7 + 1;
         int currentPage = 1;
         while (true) {
+            // ensure circular pages
+            if (currentPage > pages) {
+                currentPage = 1;
+            }
+            else if (currentPage < 1) {
+                currentPage = pages;
+            }
             clearScreen();
             printHeader();
             System.out.println(""); // spacing
             System.out.println(italic(center("<~~~{ Achievements }~~~>", MENU_WIDTH)));
-            System.out.println(""); // spacing
+            System.out.print("\n\n"); // spacing
+
+            // print art and move up cursor
+            printMenuArt(2);
+            cursorUp(25);
+
             usr.showAchievements(currentPage);
-            System.out.println(""); // spacing
            
             // command tray
             System.out.println("-".repeat(MENU_WIDTH));
-            System.out.print(italic("Page " + currentPage + " of " + (Achievements.ACV_AMOUNT / 7 + 1)) + " | ");
+            System.out.print(italic("Page " + currentPage + " of " + pages) + " | ");
             System.out.print(cyan("[/] Next Page") + " | ");
             System.out.print(cyan("[.] Last Page") + " | ");
-            System.out.println(cyan("[ENTER] Exit") + " | ");
+            System.out.print(cyan("[ENTER] Exit") + " | ");
+            System.out.println(" ".repeat(59)); // clear art in command tray
             System.out.println("-".repeat(MENU_WIDTH));
 
             System.out.print("---[Select]: ");
@@ -436,6 +450,7 @@ public class Game {
             + cyan("'/' - Advance"));
             System.out.println("-".repeat(MENU_WIDTH));
 
+            System.out.print("---[Select]: ");
             String command = scanner.nextLine();
             clearLine();
             switch (command) {

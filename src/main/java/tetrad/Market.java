@@ -199,7 +199,7 @@ class Market {
     void print() {
         // header
         System.out.println(center("Market", MENU_WIDTH, "~"));
-        System.out.println("");
+        System.out.print("\n\n"); // spacing
 
         // Print the header
         String header = "";

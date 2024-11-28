@@ -14,6 +14,8 @@ import static tetrad.Mutil.add;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.bold;
 import static tetrad.Mutil.center;
+import static tetrad.Mutil.cursorDown;
+import static tetrad.Mutil.cursorRight;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.dollar;
 import static tetrad.Mutil.green;
@@ -367,8 +369,8 @@ class User {
      */
     void showAchievements(int page) {
         System.out.println(""); // spacing
-        System.out.println(green("Completed"));
-        System.out.println(red("Uncompleted"));
+        System.out.println(green(center("Completed", MENU_WIDTH)));
+        System.out.println(red(center("Not Completed", MENU_WIDTH)));
         System.out.println(""); // spacing
     
         int acvPerPage = 7;
@@ -382,12 +384,20 @@ class User {
         // Display the specified page of achievements
         int acvOnPage = 0;
         for (int i = (page - 1) * acvPerPage; i < page * acvPerPage && i < Achievements.ACV_AMOUNT; i++) {
+            String title = acv.getAcvTitle(i);
+            String desc = acv.getAvcDesc(i);
+            // color properly, move cursor to print in middle
             if (acv.acvList[i]) {
-                System.out.println(bold(green(acv.getAcvTitle(i))));
-                System.out.println(green(acv.getAvcDesc(i)));
-            } else {
-                System.out.println(bold(red(acv.getAcvTitle(i))));
-                System.out.println(red(acv.getAvcDesc(i)));
+                cursorRight((MENU_WIDTH / 2) - (title.length() / 2));
+                System.out.println(bold(green(title)));
+                cursorRight((MENU_WIDTH / 2) - (desc.length() / 2));
+                System.out.println(green(desc));
+            } 
+            else {
+                cursorRight((MENU_WIDTH / 2) - (title.length() / 2));
+                System.out.println(bold(red(title)));
+                cursorRight((MENU_WIDTH / 2) - (desc.length() / 2));
+                System.out.println(red(desc));
             }
             System.out.println(""); // spacing
             acvOnPage++;
@@ -395,7 +405,7 @@ class User {
     
         // Add space to fit the rest of the page
         for (int i = acvOnPage; i < acvPerPage; i++) {
-            System.out.print("\n\n\n");
+            cursorDown(3);
         }
     }
     

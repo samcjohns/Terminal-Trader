@@ -11,7 +11,10 @@ import java.util.Scanner;
 import static tetrad.Market.NUM_STOCKS;
 import static tetrad.Mutil.DB_LOG;
 import static tetrad.Mutil.HISTORY_HEIGHT;
+import static tetrad.Mutil.HISTORY_LENGTH;
 import static tetrad.Mutil.dollar;
+import static tetrad.Mutil.green;
+import static tetrad.Mutil.red;
 import static tetrad.Mutil.round;
 
 /**
@@ -395,9 +398,13 @@ class Portfolio {
      * Prints a graph displaying the history of the portfolio valuation
      */
     void printHistory() {
-        final int ROWS = HISTORY_HEIGHT;       // max graph height
-        final int COLS = history.size();       // max graph length
-        char[][] array = new char[ROWS][COLS]; // for building graph
+        int compress = size;
+        if (size == 0) {
+            compress = 5;
+        }
+        final int ROWS = HISTORY_HEIGHT - compress; // max graph height
+        final int COLS = HISTORY_LENGTH;            // max graph length
+        char[][] array = new char[ROWS][COLS];      // for building graph
     
         // Fill the array with spaces
         for (int i = 0; i < ROWS; i++) {
@@ -423,6 +430,9 @@ class Portfolio {
         double range = maxVal - minVal;
         double binSize = range / ROWS;
     
+        // determine current barheight for coloring.
+        int redline = (int) ((history.at(history.size()-1) - minVal) / binSize) + 1;
+
         // Build graph in array
         for (int i = 0; i < history.size(); i++) {
             // Calculate height of the bar based on current value
@@ -440,10 +450,20 @@ class Portfolio {
     
         // Print graph
         for (int i = 0; i < ROWS; i++) { // Print from top to bottom
+            String line = "";
             for (int j = 0; j < COLS; j++) {
-                System.out.print(array[i][j]);
+                line += array[i][j];
             }
-            System.out.println();
+
+            // color accordingly
+            if (ROWS - i < redline) {
+                line = red(line);
+            }
+            else {
+                line = green(line);
+            }
+
+            System.out.println(line);
         }
     }
 
