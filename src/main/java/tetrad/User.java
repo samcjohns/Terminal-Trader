@@ -297,9 +297,9 @@ class User {
             header = add(header, "Stock Name", 5);
             header = add(header, "Amount", 25);
             header = add(header, "Total", 38);
-            header = add(header, "Current", 48);
-            header = add(header, "Recent", 65);
-            header = add(header, "Gain", 80);
+            header = add(header, "Current", 53);
+            header = add(header, "Recent", 70);
+            header = add(header, "Gain", 85);
             System.out.println(bold(header));
 
             try {
@@ -333,18 +333,18 @@ class User {
 
                     // format current
                     current +=  dollar(stock.getValue());
-                    line = add(line, current, 49);
+                    line = add(line, current, 54);
 
                     // format percent change
                     change += String.format("%.2f", stock.getChange());
                     // color accordingly
                     change = numColor(change);
-                    line = add(line, change, 65);
+                    line = add(line, change, 70);
 
                     // format gain
                     gain += String.format("%.2f", portfolio.calculateGain(i));
                     gain = numColor(gain);
-                    line = add(line, gain, 88);
+                    line = add(line, gain, 93);
                     System.out.println(line); // output final line
                 }
             }

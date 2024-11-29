@@ -259,6 +259,7 @@ public class Game {
 
             System.out.print("---[Select]: ");
             String command = scanner.nextLine();
+            clearLine();
             switch (command) {
                 case "" -> { return; }
                 case "/" -> advance();
@@ -266,7 +267,7 @@ public class Game {
                 case ";" -> usr.getPortfolio().printTransactionLogs();
                 default -> {
                     clearLine();
-                    System.out.println("Invalid Input");
+                    System.out.println(red("Invalid Input"));
                     pause(1000);
                     clearLine();
                 }
@@ -356,7 +357,7 @@ public class Game {
                     return;
                 }
                 default ->  {
-                    System.out.println("Invalid Input");
+                    System.out.println(red("Invalid Input"));
                     pause(1000);
                     clearLine();
                 }
@@ -411,7 +412,7 @@ public class Game {
                     return;
                 }
                 default ->  {
-                    System.out.println("Invalid Input");
+                    System.out.println(red("Invalid Input"));
                     pause(1000);
                 }
             }
@@ -567,7 +568,7 @@ public class Game {
                     return;
                 }
                 default -> {
-                    System.out.println("Invalid Input");
+                    System.out.println(red("Invalid Input"));
                     pause(1000);
                     clearLine();
                 }
@@ -607,8 +608,7 @@ public class Game {
                 break;
             } 
             catch (InvalidSelectionException e) {
-                clearLine();
-                System.out.println(e.getMessage());
+                System.out.println(red(e.getMessage()));
                 pause(1000); // wait one second
                 clearLine(); // clear error message
             }
@@ -686,7 +686,8 @@ public class Game {
             }
             catch (InvalidSelectionException e)  {
                 System.out.println(e.getMessage());
-                pause(scanner);
+                pause(1000);
+                clearLine();
             }
         }
     }

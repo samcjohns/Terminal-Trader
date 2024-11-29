@@ -432,7 +432,10 @@ class Portfolio {
         double binSize = range / ROWS;
     
         // determine current barheight for coloring.
-        int redline = (int) ((history.at(history.size()-1) - minVal) / binSize) + 1;
+        int redline = 0;
+        if (history.size() != 0) {
+            redline = (int) ((history.at(history.size()-1) - minVal) / binSize) + 1;
+        }
 
         // Build graph in array
         for (int i = 0; i < history.size(); i++) {

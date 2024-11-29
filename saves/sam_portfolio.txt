@@ -1,9 +1,13 @@
 ---PORTFOLIO-INFO---
 DATA: stockID amount originalPrice
+1 1 301.77
+0 1 39.38
 ---HISTORY---
 
 ---HISTORY-END---
 ---TRANSACTIONS-LOG---
+1 1 301.77
+0 1 39.38
 
 ---TRANSACTIONS-END---
 ---INFO-END---
