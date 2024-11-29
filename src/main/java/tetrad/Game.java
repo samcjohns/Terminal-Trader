@@ -54,9 +54,10 @@ import static tetrad.Mutil.yellowB;
  */
 
 public class Game {
-    User usr;
-    Market mkt;
-    News news;
+    User usr;          // current user object
+    Market mkt;        // main market object
+    News news;         // main news object
+    SoundPlayer theme; // theme song control
 
     static int headerSetting = -1; // color setting for the header
     static boolean ARCADE_MODE = false; // activates old stock behavior
@@ -65,6 +66,7 @@ public class Game {
         news = new News();
         mkt = new Market(this);
         usr = new User(this);
+        theme = new SoundPlayer("tetrad-theme");
     }
 
     /**
@@ -74,7 +76,6 @@ public class Game {
      * @return false if the user selects to exit the program
      */
     public boolean startGame(Scanner scanner) {
-        SoundPlayer theme = new SoundPlayer("tetrad-theme");
         theme.play();
         while(true) {
             showMainMenu();
@@ -184,7 +185,7 @@ public class Game {
      * Exit method, used for cleanup.
      */
     public void endGame() {
-        // doesn't do anything yet, used for cleanup
+        theme.stop();
     }
 
     /**
