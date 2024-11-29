@@ -14,8 +14,11 @@ import static tetrad.Mutil.add;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.bold;
 import static tetrad.Mutil.center;
+import static tetrad.Mutil.cursorDown;
+import static tetrad.Mutil.cursorRight;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.dollar;
+import static tetrad.Mutil.green;
 import static tetrad.Mutil.italic;
 import static tetrad.Mutil.numColor;
 import static tetrad.Mutil.red;
@@ -36,17 +39,30 @@ import static tetrad.Mutil.yellow;
  * @see Achievements
  * @see Game
  */
+
 class User {
     private String name; // name of the user
     private double cash; // total amount of liquid cash
     private int advances; // number of advances user has done
-    protected Portfolio portfolio; // portfolio of share holdings
+    private Portfolio portfolio; // portfolio of share holdings
+
+    /**
+     * <p> True - if user is loaded in main game.
+     * <p> False - if user is loaded in environment where market or news cannot
+     * be initialized.
+     */
+    private boolean main;
 
     private Achievements acv; // keeps track of achievements for user
     private Game game; // reference back to the current game for advancing while in portfolio
 
     static final double STARTING_CASH = 1000.0;
 
+    User() {
+        this.name = "null";
+        main = false;
+        acv = new Achievements(this, null);
+    }
     User(Game game) {
         this("null", 0, game);
     }
@@ -55,6 +71,7 @@ class User {
         this.cash = cash;
         this.game = game;
         
+        main = true;
         advances = 0;
         portfolio = new Portfolio(this);
         acv = new Achievements(this, game.news);
@@ -90,7 +107,17 @@ class User {
     /**
      * @return number of advances of the user
      */
-    int    getAdvances() { return advances; }
+    int getAdvances() { return advances; }
+
+    /**
+     * @return user's Trader Score
+     */
+    int getScore() { 
+        if (advances == 0) {
+            return 0;
+        }
+        return ((int) (getNet() - STARTING_CASH)/advances); 
+    }
 
     /**
      * @return a referece to the Portfolio of the user
@@ -117,8 +144,8 @@ class User {
     void save() {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + name + ".txt";
         }
         else {
@@ -131,9 +158,6 @@ class User {
             writer.println(name);
             writer.println(cash);
             writer.println(advances);
-    
-            // portfolio
-            portfolio.save();
             writer.println("---INFO-END---");
     
             // label
@@ -146,22 +170,24 @@ class User {
             DB_LOG("IO Error: User Save Method -> " + e.getMessage());
         }
         
-        portfolio.save();
         acv.save();
+        if (main) {
+            portfolio.save();
+        }
     }
 
     /**
      * Loads the information of the user from <username>.txt
      * @param username User's name and the file from which to load from
      * @param market Market instance containing the stocks that User's
-     * portfolio contains
+     * portfolio containS
      * @throws InitException if file is corrupted or missing
      */
     void load(String username, Market market) throws InitException {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + username + ".txt";
         }
         else {
@@ -177,10 +203,13 @@ class User {
             cash = Double.parseDouble(scanner.nextLine());
             advances = Integer.parseInt(scanner.nextLine());
 
-            portfolio.load(market);
             acv.load();
 
-            portfolio.update(false); // update value for init
+            // won't load portfolio if market is null (in case of minigames)
+            if (main) {
+                portfolio.load(market);
+                portfolio.update(false); // update value for init
+            }
         }
         catch (NoSuchElementException e) {
             throw new InitException("Corrupted Stock Data");
@@ -188,6 +217,17 @@ class User {
         catch (FileNotFoundException e) {
             throw new InitException("File Not Found: " + username + ".txt");
         }
+    }
+
+    /**
+     * Loads the information of the user from <username>.txt, does not load
+     * portfolio. Not to be used in main gameplay, however, it is helpful
+     * for use with mini games.
+     * @param username User's name and the file from which to load from
+     * @throws InitException if file is corrupted or missing
+     */
+    void load(String username) throws InitException {
+        this.load(username, null);
     }
 
     /**
@@ -257,9 +297,9 @@ class User {
             header = add(header, "Stock Name", 5);
             header = add(header, "Amount", 25);
             header = add(header, "Total", 38);
-            header = add(header, "Current", 48);
-            header = add(header, "Recent", 65);
-            header = add(header, "Gain", 80);
+            header = add(header, "Current", 53);
+            header = add(header, "Recent", 70);
+            header = add(header, "Gain", 85);
             System.out.println(bold(header));
 
             try {
@@ -293,18 +333,18 @@ class User {
 
                     // format current
                     current +=  dollar(stock.getValue());
-                    line = add(line, current, 49);
+                    line = add(line, current, 54);
 
                     // format percent change
                     change += String.format("%.2f", stock.getChange());
                     // color accordingly
                     change = numColor(change);
-                    line = add(line, change, 65);
+                    line = add(line, change, 70);
 
                     // format gain
                     gain += String.format("%.2f", portfolio.calculateGain(i));
                     gain = numColor(gain);
-                    line = add(line, gain, 88);
+                    line = add(line, gain, 93);
                     System.out.println(line); // output final line
                 }
             }
@@ -325,10 +365,51 @@ class User {
 
     /**
      * Prints a page showing achievements locked and unlocked for the user.
+     * @param page current page of achievements
      */
-    void showAchievements() {
-        acv.printPage();
+    void showAchievements(int page) {
+        System.out.println(""); // spacing
+        System.out.println(green(center("Completed", MENU_WIDTH)));
+        System.out.println(red(center("Not Completed", MENU_WIDTH)));
+        System.out.println(""); // spacing
+    
+        int acvPerPage = 7;
+        int totalPages = (int) Math.ceil(Achievements.ACV_AMOUNT / (double) acvPerPage);
+    
+        // Check if the page number is within the valid range (1-based index)
+        if (page < 1 || page > totalPages) {
+            return;
+        }
+    
+        // Display the specified page of achievements
+        int acvOnPage = 0;
+        for (int i = (page - 1) * acvPerPage; i < page * acvPerPage && i < Achievements.ACV_AMOUNT; i++) {
+            String title = acv.getAcvTitle(i);
+            String desc = acv.getAvcDesc(i);
+            // color properly, move cursor to print in middle
+            if (acv.acvList[i]) {
+                cursorRight((MENU_WIDTH / 2) - (title.length() / 2));
+                System.out.println(bold(green(title)));
+                cursorRight((MENU_WIDTH / 2) - (desc.length() / 2));
+                System.out.println(green(desc));
+            } 
+            else {
+                cursorRight((MENU_WIDTH / 2) - (title.length() / 2));
+                System.out.println(bold(red(title)));
+                cursorRight((MENU_WIDTH / 2) - (desc.length() / 2));
+                System.out.println(red(desc));
+            }
+            System.out.println(""); // spacing
+            acvOnPage++;
+        }
+    
+        // Add space to fit the rest of the page
+        for (int i = acvOnPage; i < acvPerPage; i++) {
+            cursorDown(3);
+        }
     }
+    
+    
 
     /**
      * Prints a page showing the stats of the user.
@@ -339,7 +420,7 @@ class User {
             traderScore = "N/A";
         }
         else {
-            traderScore = "" + ((int) (getNet() - STARTING_CASH)/advances);
+            traderScore = "" + getScore();
         }
 
         System.out.println(""); // spacing

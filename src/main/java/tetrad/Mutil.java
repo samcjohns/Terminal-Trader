@@ -20,11 +20,46 @@ import java.util.Scanner;
 
 public class Mutil {
 
-    /* Terminal Format Constants */
-    // MAY CHANGE LATER WITH A SETTINGS UPDATE
-    public static final int     MENU_WIDTH = 100; // total width of the menu on screen
-    public static final int HISTORY_LENGTH = 100; // variables for printing history graph
-    public static final int HISTORY_HEIGHT = 15;
+    /** total width of the menu on screen */
+    public static final int     MENU_WIDTH = 120;
+
+    /** total number of lines on screen */
+    public static final int    MENU_HEIGHT = 36;
+
+    /** default width of history graphs */
+    public static final int HISTORY_LENGTH = 120;
+
+    /** default height of history graphs */
+    public static final int HISTORY_HEIGHT = 25;
+
+    /**
+     * Clears the screen and scrollback buffer using ANSI Escape Code
+     */
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J"); // clear screen
+        System.out.println("\033[3J");     // clear scrollback buffer
+        System.out.flush();
+    }
+
+    /**
+     * Clears the current line on the screen
+     */
+    public static void clearLine() {
+        System.out.print("\033[2K");  // Clears the second line
+        System.out.print("\033[1F");  // Moves the cursor up to the first line
+        System.out.print("\033[2K");  // Clears the first line
+        System.out.print("\033[0G");  // Move cursor back to the beginning of the line
+    }
+
+    /**
+     * Clears a number of lines (current and above)
+     * @param lines number of lines to clear
+     */
+    public static void clearLine(int numLines) {
+        for (int i = 0; i < numLines; i++) {
+            clearLine();
+        }
+    }
 
     /** 
      * Formats the string in the center of a given width
@@ -315,35 +350,6 @@ public class Mutil {
     }
 
     /**
-     * Clears the screen and scrollback buffer using ANSI Escape Code
-     */
-    public static void clearScreen() {
-        System.out.print("\033[H\033[2J"); // clear screen
-        System.out.println("\033[3J");     // clear scrollback buffer
-        System.out.flush();
-    }
-
-    /**
-     * Clears the current line on the screen
-     */
-    public static void clearLine() {
-        System.out.print("\033[2K");  // Clears the second line
-        System.out.print("\033[1F");  // Moves the cursor up to the first line
-        System.out.print("\033[2K");  // Clears the first line
-        System.out.print("\033[0G");  // Move cursor back to the beginning of the line
-    }
-
-    /**
-     * Clears a number of lines (current and above)
-     * @param lines number of lines to clear
-     */
-    public static void clearLine(int lines) {
-        for (int i = 0; i < lines; i++) {
-            clearLine();
-        }
-    }
-
-    /**
      * Experimental function for printing taxman screen from ASCI art
      * @deprecated WILL BE MOVED TO TERMINALGAME
      */
@@ -359,6 +365,16 @@ public class Mutil {
         } catch (IOException e) {
             System.err.println("Error reading the file: " + e.getMessage());
         }
+    }
+
+    /**
+     * Takes a String and prints it as a header
+     * @param title String to be used for header
+     */
+    public static void header(String title) {
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("~ ".repeat((MENU_WIDTH - title.length())/4) + title + " ~".repeat((MENU_WIDTH - title.length())/4) + " ");
+        System.out.println("-".repeat(MENU_WIDTH));
     }
 
     /**
@@ -392,9 +408,46 @@ public class Mutil {
         }
         if (scanner != null) {
             // display message
-            System.out.println(italic("Press Enter to Continue..."));
+            System.out.print(italic("Press Enter to Continue..."));
             scanner.nextLine();
         }
+    }
+
+    // cursor commands
+    /**
+     * Moves the cursor up using ANSI Escape Codes, if there is text in from of
+     * the cursor when it prints, it will be overwritten.
+     * @param num number of lines up
+     */
+    public static void cursorUp(int num) {
+        System.out.print("\033[" + num + "A");
+    }
+
+    /**
+     * Moves the cursor down using ANSI Escape Codes, if there is text in from of
+     * the cursor when it prints, it will be overwritten.
+     * @param num number of lines down
+     */
+    public static void cursorDown(int num) {
+        System.out.print("\033[" + num + "B");
+    }
+
+    /**
+     * Moves the cursor right using ANSI Escape Codes, if there is text in from of
+     * the cursor when it prints, it will be overwritten.
+     * @param num number of characters right
+     */
+    public static void cursorRight(int num) {
+        System.out.print("\033[" + num + "C");
+    }
+
+    /**
+     * Moves the cursor down using ANSI Escape Codes, if there is text in from of
+     * the cursor when it prints, it will be overwritten.
+     * @param num number of characters left
+     */
+    public static void cursorLeft(int num) {
+        System.out.print("\033[" + num + "D");
     }
 
     // DEBUGGING

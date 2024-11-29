@@ -15,6 +15,8 @@ import static tetrad.Mutil.bold;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.clearLine;
 import static tetrad.Mutil.clearScreen;
+import static tetrad.Mutil.cursorDown;
+import static tetrad.Mutil.cursorUp;
 import static tetrad.Mutil.cyan;
 import static tetrad.Mutil.cyanB;
 import static tetrad.Mutil.dollar;
@@ -52,9 +54,10 @@ import static tetrad.Mutil.yellowB;
  */
 
 public class Game {
-    User usr;
-    Market mkt;
-    News news;
+    User usr;          // current user object
+    Market mkt;        // main market object
+    News news;         // main news object
+    SoundPlayer theme; // theme song control
 
     static int headerSetting = -1; // color setting for the header
     static boolean ARCADE_MODE = false; // activates old stock behavior
@@ -63,6 +66,7 @@ public class Game {
         news = new News();
         mkt = new Market(this);
         usr = new User(this);
+        theme = new SoundPlayer("tetrad-theme");
     }
 
     /**
@@ -72,6 +76,7 @@ public class Game {
      * @return false if the user selects to exit the program
      */
     public boolean startGame(Scanner scanner) {
+        theme.play();
         while(true) {
             showMainMenu();
             String choice = scanner.nextLine();
@@ -91,7 +96,11 @@ public class Game {
                         System.out.println(redB(e.getMessage()));
                         System.out.println("User: '" + username + "' cannot be accessed...");
                         System.out.println(italic("Try making a new save if this is your first time! :)"));
+                        printMenuArt(2);
+                        System.out.println("-".repeat(MENU_WIDTH));
                         System.out.println("");
+                        System.out.println("-".repeat(MENU_WIDTH));
+                        cursorUp(2);
                         pause(scanner);
                         // error, so repeat
                     }
@@ -104,11 +113,14 @@ public class Game {
                 }
                 case "3" -> doExtras(scanner);
                 case "4" -> {
+                    theme.stop();
                     return false; // exit program
                 }
                 default -> {
-                    System.out.println("Invalid Selection");
-                    pause(scanner);
+                    clearLine();
+                    System.out.println(red("Invalid Input"));
+                    pause(1000);
+                    clearLine();
                     // error, so repeat
                 }
             }
@@ -125,36 +137,17 @@ public class Game {
             clearScreen();
             printHeader();
             showPlayMenu();
-            System.out.print("---Select: ");
+            System.out.print("---[Select]: ");
             String input = scanner.nextLine();
             switch (input) {
                 case "1" -> portfolioMenu(scanner); // show portfolio
                 case "2" -> marketMenu(scanner);    // show stock exchange
-                case "3" -> {
-                    // user stats
-                    clearScreen();
-                    printHeader();
-                    usr.showStats();
-                    pause(scanner);
-                }
-                case "4" -> {
-                    // achievements
-                    clearScreen();
-                    printHeader();
-                    usr.showAchievements();
-                    pause(scanner);
-                }
-                case "5" -> {
-                    clearScreen();
-                    printHeader();
-                    news.page();
-                    pause(scanner);
-                }
+                case "3" -> statsMenu(scanner);     // user stats menu
+                case "4" -> acvMenu(scanner);
+                case "5" -> newsFeedMenu(scanner);
                 case "6" -> {
                     saveGame();
-                }
-                case "7" -> {
-                    break;
+                    return;
                 }
 
                 // cheat codes :)
@@ -169,8 +162,10 @@ public class Game {
                 }
                 default -> {
                     // help case
-                    System.out.println("Invalid Selection");
-                    pause(scanner);
+                    clearLine();
+                    System.out.println(red("Invalid Input"));
+                    pause(1000);
+                    clearLine();
                 }
             }
         }
@@ -180,7 +175,7 @@ public class Game {
      * Exit method, used for cleanup.
      */
     public void endGame() {
-        // doesn't do anything yet, used for cleanup
+        theme.stop();
     }
 
     /**
@@ -262,15 +257,30 @@ public class Game {
             + cyan("; - History"));
             System.out.println("-".repeat(MENU_WIDTH));
 
+            System.out.print("---[Select]: ");
             String command = scanner.nextLine();
+            clearLine();
             switch (command) {
                 case "" -> { return; }
                 case "/" -> advance();
                 case "." -> doSell(scanner);
-                case ";" -> usr.portfolio.printTransactionLogs();
+                case ";" ->  {
+                    /**
+                     * FIXME
+                     * Add pages next update
+                     * Not a high enough priority for v1.0
+                     */
+                    clearScreen();
+                    printHeader();
+                    usr.getPortfolio().printTransactionLogs();
+                    System.out.println("");
+                    pause(scanner);
+                }
                 default -> {
-                    System.out.println("Invalid Input");
+                    clearLine();
+                    System.out.println(red("Invalid Input"));
                     pause(1000);
+                    clearLine();
                 }
             }
         }
@@ -291,6 +301,7 @@ public class Game {
             System.out.println(cyan("Enter - Exit | '/' - Advance | ',' - View | '.' - Buy"));
             System.out.println("-".repeat(MENU_WIDTH));  
             
+            System.out.print("---[Select]: ");
             String command = scanner.nextLine();
             clearLine();
             switch (command) {
@@ -299,13 +310,140 @@ public class Game {
                 }
                 case "/" -> advance();
                 case "," -> stockView(scanner);
-                case "." -> doBuy(scanner);
+                case "." -> {
+                    doBuy(scanner);
+                }
                 default -> {
                     System.out.println(red("Invalid Command"));
-                    pause(2000);
+                    pause(1000);
+                    clearLine();
                 }
             }
         }
+    }
+
+    /**
+     * Shows the alerts in the news reel, allowing the user to navigate each 
+     * page. Will return when the user is finished.
+     * @param scanner user input scanner
+     */
+    private void newsFeedMenu(Scanner scanner) {
+        int currentPage = 1;
+        while (true) {
+            // keep circular pages
+            if (currentPage < 1) {
+                currentPage = news.pages();
+            }
+            else if (currentPage > news.pages()) {
+                currentPage = 1;
+            }
+
+            clearScreen();
+            printHeader();
+            System.out.println(""); // spacing
+            System.out.println(italic(center("<~~~{ News Feed }~~~>", MENU_WIDTH)));
+            System.out.print("\n\n"); // spacing
+            news.page(currentPage);
+            System.out.println(""); // spacing
+           
+            // command tray
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.print(italic("Page " + currentPage + " of " + news.pages()) + " | ");
+            System.out.print(cyan("[,] Next Page") + " | ");
+            System.out.print(cyan("[.] Last Page") + " | ");
+            System.out.print(cyan("[/] Clear Feed") + " | ");
+            System.out.println(cyan("[ENTER] Exit") + " | ");
+            System.out.println("-".repeat(MENU_WIDTH));
+
+            System.out.print("---[Select]: ");
+            String choice = scanner.nextLine();
+            clearLine();
+            switch (choice) {
+                case "," -> currentPage++;
+                case "." -> currentPage--;
+                case "/" -> {
+                    news.clear();
+                }
+                case "" -> {
+                    return;
+                }
+                default ->  {
+                    System.out.println(red("Invalid Input"));
+                    pause(1000);
+                    clearLine();
+                }
+            }
+        }
+    }
+
+    /**
+     * Shows the achievements for the user, allowing the user to navigate each
+     * page. Will return when the user is finished.
+     * @param scanner user input scanner
+     */
+    private void acvMenu(Scanner scanner) {
+        int pages = Achievements.ACV_AMOUNT / 7 + 1;
+        int currentPage = 1;
+        while (true) {
+            // ensure circular pages
+            if (currentPage > pages) {
+                currentPage = 1;
+            }
+            else if (currentPage < 1) {
+                currentPage = pages;
+            }
+            clearScreen();
+            printHeader();
+            System.out.println(""); // spacing
+            System.out.println(italic(center("<~~~{ Achievements }~~~>", MENU_WIDTH)));
+            System.out.print("\n\n"); // spacing
+
+            // print art and move up cursor
+            printMenuArt(2);
+            cursorUp(25);
+
+            usr.showAchievements(currentPage);
+           
+            // command tray
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.print(italic("Page " + currentPage + " of " + pages) + " | ");
+            System.out.print(cyan("[/] Next Page") + " | ");
+            System.out.print(cyan("[.] Last Page") + " | ");
+            System.out.print(cyan("[ENTER] Exit") + " | ");
+            System.out.println(" ".repeat(59)); // clear art in command tray
+            System.out.println("-".repeat(MENU_WIDTH));
+
+            System.out.print("---[Select]: ");
+            String choice = scanner.nextLine();
+            clearLine();
+            switch (choice) {
+                case "/" -> currentPage++;
+                case "." -> currentPage--;
+                case "" -> {
+                    return;
+                }
+                default ->  {
+                    System.out.println(red("Invalid Input"));
+                    pause(1000);
+                }
+            }
+        }
+    }
+
+    /**
+     * Shows the users stats and exits when they press enter
+     * @param scanner
+     */
+    private void statsMenu(Scanner scanner) {
+        // user stats
+        clearScreen();
+        printHeader();
+        usr.showStats();
+        printMenuArt(8);
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(italic(center("Thank you for playing Terminal Trader", MENU_WIDTH)));
+        System.out.println("-".repeat(MENU_WIDTH));
+        pause(scanner);
     }
 
     /**
@@ -314,12 +452,37 @@ public class Game {
      * @param scanner user input scanner
      */
     private void stockView(Scanner scanner) {
-        System.out.print("---Stock: ");
-        String view = scanner.nextLine();
-        while(!view.equals("")) {
+        Stock stock = null;
+        int view = -1;
+        while(true) {
+            // signifies first iteration
+            if (view == -1) {
+                try {
+                    System.out.print("---[Stock]: ");
+                    String input = scanner.nextLine();
+
+                    if (input.equals("")) {
+                        return; // exit case
+                    }
+
+                    view = Integer.parseInt(input);
+                    stock = mkt.getStock(view - 1); // may throw if view out of bound
+                } 
+                catch (IndexOutOfBoundsException | NumberFormatException e) {
+                    view = -1;
+                    clearLine();
+                    System.out.println(red("Invalid Input"));
+                    pause(1000);
+                    clearLine();
+                    continue;
+                }
+            }
+            else { 
+                stock = mkt.getStock(view - 1); 
+            }
+
             clearScreen();
             printHeader();
-            Stock stock = mkt.getStock(Integer.parseInt(view) - 1);
             System.out.println(yellow(center(" " + stock.getName() + " ", MENU_WIDTH, "~")));
             System.out.println("-".repeat(MENU_WIDTH));
             stock.printHistory();
@@ -329,6 +492,7 @@ public class Game {
                 blue(italic("Now: ")) + dollar(stock.getValue()) + " | " +
                 red(italic("Min: ")) + dollar(stock.getMin()) + " | " +
                 green(italic("Max: ")) + dollar(stock.getMax()) + " | " +
+                cyan(italic("Average: ")) + dollar(stock.getAverage(120)) + " | " +
                 yellow(italic("Recent: ")) + numColor(stock.getChange()) + " | " +
                 yellow(italic("10-Day: ")) + numColor(stock.getChange(10)) + " | " +
                 yellow(italic("100-Day: ")) + numColor(stock.getChange(100))
@@ -341,6 +505,7 @@ public class Game {
             + cyan("'/' - Advance"));
             System.out.println("-".repeat(MENU_WIDTH));
 
+            System.out.print("---[Select]: ");
             String command = scanner.nextLine();
             clearLine();
             switch (command) {
@@ -348,14 +513,14 @@ public class Game {
                     return;
                 }
                 case "," -> {
-                    if (Integer.parseInt(view) < Market.NUM_STOCKS) {
-                        view = "" + (Integer.parseInt(view) + 1);
+                    if (view < Market.NUM_STOCKS) {
+                        view++;
                     }
                     else {
-                        view = "" + 1;
+                        view = 1;
                     }
                 }
-                case "." -> doBuy(scanner);
+                case "." -> doBuy(scanner, view);
                 case "/" -> {
                     advance();
                     pause(500);
@@ -363,6 +528,7 @@ public class Game {
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(1000);
+                    clearLine();
                 }
             }
         }
@@ -375,19 +541,17 @@ public class Game {
     private void doExtras(Scanner scanner) {
         clearScreen();
         printHeader();
-        System.out.println(center("Extras", MENU_WIDTH, "~"));
-        System.out.println(""); // spacing
-        System.out.println("1. Settings");
-        System.out.println("2. Developer Tools");
-        System.out.println("3. Help");
-        System.out.println("4. Mini Games!");
-        System.out.println("5. Credits");
-        System.out.println("6. Back");
-        System.out.println(""); // spacing
+        System.out.println();
+        System.out.println(center("<~~~~{ Extras }~~~~>", MENU_WIDTH));
 
+        printMenuArt(0);
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(cyan("1. Settings | 2. Developer Tools | 3. Help | 4. Mini Games! | 5. Credits | 6. Back"));
+        System.out.println("-".repeat(MENU_WIDTH));
+        
         String input;
         while (true) {
-            System.out.print("---Select: ");
+            System.out.print("---[Select]: ");
             input = scanner.nextLine();
             clearLine();
             switch (input) {
@@ -414,7 +578,11 @@ public class Game {
                 case "6" -> {
                     return;
                 }
-                default -> System.out.println("Invalid Input");
+                default -> {
+                    System.out.println(red("Invalid Input"));
+                    pause(1000);
+                    clearLine();
+                }
             }
         }
     }
@@ -427,30 +595,33 @@ public class Game {
     private void doSell(Scanner scanner) {
         while (true) {
             try {
-                System.out.println("(0 to Exit)");
-                System.out.print("--Stock: ");
+                System.out.print("--[Stock (0 to Exit)]: ");
                 int selection = Integer.parseInt(scanner.nextLine());
                 if (selection == 0) {
                     return; // exit case
                 }
                 clearLine();
-                Stock stock = usr.portfolio.stockAt(selection - 1);
+                Stock stock = usr.getPortfolio().stockAt(selection - 1);
 
-                System.out.print("---Amount: ");
+                System.out.print("---[Amount (0 to Exit)]: ");
                 int amount = Integer.parseInt(scanner.nextLine());
                 if (amount == 0) {
                     return; // exit case
                 }
+                else if (amount < 0) {
+                    throw new NumberFormatException();
+                }
                 clearLine();
 
-                System.out.println(yellow(usr.sell(stock, amount)));
+                System.out.print(yellow(usr.sell(stock, amount)));
                 pause(2000);
+                clearLine();
                 break;
             } 
             catch (InvalidSelectionException e) {
-                System.out.println(e.getMessage());
+                System.out.println(red(e.getMessage()));
                 pause(1000); // wait one second
-                clearLine(2); // clear error message
+                clearLine(); // clear error message
             }
         }
     }
@@ -461,16 +632,42 @@ public class Game {
      * @param scanner user input scanner
      */
     private void doBuy(Scanner scanner) {
+        int selection;
         while(true) {
-            double cash = usr.getCash();
             try {
-                System.out.print("---Stock: ");
-                int selection = Integer.parseInt(scanner.nextLine());
+                System.out.print("---[Stock (0 to Exit)]: ");
+                selection = Integer.parseInt(scanner.nextLine());
                 if (selection == 0) {
                     return; // exit case
                 }
+                else if (selection < 1 || selection > Market.NUM_STOCKS) {
+                    throw new IllegalArgumentException();
+                }
                 clearLine();
+                break;
+            } 
+            catch (NoSuchElementException | IllegalArgumentException e) {
+                clearLine();
+                System.out.println(red("Invalid Input"));
+                pause(1000);
+                clearLine();
+            }
+        }
+        doBuy(scanner, selection);
+    }
 
+    /**
+     * Buy method, gets amount of stock given by selection to be bought and 
+     * makes sale. Handles errors appropriately and returns when user is 
+     * finished.
+     * @param scanner user input scanner
+     * @param selection stock selected
+     */
+    private void doBuy(Scanner scanner, int selection) {
+        while(true) {
+            double cash = usr.getCash();
+            try {
+                clearLine(2);
                 // show cash and max buy amount
                 Stock stock = mkt.getStock(selection - 1);
                 int maxAmount = (int) (cash / stock.getValue());
@@ -478,24 +675,31 @@ public class Game {
                 + yellow(bold("Max Amount: ")) + maxAmount);
                 System.out.println("-".repeat(MENU_WIDTH));
 
-                System.out.print("---Amount: ");
+                System.out.print("---[Amount (0 to Exit)]: ");
                 int amount = Integer.parseInt(scanner.nextLine());
                 if (amount == 0) {
                     return; // exit case
                 }
+                else if (amount < 0) {
+                    throw new NumberFormatException();
+                }
                 clearLine();
 
-                System.out.println(yellow(usr.buy(stock, amount)));
+                System.out.print(yellow(usr.buy(stock, amount)));
                 pause(2000);
-                break;
-            } 
+                clearLine();
+                return;
+            }
             catch (NoSuchElementException | NumberFormatException e) {
-                System.out.println("Invalid Input, please try again.");
-                pause(scanner);
+                clearLine();
+                System.out.println(red("Invalid Input"));
+                pause(1000);
+                clearLine();
             }
             catch (InvalidSelectionException e)  {
-                System.out.println(e.getMessage());
-                pause(scanner);
+                System.out.println(red(e.getMessage()));
+                pause(1000);
+                clearLine();
             }
         }
     }
@@ -503,6 +707,7 @@ public class Game {
     // menu functions
     /**
      * Prints main menu
+     * Height: 36 lines
      */
     private void showMainMenu() {
         clearScreen();
@@ -510,34 +715,20 @@ public class Game {
 
         // main menu options
         System.out.println(center("Welcome to the show!", MENU_WIDTH));
-        System.out.println(italic(center("Version 0.12 beta", MENU_WIDTH)));
+        System.out.println(italic(center("Version 1.0.0", MENU_WIDTH)));
 
-        // main menu art
-        String filePath;
-        if (Main.NDEV) {
-            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline100.txt";
-        }
-        else {
-            filePath = "assets\\city-skyline100.txt";
-        }
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(center(line, MENU_WIDTH));
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading the file: " + e.getMessage());
-        }
+        printMenuArt(0);
 
-        // the rest
+        // command tray
         System.out.println("-".repeat(MENU_WIDTH));
         System.out.println(cyan("1. Load Game | 2. New Game | 3. Extras | 4. Exit"));
         System.out.println("-".repeat(MENU_WIDTH));
-        System.out.print("Please make a selection: ");
+        System.out.print("---[Select]: ");
     }
 
     /**
      * Prints play menu
+     * Height: 36 lines
      */
     private void showPlayMenu() {
         clearScreen();
@@ -545,12 +736,21 @@ public class Game {
         news.roll();
         System.out.println("-".repeat(MENU_WIDTH));
 
-        System.out.println("1. Your Portfolio");
-        System.out.println("2. Stock Exchange");
-        System.out.println("3. Your Stats");
-        System.out.println("4. Achievements");
-        System.out.println("5. News Feed");
-        System.out.println("6. Save and Exit");
+        // compressed menu art
+        printMenuArt(2);
+
+        // user quick stats
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.print(red("Day: " + usr.getAdvances()) + " | ");
+        System.out.print(yellow("Cash: " + dollar(usr.getCash())) + " | ");
+        System.out.print(yellow("Net Worth: " + dollar(usr.getNet())) + " | ");
+        System.out.print(green("Trader Score: " + usr.getScore()) + " | ");
+        System.out.println(blue("Recent Performance: ") + numColor(round(usr.getPortfolio().getChange())));
+
+        // command tray
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(cyan("1. Your Portfolio | 2. Stock Exchange | 3. Your Stats | 4. Achievements | 5. News Feed | 6. Save and Exit"));
+        System.out.println("-".repeat(MENU_WIDTH));
     }
 
     /**
@@ -559,10 +759,18 @@ public class Game {
     private void showNewGameMenu() {
         clearScreen();
         printHeader();
-        System.out.println("");
+        System.out.println();
         System.out.println(italic(center("<----------New Game---------->", MENU_WIDTH)));
-        System.out.println("");
-        System.out.print(" ".repeat(30) + "Select a username: ");
+
+        // print main menu, but clear command tray
+        printMenuArt(1);
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("New Account Name: ");
+        System.out.println("-".repeat(MENU_WIDTH));
+        // test
+        // moves the cursor up and forward for typing
+        Mutil.cursorUp(2);
+        Mutil.cursorRight("New Account Name: ".length());
     }
 
     /**
@@ -571,17 +779,59 @@ public class Game {
     private void showLoadGameMenu() {
         clearScreen();
         printHeader();
-        
+        System.out.println();
+        System.out.println(italic(center("<----------Load Game---------->", MENU_WIDTH)));
+
         // funny bit for now
         Random rand = new Random();
         if (rand.nextInt(100) == 1) {
             System.out.println("");
             printTaxMan();
         }
-        System.out.println("");
-        System.out.println(italic(center("<----------Load Game---------->", MENU_WIDTH)));
-        System.out.println("");
-        System.out.print(" ".repeat(30) + "Select a username: ");
+        else {
+            // print main menu, but clear command tray
+            printMenuArt(0);
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println("Account Name: ");
+            System.out.println("-".repeat(MENU_WIDTH));
+
+            // moves the cursor up and forward for typing
+            Mutil.cursorUp(2);
+            Mutil.cursorRight("Account Name: ".length());
+        }
+    }
+
+    /**
+     * Prints the main menu ASCII art
+     * @param less The amount that the art will be shortened to fit in the
+     * current screen
+     */
+    private void printMenuArt(int less) {
+        // main menu art
+        String filePath;
+        if (Main.PROD) {
+            filePath = "C:\\Program Files\\TerminalTrader\\assets\\city-skyline-120.txt";
+        }
+        else {
+            filePath = "assets\\city-skyline-120.txt";
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            // truncate for less
+            for (int i = 0; i < 27; i++) {
+                if (less != 0) {
+                    reader.readLine(); // skip current line
+                    less--;
+                }
+            }
+
+            while ((line = reader.readLine()) != null) {
+                System.out.println(cyan(center(line, MENU_WIDTH)));
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
     }
 
     // extras
@@ -594,15 +844,19 @@ public class Game {
         while (true) { 
             clearScreen();
             printHeader();
-            System.out.println(center("Settings", MENU_WIDTH, "="));
-            System.out.println(italic(center("Changes only affect current session", MENU_WIDTH)));
-            System.out.println(""); // spacing
-            System.out.println(center("1. Arcade Stock Behavior", MENU_WIDTH));
-            System.out.println(center("2. Change Header Color", MENU_WIDTH));
-            System.out.println(center("Enter to Exit", MENU_WIDTH));
-            System.out.println("");
 
-            System.out.print("---Select: ");
+            clearScreen();
+            printHeader();
+            System.out.println(center(" Settings ", MENU_WIDTH, "="));
+            System.out.println("");
+            
+            printMenuArt(0);
+            
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println(green("[ENTER] Exit | 1. Arcade Stock Behavior | 2. Change Header Color"));
+            System.out.println("-".repeat(MENU_WIDTH));
+
+            System.out.print("---[Select]: ");
             String input = scanner.nextLine();
             clearLine();
             
@@ -613,17 +867,19 @@ public class Game {
 
                 if (input.toUpperCase().equals("Y")) {
                     Game.ARCADE_MODE = true;
-                    System.out.println("Arcade Mode Activated.");
-                    pause(scanner);
+                    System.out.print("Arcade Mode Activated.");
+                    pause(1000);
+                    return;
                 }
                 else if (input.toUpperCase().equals("N")) {
                     Game.ARCADE_MODE = false;
-                    System.out.println("Arcade Mode Deactivated.");
-                    pause(scanner);
+                    System.out.print("Arcade Mode Deactivated.");
+                    pause(1000);
+                    return;
                 }
                 else {
                     System.out.println("Invalid Input");
-                    pause(scanner);
+                    pause(1000);
                 }
             }
             else if (input.equals("2")) {
@@ -641,6 +897,8 @@ public class Game {
                 } 
                 catch (NumberFormatException e) {
                     System.out.println("Invalid Input");
+                    pause(1000);
+                    clearLine();
                     pause(scanner);
                 }
             }
@@ -658,6 +916,9 @@ public class Game {
     private void eHelp(Scanner scanner) {
         clearScreen();
         printHeader();
+        System.out.print("\n\n"); // spacing
+        printMenuArt(0);
+        cursorUp(29);
         System.out.println(center(" Help ", MENU_WIDTH, "#"));
         System.out.println("");
         System.out.println(italic(center("Terminal Trader is a text-based, terminal stock trading simulator. Stock purchases", MENU_WIDTH)));
@@ -675,6 +936,11 @@ public class Game {
         System.out.println(green(italic(center("Samuel Johns at samueljohns@cedarville.edu ", MENU_WIDTH))));
         System.out.println("");
         System.out.println(""); // spacing
+        cursorDown(12);
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("");
+        System.out.println("-".repeat(MENU_WIDTH));
+        cursorUp(2);
         pause(scanner);
     }
 
@@ -688,10 +954,21 @@ public class Game {
         printHeader();
         System.out.println(center(" Mini Games ", MENU_WIDTH, "!"));
         System.out.println("");
-        System.out.println(italic(center("Coming soon!", MENU_WIDTH)));
-        System.out.println("");
-        System.out.println(""); // spacing
-        pause(scanner);
+        
+        printMenuArt(0);
+        
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(cyan("[ENTER] Exit | 1. Coin Toss | " + italic("Many More to Come!")));
+        System.out.println("-".repeat(MENU_WIDTH));
+        
+        System.err.print("---[Select]: ");
+        String choice = scanner.nextLine();
+        switch (choice) {
+            case "1" -> {
+                MiniGames.coinToss(scanner);
+                pause(scanner);
+            }
+        }
     }
 
     /**
@@ -701,6 +978,9 @@ public class Game {
     private void eCredits(Scanner scanner) {
         clearScreen();
         printHeader();
+        System.out.print("\n\n"); // spacing
+        printMenuArt(0);
+        cursorUp(29);
         System.out.println(center(" Credits ", MENU_WIDTH, "#"));
         System.out.println("");
         System.out.println(italic(center("'Terminal Trader' was designed, implemented, and produced by Samuel Johns, 2024", MENU_WIDTH)));
@@ -709,8 +989,12 @@ public class Game {
         System.out.println(blue(italic(center("Logan J Burley", MENU_WIDTH))));
         System.out.println(red(italic(center("Colin Burley", MENU_WIDTH))));
         System.out.println(green(italic(center("Jaden Butler", MENU_WIDTH))));
+        System.out.println(magenta((italic(center("Isaac Lloyd", MENU_WIDTH)))));
+        cursorDown(20);
+        System.out.println("-".repeat(MENU_WIDTH));
         System.out.println("");
-        System.out.println(""); // spacing
+        System.out.println("-".repeat(MENU_WIDTH));
+        cursorUp(2);
         pause(scanner);
     }
 
@@ -724,20 +1008,26 @@ public class Game {
             clearScreen();
             printHeader();
 
-            System.out.println(center(" Developer Tools ", MENU_WIDTH, "#"));
-            System.out.println(""); // spacing
-            System.out.println("0. Back");
-            System.out.println(redB("1. Repair Asset Files"));
-            System.out.println(redB("2. Stock Walk"));
-            System.out.println(""); // spacing
-            System.out.print("---Select: ");
+            clearScreen();
+            printHeader();
+            System.out.println(center(" Developer Tools ", MENU_WIDTH, "~"));
+            System.out.println("");
+            
+            printMenuArt(0);
+            
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println(cyan("[ENTER] Exit") + " | " + redB("1. Repair Generated Assets") + " | " + redB("2. Stock Walk" ));
+            System.out.println("-".repeat(MENU_WIDTH));
+            
+
+            System.out.print("---[Select]: ");
 
             String input = "";
             
             input = scanner.nextLine();
             clearLine();
             switch (input) {
-                case "0" -> {
+                case "" -> {
                     return;
                 }
                 case "1" -> {
@@ -747,12 +1037,12 @@ public class Game {
                 }
                 case "2" -> {
                     while (true) {
-                        System.out.print("---Stock: ");
+                        System.out.print("---[Stock]: ");
                         try {
                             // get selection
                             int stockID = Integer.parseInt(scanner.nextLine());
                             clearLine();
-                            System.out.print("---Times: ");
+                            System.out.print("---[Times]: ");
                             input = scanner.nextLine();
 
                             // load mkt assets
@@ -768,11 +1058,17 @@ public class Game {
                         } 
                         catch (NumberFormatException e) {
                             System.out.println("Invalid Input");
+                            pause(1000);
+                            clearLine();
                             pause(scanner);
                         }
                     }
                 }
-                default -> System.out.println("Invalid Input");
+                default -> {
+                    System.out.println("Invalid Input");
+                    pause(1000);
+                    clearLine();
+                }
             }   
         }
     }
@@ -784,8 +1080,13 @@ public class Game {
     public static void printHeader() {
         // title card
         String title = "Terminal Trader";
+        int tlen = title.length();
+        if (headerSetting == -1) {
+            title = blue(title);
+        }
+
         String line1 = "-".repeat(MENU_WIDTH);
-        String line2 = "~ ".repeat((MENU_WIDTH - title.length())/4) + title + " ~".repeat((MENU_WIDTH - title.length())/4) + " ";
+        String line2 = "~ ".repeat((MENU_WIDTH - tlen)/4) + title + " ~".repeat((MENU_WIDTH - tlen)/4) + " ";
         String line3 = "-".repeat(MENU_WIDTH);
 
         switch (headerSetting) {
@@ -867,8 +1168,8 @@ public class Game {
         mkt = new Market(this);
 
         // prep market
-        mkt.setTrend(0); // for now FIXME
-        mkt.setNUM_STOCKS(10); 
+        mkt.setTrend(1); // start market a tad promising
+        mkt.setNUM_STOCKS(20); 
 
         try {
             Stock s0 = new Stock(0, "Burley Buns", 18.24, 0.7, 2);
@@ -883,11 +1184,17 @@ public class Game {
             Stock s9 = new Stock(9, "The Rip", 420.00, 2.7, 3);
 
             // new!
-            Stock s10 = new Stock(9, "Samuel's Johns", 420.00, 2.7, 3);
-            Stock s11 = new Stock(9, "Jenna Gyms", 420.00, 2.7, 3);
-            Stock s12 = new Stock(9, "Rockford Mine", 420.00, 2.7, 3);
-            Stock s13 = new Stock(9, "Colin Call-Center", 420.00, 2.7, 3);
-            Stock s14 = new Stock(9, "Dave's Diner", 420.00, 2.7, 3);
+            Stock s10 = new Stock(10, "Sam's Johns", 67.00, 1, 1);
+            Stock s11 = new Stock(11, "Jenna Gyms", 140.00, 2, 2);
+            Stock s12 = new Stock(12, "Rockford Mine", 13000.00, 1, 3);
+            Stock s13 = new Stock(13, "Colin Call-Center", 240.00, 2.9, 3);
+            Stock s14 = new Stock(14, "Dave's Drive-In", 150.00, 1, 1);
+            
+            Stock s15 = new Stock(15, "Woolworth's Diner", 750.00, 1, 3);
+            Stock s16 = new Stock(16, "Ben Medical", 11000.00, 2, 1);
+            Stock s17 = new Stock(17, "Clanton Power", 1400.00, 1, 1);
+            Stock s18 = new Stock(18, "Alfred & Harrell", 670000.00, 3, 2);
+            Stock s19 = new Stock(19, "TYLO", 1900000.00, 1, 3);
 
             s0.save();
             s1.save();
@@ -899,6 +1206,16 @@ public class Game {
             s7.save();
             s8.save();
             s9.save();
+            s10.save();
+            s11.save();
+            s12.save();
+            s13.save();
+            s14.save();
+            s15.save();
+            s16.save();
+            s17.save();
+            s18.save();
+            s19.save();
         } 
         catch (InitException e) {
             DB_LOG("Exception In: createGen(), THIS: " + e.getMessage());
@@ -914,8 +1231,8 @@ public class Game {
             e.printStackTrace(System.err);
         }
 
-        // advance time to generate histories
-        advance(100);
+        // advance time to generate histories so early game graphs aren't empty
+        advance(120);
 
         // save files
         mkt.save();

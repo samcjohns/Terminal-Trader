@@ -1,10 +1,10 @@
 [Setup]
-AppName=Terminal Trader (beta 0.12)
-AppVerName=Terminal Trader 0.12
+AppName=Terminal Trader
+AppVerName=Terminal Trader 1.0.0
 DefaultDirName={pf}\Terminal Trader
 DefaultGroupName=Terminal Trader
 OutputDir=.
-OutputBaseFilename=Terminal-Trader-0.12-Installer
+OutputBaseFilename=Terminal-Trader-1.0.0-Installer
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
@@ -17,19 +17,19 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Dirs]
-Name: "{userappdata}\Terminal Trader\saves"
-Name: "{userappdata}\Terminal Trader\gen"
+Name: "{userappdata}\TerminalTrader\saves"
+Name: "{userappdata}\TerminalTrader\gen"
 
 [Files]
-Source: ".\cmd\start-0.12.cmd"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\target\tetrad-0.12.jar"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\cmd\start-1.0.0.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\target\tetrad-1.0.0.jar"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\icons\tetradicon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ".\runtime\*"; DestDir: "{app}\runtime"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{commondesktop}\Terminal Trader (beta 0.12)"; Filename: "{app}\start-0.12.cmd"; IconFilename: "{app}\tetradicon.ico"; Tasks: desktopicon
-Name: "{group}\Terminal Trader (beta 0.12)"; Filename: "{app}\start-0.12.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\tetradicon.ico"
+Name: "{commondesktop}\Terminal Trader"; Filename: "{app}\start-1.0.0.cmd"; IconFilename: "{app}\tetradicon.ico"; Tasks: desktopicon
+Name: "{group}\Terminal Trader"; Filename: "{app}\start-1.0.0.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\tetradicon.ico"
 
 [Run]
-Filename: "{app}\start-0.12.cmd"; Description: "Launch Terminal Trader (beta 0.12)"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\start-1.0.0.cmd"; Description: "Launch Terminal Trader"; Flags: nowait postinstall skipifsilent

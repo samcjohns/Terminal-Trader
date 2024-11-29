@@ -14,6 +14,7 @@ import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.add;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.numColor;
+import static tetrad.Mutil.yellow;
 
 /**
  * A specialized container for stock objects
@@ -32,7 +33,7 @@ import static tetrad.Mutil.numColor;
 
 class Market {
     private final Stock[] stocks; // all stocks objects
-    static int NUM_STOCKS = 10;   // number of stocks on the market
+    static int NUM_STOCKS = 20;   // number of stocks on the market
     private final Game game;      // reference to current game instance
 
     // behavioral variables for market
@@ -108,8 +109,8 @@ class Market {
         try {
             // determine correct save path
             String fileName;
-            if (Main.NDEV) {
-                String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+            if (Main.PROD) {
+                String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
                 fileName = savePath + "mkt.txt";
             }
             else {
@@ -156,8 +157,8 @@ class Market {
     void load() throws InitException {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
             fileName = savePath + "mkt.txt";
         }
         else {
@@ -198,18 +199,20 @@ class Market {
     void print() {
         // header
         System.out.println(center("Market", MENU_WIDTH, "~"));
-        System.out.println("");
+        System.out.print("\n\n"); // spacing
 
         // Print the header
         String header = "";
         
         header = add(header, "ID", 0);
         header = add(header, "Stock Name", 10);
-        header = add(header, "Current Price", 30);
-        header = add(header, "Recent", 50);
-        header = add(header, "10-Day", 65);
+        header = add(header, "Current Price", 35);
+        header = add(header, "Recent", 55);
+        header = add(header, "10-Day", 70);
+        header = add(header, "100-Day", 86);
 
-        System.out.println(header);
+        System.out.println(yellow(header));
+        System.out.println(""); // spacing
         System.out.println(""); // spacing
 
         // Print each stock's information
@@ -222,9 +225,10 @@ class Market {
                 try {
                     // Add formatted stock details
                     line = add(line, stock.getName(), 10); // Stock Name
-                    line = add(line, String.format("$%.2f", stock.getValue()), 30); // Current Price
-                    line = add(line, numColor(String.format("%.2f", stock.getChange())), 50); // Recent Change
-                    line = add(line, numColor(String.format("%.2f", stock.getChange(10))), 74); // 10-Day Change
+                    line = add(line, String.format("$%.2f", stock.getValue()), 35); // Current Price
+                    line = add(line, numColor(String.format("%.2f", stock.getChange())), 55); // Recent Change
+                    line = add(line, numColor(String.format("%.2f", stock.getChange(10))), 79); // 10-Day Change
+                    line = add(line, numColor(String.format("%.2f", stock.getChange(10))), 105); // 100-Day Change
                 }
                 catch (IllegalArgumentException e) {
                     // some number is unexpectedly large
@@ -238,6 +242,7 @@ class Market {
             }
         }
 
+        System.out.println(""); // spacing
         System.out.println(""); // spacing
         System.out.println("~".repeat(MENU_WIDTH));
     }

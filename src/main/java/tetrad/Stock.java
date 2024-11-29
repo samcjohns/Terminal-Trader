@@ -12,6 +12,8 @@ import java.util.Scanner;
 import static tetrad.Mutil.DB_LOG;
 import static tetrad.Mutil.HISTORY_HEIGHT;
 import static tetrad.Mutil.HISTORY_LENGTH;
+import static tetrad.Mutil.green;
+import static tetrad.Mutil.red;
 import static tetrad.Mutil.round;
 
 /**
@@ -30,6 +32,7 @@ import static tetrad.Mutil.round;
  * @see Market
  * @see Log
  */
+
 class Stock {
     private int id;           // unique id number
     private String name;      // name of the stock
@@ -140,7 +143,20 @@ class Stock {
      */
     double getChange(int term) {
         // change from 'term' days ago
-        return round(((value - history.at(term - 1)) / getLast()) * 100);
+        return round(((value - history.at(term - 1)) /  history.at(term - 1)) * 100);
+    }
+
+    /**
+     * Average price over term
+     * @param term
+     * @return after price across the term
+     */
+    double getAverage(int term) {
+        double total = 0;
+        for (int i = 0; i < term; i++) {
+            total += history.at(i);
+        }
+        return round(total/term);
     }
 
     // stock behavior functions
@@ -284,6 +300,9 @@ class Stock {
         double range = maxVal - minVal;
         double binSize = range / ROWS;
     
+        // determine current barheight for coloring.
+        int redline = (int) ((history.at(history.size()-1) - minVal) / binSize) + 1;
+
         // Build graph in array
         for (int i = 0; i < history.size(); i++) {
             // Calculate height of the bar based on current value
@@ -301,10 +320,20 @@ class Stock {
     
         // Print graph
         for (int i = 0; i < ROWS; i++) { // Print from top to bottom
+            String line = "";
             for (int j = 0; j < COLS; j++) {
-                System.out.print(array[i][j]);
+                line += array[i][j];
             }
-            System.out.println();
+
+            // color accordingly
+            if (ROWS - i < redline) {
+                line = red(line);
+            }
+            else {
+                line = green(line);
+            }
+
+            System.out.println(line);
         }
     }
     
@@ -316,8 +345,8 @@ class Stock {
         try {
             // determine correct save path 
             String fileName;
-            if (Main.NDEV) {
-                String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+            if (Main.PROD) {
+                String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
                 fileName = savePath + "s" + id + ".txt";
             }
             else {
@@ -370,8 +399,8 @@ class Stock {
     void load(int id) throws InitException {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
             fileName = savePath + "s" + id + ".txt";
         }
         else {

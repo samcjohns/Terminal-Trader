@@ -11,7 +11,10 @@ import java.util.Scanner;
 import static tetrad.Market.NUM_STOCKS;
 import static tetrad.Mutil.DB_LOG;
 import static tetrad.Mutil.HISTORY_HEIGHT;
+import static tetrad.Mutil.HISTORY_LENGTH;
 import static tetrad.Mutil.dollar;
+import static tetrad.Mutil.green;
+import static tetrad.Mutil.red;
 import static tetrad.Mutil.round;
 
 /**
@@ -73,14 +76,19 @@ class Portfolio {
      * @return total valuation of the portfolio yesterday
      * (before the most recent advance)
      */
-    double getLast() { return history.at(history.size()-1); }
+    double getLast() { 
+        if (history.size() == 0) {
+            return owner.getCash();
+        }
+        return history.recent(); 
+    }
 
     /**
      * @return the difference between the current valuation and the valuation
      * of the previous day (before the most recent advance)
      */
     double getChange() {
-        return round(((value - getLast()) / getLast()) * 100);
+        return round(((value + owner.getCash() - getLast()) / getLast()) * 100);
     }
 
     /**
@@ -251,8 +259,8 @@ class Portfolio {
     void save() {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + owner.getName() + "_portfolio.txt";
         }
         else {
@@ -306,6 +314,7 @@ class Portfolio {
             DB_LOG("IO Error: Portfolio Save Method -> " + e.getMessage());
         }
     }
+
     /**
      * Loads the portfolio from <username>_p.txt
      * @param market relevant market instance for locating stocks
@@ -314,8 +323,8 @@ class Portfolio {
     void load(Market market) throws InitException {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + owner.getName() + "_portfolio.txt";
         }
         else {
@@ -390,9 +399,13 @@ class Portfolio {
      * Prints a graph displaying the history of the portfolio valuation
      */
     void printHistory() {
-        final int ROWS = HISTORY_HEIGHT;       // max graph height
-        final int COLS = history.size();       // max graph length
-        char[][] array = new char[ROWS][COLS]; // for building graph
+        int compress = size + 2;
+        if (size == 0) {
+            compress = 5;
+        }
+        final int ROWS = HISTORY_HEIGHT - compress; // max graph height
+        final int COLS = HISTORY_LENGTH;            // max graph length
+        char[][] array = new char[ROWS][COLS];      // for building graph
     
         // Fill the array with spaces
         for (int i = 0; i < ROWS; i++) {
@@ -418,6 +431,12 @@ class Portfolio {
         double range = maxVal - minVal;
         double binSize = range / ROWS;
     
+        // determine current barheight for coloring.
+        int redline = 0;
+        if (history.size() != 0) {
+            redline = (int) ((history.at(history.size()-1) - minVal) / binSize) + 1;
+        }
+
         // Build graph in array
         for (int i = 0; i < history.size(); i++) {
             // Calculate height of the bar based on current value
@@ -435,10 +454,20 @@ class Portfolio {
     
         // Print graph
         for (int i = 0; i < ROWS; i++) { // Print from top to bottom
+            String line = "";
             for (int j = 0; j < COLS; j++) {
-                System.out.print(array[i][j]);
+                line += array[i][j];
             }
-            System.out.println();
+
+            // color accordingly
+            if (ROWS - i < redline) {
+                line = red(line);
+            }
+            else {
+                line = green(line);
+            }
+
+            System.out.println(line);
         }
     }
 

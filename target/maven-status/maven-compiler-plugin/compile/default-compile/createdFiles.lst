@@ -11,5 +11,6 @@ tetrad\InitException.class
 tetrad\Portfolio.class
 tetrad\Achievements.class
 tetrad\Alert.class
+tetrad\SoundPlayer.class
 tetrad\InvalidSelectionException.class
 tetrad\Stock.class

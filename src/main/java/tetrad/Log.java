@@ -16,7 +16,7 @@ public class Log<T> {
     private final int maxSize;       // maximum size of the log
     private final LinkedList<T> log; // data structure to hold the elements
 
-    public static final int DEFAULT_SIZE = 100;
+    public static final int DEFAULT_SIZE = 120;
 
     // Constructor to initialize the log with a fixed size
     public Log(int maxSize) {
