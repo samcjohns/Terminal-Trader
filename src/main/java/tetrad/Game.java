@@ -112,7 +112,7 @@ public class Game {
                 }
                 case "3" -> doExtras(scanner);
                 case "4" -> {
-                    theme.close();
+                    theme.stop();
                     return false; // exit program
                 }
                 default -> {

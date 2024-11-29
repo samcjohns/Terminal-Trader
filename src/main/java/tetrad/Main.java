@@ -35,21 +35,26 @@ public class Main {
             int DEBUG_MODE = 8;
 
             Scanner scanner = getSource(DEBUG, DEBUG_MODE);
+            SoundPlayer theme = new SoundPlayer("tetrad-theme");
             
             try {
                 while (true) {
                     Game game = new Game();
+                    theme.play();
                     // exits if user selects exit
                     if (!game.startGame(scanner)) {
+                        theme.close();
                         scanner.close();
                         return;
                     }
                     game.play(scanner);
                     game.endGame();
+                    theme.stop();
                 }
             }
             catch (NoSuchElementException e) {
                 // DEBUG
+                theme.close();
                 scanner.close();
                 while(true) {} //suspend prog
             }

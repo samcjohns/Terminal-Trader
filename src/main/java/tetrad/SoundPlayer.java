@@ -27,7 +27,6 @@ public class SoundPlayer {
      * @param filePath The path to the sound file (.wav format).
      */
     public SoundPlayer(String fileName) {
-
         // determine correct save path
         String filePath;
         if (Main.NDEV) {
