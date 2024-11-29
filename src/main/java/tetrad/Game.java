@@ -710,7 +710,7 @@ public class Game {
         System.out.println(italic(center("<----------New Game---------->", MENU_WIDTH)));
 
         // print main menu, but clear command tray
-        printMenuArt(0);
+        printMenuArt(1);
         System.out.println("-".repeat(MENU_WIDTH));
         System.out.println("New Account Name: ");
         System.out.println("-".repeat(MENU_WIDTH));
