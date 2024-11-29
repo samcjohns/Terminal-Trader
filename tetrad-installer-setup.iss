@@ -17,8 +17,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Dirs]
-Name: "{userappdata}\Terminal Trader\saves"
-Name: "{userappdata}\Terminal Trader\gen"
+Name: "{userappdata}\TerminalTrader\saves"
+Name: "{userappdata}\TerminalTrader\gen"
 
 [Files]
 Source: ".\cmd\start-1.0.0.cmd"; DestDir: "{app}"; Flags: ignoreversion
