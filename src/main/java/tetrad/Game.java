@@ -264,7 +264,18 @@ public class Game {
                 case "" -> { return; }
                 case "/" -> advance();
                 case "." -> doSell(scanner);
-                case ";" -> usr.getPortfolio().printTransactionLogs();
+                case ";" ->  {
+                    /**
+                     * FIXME
+                     * Add pages next update
+                     * Not a high enough priority for v1.0
+                     */
+                    clearScreen();
+                    printHeader();
+                    usr.getPortfolio().printTransactionLogs();
+                    System.out.println("");
+                    pause(scanner);
+                }
                 default -> {
                     clearLine();
                     System.out.println(red("Invalid Input"));
@@ -680,12 +691,13 @@ public class Game {
                 return;
             }
             catch (NoSuchElementException | NumberFormatException e) {
+                clearLine();
                 System.out.println(red("Invalid Input"));
                 pause(1000);
                 clearLine();
             }
             catch (InvalidSelectionException e)  {
-                System.out.println(e.getMessage());
+                System.out.println(red(e.getMessage()));
                 pause(1000);
                 clearLine();
             }

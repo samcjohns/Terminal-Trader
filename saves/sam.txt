@@ -1,6 +1,6 @@
 ---USER-INFO---
 sam
-658.85
+992107.61
 0
 ---INFO-END---
 For Terminal Trader, a text-based stock game.
