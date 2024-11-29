@@ -78,7 +78,7 @@ class Portfolio {
      */
     double getLast() { 
         if (history.size() == 0) {
-            return 0.0;
+            return owner.getCash();
         }
         return history.recent(); 
     }
@@ -259,8 +259,8 @@ class Portfolio {
     void save() {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + owner.getName() + "_portfolio.txt";
         }
         else {
@@ -314,6 +314,7 @@ class Portfolio {
             DB_LOG("IO Error: Portfolio Save Method -> " + e.getMessage());
         }
     }
+
     /**
      * Loads the portfolio from <username>_p.txt
      * @param market relevant market instance for locating stocks
@@ -322,8 +323,8 @@ class Portfolio {
     void load(Market market) throws InitException {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + owner.getName() + "_portfolio.txt";
         }
         else {

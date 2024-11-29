@@ -29,8 +29,8 @@ public class SoundPlayer {
     public SoundPlayer(String fileName) {
         // determine correct save path
         String filePath;
-        if (Main.NDEV) {
-            filePath = System.getenv("APPDATA") + "\\Terminal Trader\\assets\\";
+        if (Main.PROD) {
+            filePath = "C:\\Program Files\\TerminalTrader\\assets\\";
             filePath += fileName + ".wav";
         }
         else {

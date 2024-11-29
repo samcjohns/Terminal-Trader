@@ -346,9 +346,9 @@ public class Game {
             // command tray
             System.out.println("-".repeat(MENU_WIDTH));
             System.out.print(italic("Page " + currentPage + " of " + news.pages()) + " | ");
-            System.out.print(cyan("[/] Next Page") + " | ");
+            System.out.print(cyan("[,] Next Page") + " | ");
             System.out.print(cyan("[.] Last Page") + " | ");
-            System.out.print(cyan("[,] Clear Feed") + " | ");
+            System.out.print(cyan("[/] Clear Feed") + " | ");
             System.out.println(cyan("[ENTER] Exit") + " | ");
             System.out.println("-".repeat(MENU_WIDTH));
 
@@ -356,9 +356,9 @@ public class Game {
             String choice = scanner.nextLine();
             clearLine();
             switch (choice) {
-                case "/" -> currentPage++;
+                case "," -> currentPage++;
                 case "." -> currentPage--;
-                case "," -> {
+                case "/" -> {
                     news.clear();
                 }
                 case "" -> {
@@ -691,7 +691,7 @@ public class Game {
         System.out.print(yellow("Cash: " + dollar(usr.getCash())) + " | ");
         System.out.print(yellow("Net Worth: " + dollar(usr.getNet())) + " | ");
         System.out.print(green("Trader Score: " + usr.getScore()) + " | ");
-        System.out.println(blue("Recent Performance: ") + numColor(usr.getPortfolio().getChange()));
+        System.out.println(blue("Recent Performance: ") + numColor(round(usr.getPortfolio().getChange())));
 
         // command tray
         System.out.println("-".repeat(MENU_WIDTH));
@@ -755,8 +755,8 @@ public class Game {
     private void printMenuArt(int less) {
         // main menu art
         String filePath;
-        if (Main.NDEV) {
-            filePath = "C:\\Program Files\\Terminal Trader\\assets\\city-skyline-120.txt";
+        if (Main.PROD) {
+            filePath = "C:\\Program Files\\TerminalTrader\\assets\\city-skyline-120.txt";
         }
         else {
             filePath = "assets\\city-skyline-120.txt";

@@ -345,8 +345,8 @@ class Stock {
         try {
             // determine correct save path 
             String fileName;
-            if (Main.NDEV) {
-                String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+            if (Main.PROD) {
+                String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
                 fileName = savePath + "s" + id + ".txt";
             }
             else {
@@ -399,8 +399,8 @@ class Stock {
     void load(int id) throws InitException {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
             fileName = savePath + "s" + id + ".txt";
         }
         else {

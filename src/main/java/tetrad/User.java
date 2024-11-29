@@ -144,8 +144,8 @@ class User {
     void save() {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + name + ".txt";
         }
         else {
@@ -186,8 +186,8 @@ class User {
     void load(String username, Market market) throws InitException {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + username + ".txt";
         }
         else {

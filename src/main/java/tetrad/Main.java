@@ -16,13 +16,13 @@ import static tetrad.Mutil.pause;
  */
 
 public class Main {    
-    static boolean NDEV = false; // false when testing in VSCode
+    static boolean PROD = false; // false when testing in VSCode
     static boolean INIT = false; // true for first start only
     
     public static void main(String[] args) {
         try {
             if (args.length > 0) {
-                NDEV = args[0].equals("-NDEV");
+                PROD = args[0].equals("-PROD");
                 if (args.length > 1) {
                     INIT = args[1].equals("-INIT");
                 }

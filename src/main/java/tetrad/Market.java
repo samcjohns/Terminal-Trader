@@ -109,8 +109,8 @@ class Market {
         try {
             // determine correct save path
             String fileName;
-            if (Main.NDEV) {
-                String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+            if (Main.PROD) {
+                String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
                 fileName = savePath + "mkt.txt";
             }
             else {
@@ -157,8 +157,8 @@ class Market {
     void load() throws InitException {
         // determine correct save path
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\gen\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
             fileName = savePath + "mkt.txt";
         }
         else {

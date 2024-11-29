@@ -205,8 +205,8 @@ public class Achievements {
     void save() {
         try {
             String fileName;
-            if (Main.NDEV) {
-                String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+            if (Main.PROD) {
+                String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
                 fileName = savePath + relevantUser.getName() + "_a.txt";
             }
             else {
@@ -242,8 +242,8 @@ public class Achievements {
      */
     void load() throws InitException {
         String fileName;
-        if (Main.NDEV) {
-            String savePath = System.getenv("APPDATA") + "\\Terminal Trader\\saves\\";
+        if (Main.PROD) {
+            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
             fileName = savePath + relevantUser.getName() + "_a.txt";
         }
         else {
