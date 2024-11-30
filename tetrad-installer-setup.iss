@@ -1,7 +1,7 @@
 [Setup]
 AppName=Terminal Trader
 AppVerName=Terminal Trader 1.0.1
-DefaultDirName={pf}\TerminalTrader
+DefaultDirName={pf}\Terminal Trader
 DefaultGroupName=Terminal Trader
 OutputDir=.
 OutputBaseFilename=Terminal-Trader-1.0.1-Installer
@@ -18,8 +18,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Dirs]
-Name: "{userappdata}\TerminalTrader\saves"
-Name: "{userappdata}\TerminalTrader\gen"
+Name: "{userappdata}\Terminal Trader\saves"
+Name: "{userappdata}\Terminal Trader\gen"
 
 [Files]
 Source: ".\cmd\start-1.0.1.cmd"; DestDir: "{app}"; Flags: ignoreversion
