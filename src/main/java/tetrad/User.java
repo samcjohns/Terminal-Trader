@@ -143,17 +143,11 @@ class User {
      */
     void save() {
         // determine correct save path
-        String fileName;
-        if (Main.PROD) {
-            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
-            fileName = savePath + name + ".txt";
-        }
-        else {
-            fileName = "saves/" + name + ".txt";
-        }
+        String filePath = Main.getSource("saves");
+        filePath += name + ".txt";
 
         try {
-            PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+            PrintWriter writer = new PrintWriter(new FileWriter(filePath));
             writer.println("---USER-INFO---");
             writer.println(name);
             writer.println(cash);
@@ -185,16 +179,10 @@ class User {
      */
     void load(String username, Market market) throws InitException {
         // determine correct save path
-        String fileName;
-        if (Main.PROD) {
-            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
-            fileName = savePath + username + ".txt";
-        }
-        else {
-            fileName = "saves/" + username + ".txt";
-        }
+        String filePath = Main.getSource("saves");
+        filePath += username + ".txt";
 
-        File file = new File(fileName);
+        File file = new File(filePath);
         try (Scanner scanner = new Scanner(file)) {
             this.name = username;
             // skip header

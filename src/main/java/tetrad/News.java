@@ -194,14 +194,7 @@ public class News {
         Random random = new Random();
         int randomLineIndex = random.nextInt(RHF_LENGTH);
 
-        String filePath;
-        if (Main.PROD) {
-            filePath = "C:\\Program Files\\TerminalTrader\\assets\\random_headlines.txt";
-        }
-        else {
-            filePath = "assets\\random_headlines.txt";
-        }
-
+        String filePath = Main.getSource("assets") + "random_headlines.txt";
         try (Scanner scanner = new Scanner(new File(filePath))) {
             for (int i = 0; i < randomLineIndex; i++) {
                 if (scanner.hasNextLine()) {

@@ -258,17 +258,10 @@ class Portfolio {
      */
     void save() {
         // determine correct save path
-        String fileName;
-        if (Main.PROD) {
-            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
-            fileName = savePath + owner.getName() + "_portfolio.txt";
-        }
-        else {
-            fileName = "saves/" + owner.getName() + "_portfolio.txt";
-        }
-        
+        String filePath = Main.getSource("saves");
+        filePath += owner.getName() + "_ptf.txt";
         try {
-            PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+            PrintWriter writer = new PrintWriter(new FileWriter(filePath));
             writer.println("---PORTFOLIO-INFO---");
 
             // stock info
@@ -322,16 +315,9 @@ class Portfolio {
      */
     void load(Market market) throws InitException {
         // determine correct save path
-        String fileName;
-        if (Main.PROD) {
-            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
-            fileName = savePath + owner.getName() + "_portfolio.txt";
-        }
-        else {
-            fileName = "saves/" + owner.getName() + "_portfolio.txt";
-        }
-
-        File file = new File(fileName);
+        String filePath = Main.getSource("saves");
+        filePath += owner.getName() + "_ptf.txt";
+        File file = new File(filePath);
         try (Scanner scanner = new Scanner(file)) {
             // skip header
             scanner.nextLine();
@@ -378,7 +364,7 @@ class Portfolio {
             throw new InitException("Corrupted Portfolio File");
         }
         catch (FileNotFoundException e) {
-            throw new InitException("File Not Found: " + fileName);
+            throw new InitException("File Not Found: " + filePath);
         }
     }
 

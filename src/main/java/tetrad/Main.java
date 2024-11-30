@@ -1,8 +1,5 @@
 package tetrad;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static tetrad.Mutil.pause;
@@ -17,41 +14,24 @@ import static tetrad.Mutil.pause;
 
 public class Main {    
     static boolean PROD = false; // false when testing in VSCode
-    static boolean INIT = false; // true for first start only
     
     public static void main(String[] args) {
         try {
             if (args.length > 0) {
                 PROD = args[0].equals("-PROD");
-                if (args.length > 1) {
-                    INIT = args[1].equals("-INIT");
-                }
             }
 
-            boolean exit = false;
-
-            // DEBUG: edit me
-            boolean DEBUG = false;
-            int DEBUG_MODE = 8;
-
-            Scanner scanner = getSource(DEBUG, DEBUG_MODE);
-            
-            try {
-                while (true) {
-                    Game game = new Game();
-                    // exits if user selects exit
-                    if (!game.startGame(scanner)) {
-                        scanner.close();
-                        return;
-                    }
-                    game.play(scanner);
-                    game.endGame();
+            Scanner scanner = new Scanner(System.in);
+    
+            while (true) {
+                Game game = new Game();
+                // exits if user selects exit
+                if (!game.startGame(scanner)) {
+                    scanner.close();
+                    return;
                 }
-            }
-            catch (NoSuchElementException e) {
-                // DEBUG
-                scanner.close();
-                while(true) {} //suspend prog
+                game.play(scanner);
+                game.endGame();
             }
         }
         catch (Exception e) {
@@ -61,36 +41,75 @@ public class Main {
         }
     }
 
-    private static Scanner getSource(boolean DEBUG, int MODE) {
-        if (DEBUG) {
-            // determine test input file
-            String fileName;
-            switch (MODE) {
-                case 1 -> fileName = "view_stock_test";
-                case 2 -> fileName = "view_portfolio";
-                case 3 -> fileName = "view_market";
-                case 4 -> fileName = "repair_dependencies";
-                case 5 -> fileName = "view_new_market";
-                case 6 -> fileName = "new_save_plus";
-                case 7 -> fileName = "load_new_save";
-                case 8 -> fileName = "stock_walk";
-
-                default -> fileName = "exit";
-            }
-
-            // open scanner and return
-            try {
-                fileName = "DEBUG/" + fileName + ".in";
-                return new Scanner(new File(fileName));   
-            }
-            catch (FileNotFoundException e) {
-                System.out.println("File Not Found");
-                return null;
+    /**
+     * Used to get the soure or destination of save file depending of
+     * environment. Takes the directory as a string and to determine 
+     * destination.
+     * @param dir save directory
+     * @return file path of the save file
+     */
+    public static String getSource(String dir) {
+        String os = System.getProperty("os.name").toLowerCase();
+        
+        // Windows
+        if (os.contains("win")) {
+            if (dir.equals("saves") || dir.equals("gen")) {
+                // Production environment
+                if (PROD) {
+                    return System.getenv("APPDATA") + "\\Terminal Trader\\" + dir + "\\";
+                } 
+                // Development (VSCode)
+                else {
+                    return dir + "/";
+                }
+            } else if (dir.equals("assets")) {
+                if (PROD) {
+                    return "C:\\Program Files\\Terminal Trader\\" + dir + "\\";
+                } else {
+                    return dir + "/";
+                }
             }
         }
+    
+        // macOS
+        else if (os.contains("mac")) {
+            if (dir.equals("saves") || dir.equals("gen")) {
+                // Production environment
+                if (PROD) {
+                    return System.getProperty("user.home") + "/Library/Application Support/Terminal Trader/" + dir + "/";
+                } 
+                // Development (VSCode)
+                else {
+                    return dir + "/";
+                }
+            } else if (dir.equals("assets")) {
+                if (PROD) {
+                    return "/Applications/Terminal Trader/" + dir + "/";
+                } else {
+                    return dir + "/";
+                }
+            }
+        }
+    
+        // Linux
         else {
-            return new Scanner(System.in);
+            if (dir.equals("saves") || dir.equals("gen")) {
+                if (PROD) {
+                    return System.getProperty("user.home") + "/.terminal-trader/" + dir + "/";
+                } else {
+                    return dir + "/";
+                }
+            } else if (dir.equals("assets")) {
+                if (PROD) {
+                    return "/usr/local/share/Terminal Trader/" + dir + "/";
+                } else {
+                    return dir + "/";
+                }
+            }
         }
+    
+        // Default to returning the directory itself if no match
+        return dir + "/";
     }
 
     public static void systemCheck(String[] args) {

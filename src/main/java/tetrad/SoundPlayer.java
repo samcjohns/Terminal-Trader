@@ -28,14 +28,8 @@ public class SoundPlayer {
      */
     public SoundPlayer(String fileName) {
         // determine correct save path
-        String filePath;
-        if (Main.PROD) {
-            filePath = "C:\\Program Files\\TerminalTrader\\assets\\";
-            filePath += fileName + ".wav";
-        }
-        else {
-            filePath = "assets/" + fileName + ".wav";
-        }
+        String filePath = Main.getSource("assets");
+        filePath += fileName + ".wav";
 
         try {
             File audioFile = new File(filePath);
