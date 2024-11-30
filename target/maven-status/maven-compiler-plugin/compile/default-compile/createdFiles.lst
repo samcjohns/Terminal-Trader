@@ -8,6 +8,7 @@ tetrad\Market.class
 tetrad\Game.class
 tetrad\Mutil.class
 tetrad\InitException.class
+tetrad\Calendar.class
 tetrad\Portfolio.class
 tetrad\Achievements.class
 tetrad\Alert.class
