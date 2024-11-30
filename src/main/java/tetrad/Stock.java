@@ -344,16 +344,10 @@ class Stock {
         // saves all info about the stock to a unique file
         try {
             // determine correct save path 
-            String fileName;
-            if (Main.PROD) {
-                String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
-                fileName = savePath + "s" + id + ".txt";
-            }
-            else {
-                fileName = "gen/s" + id + ".txt";
-            }
+            String filePath = Main.getSource("gen");
+            filePath += "s" + id + ".txt";
 
-            PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+            PrintWriter writer = new PrintWriter(new FileWriter(filePath));
 
             writer.println("---STOCK-INFO---");
             writer.println(id);
@@ -398,16 +392,10 @@ class Stock {
      */
     void load(int id) throws InitException {
         // determine correct save path
-        String fileName;
-        if (Main.PROD) {
-            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
-            fileName = savePath + "s" + id + ".txt";
-        }
-        else {
-            fileName = "gen/s" + id + ".txt";
-        }
+        String filePath = Main.getSource("gen");
+        filePath += "s" + id + ".txt";
 
-        File file = new File(fileName);
+        File file = new File(filePath);
         try (Scanner scanner = new Scanner(file)) {
             this.id = id;
             // skip headers
@@ -447,7 +435,7 @@ class Stock {
             throw new InitException("Corrupted Stock Data");
         }
         catch (FileNotFoundException e) {
-            throw new InitException("File Not Found: " + fileName);
+            throw new InitException("File Not Found: " + filePath);
         }
     }
 

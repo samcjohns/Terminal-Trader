@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.NoSuchElementException;
-import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
@@ -27,7 +26,6 @@ import static tetrad.Mutil.magenta;
 import static tetrad.Mutil.magentaB;
 import static tetrad.Mutil.numColor;
 import static tetrad.Mutil.pause;
-import static tetrad.Mutil.printTaxMan;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.redB;
 import static tetrad.Mutil.round;
@@ -782,23 +780,15 @@ public class Game {
         System.out.println();
         System.out.println(italic(center("<----------Load Game---------->", MENU_WIDTH)));
 
-        // funny bit for now
-        Random rand = new Random();
-        if (rand.nextInt(100) == 1) {
-            System.out.println("");
-            printTaxMan();
-        }
-        else {
-            // print main menu, but clear command tray
-            printMenuArt(0);
-            System.out.println("-".repeat(MENU_WIDTH));
-            System.out.println("Account Name: ");
-            System.out.println("-".repeat(MENU_WIDTH));
+        // print main menu, but clear command tray
+        printMenuArt(0);
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("Account Name: ");
+        System.out.println("-".repeat(MENU_WIDTH));
 
-            // moves the cursor up and forward for typing
-            Mutil.cursorUp(2);
-            Mutil.cursorRight("Account Name: ".length());
-        }
+        // moves the cursor up and forward for typing
+        Mutil.cursorUp(2);
+        Mutil.cursorRight("Account Name: ".length());
     }
 
     /**
@@ -808,13 +798,8 @@ public class Game {
      */
     private void printMenuArt(int less) {
         // main menu art
-        String filePath;
-        if (Main.PROD) {
-            filePath = "C:\\Program Files\\TerminalTrader\\assets\\city-skyline-120.txt";
-        }
-        else {
-            filePath = "assets\\city-skyline-120.txt";
-        }
+        String filePath = Main.getSource("assets");
+        filePath += "city-skyline-120.txt";
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 

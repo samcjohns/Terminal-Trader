@@ -156,16 +156,8 @@ class Market {
      */
     void load() throws InitException {
         // determine correct save path
-        String fileName;
-        if (Main.PROD) {
-            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
-            fileName = savePath + "mkt.txt";
-        }
-        else {
-            fileName = "gen/mkt.txt";
-        }
-
-        File file = new File(fileName);
+        String filePath = Main.getSource("gen") + "mkt.txt";
+        File file = new File(filePath);
         try (Scanner scanner = new Scanner(file)) {
             // skip headers
             scanner.nextLine();

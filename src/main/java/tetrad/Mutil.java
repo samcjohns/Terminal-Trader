@@ -1,7 +1,5 @@
 package tetrad;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -347,24 +345,6 @@ public class Mutil {
      */
     public static double change(double previous, double current) {
         return ((current - previous) / previous) * 100;
-    }
-
-    /**
-     * Experimental function for printing taxman screen from ASCI art
-     * @deprecated WILL BE MOVED TO TERMINALGAME
-     */
-    @Deprecated
-    public static void printTaxMan() {
-        String filePath = "assets/taxman70.txt";
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(center(" | " + line + " | ", MENU_WIDTH));
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading the file: " + e.getMessage());
-        }
     }
 
     /**

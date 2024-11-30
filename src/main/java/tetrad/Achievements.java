@@ -204,17 +204,11 @@ public class Achievements {
     /** Saves the user's achievement data to a unique file */
     void save() {
         try {
-            String fileName;
-            if (Main.PROD) {
-                String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
-                fileName = savePath + relevantUser.getName() + "_a.txt";
-            }
-            else {
-                fileName = "saves/" + relevantUser.getName() + "_a.txt";
-            }
+            String filePath = Main.getSource("saves");
+            filePath += relevantUser.getName() + "_acv.txt";
 
             // saves all info about the stock to a unique file
-            PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+            PrintWriter writer = new PrintWriter(new FileWriter(filePath));
 
             writer.println("---ACHIEVEMENT-INFO---");
             writer.println(relevantUser.getName());
@@ -241,16 +235,9 @@ public class Achievements {
      * @throws InitException if the file is not found or is corrupted/improper
      */
     void load() throws InitException {
-        String fileName;
-        if (Main.PROD) {
-            String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\saves\\";
-            fileName = savePath + relevantUser.getName() + "_a.txt";
-        }
-        else {
-            fileName = "saves/" + relevantUser.getName() + "_a.txt";
-        }
-
-        File file = new File(fileName);
+        String filePath = Main.getSource("saves");
+        filePath += relevantUser.getName() + "_acv.txt";
+        File file = new File(filePath);
         try (Scanner scanner = new Scanner(file)) {
             // skip headers
             scanner.nextLine();
