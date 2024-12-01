@@ -713,7 +713,7 @@ public class Game {
 
         // main menu options
         System.out.println(center("Welcome to the show!", MENU_WIDTH));
-        System.out.println(italic(center("Version 1.0.0", MENU_WIDTH)));
+        System.out.println(italic(center("Version 1.0.2", MENU_WIDTH)));
 
         printMenuArt(0);
 

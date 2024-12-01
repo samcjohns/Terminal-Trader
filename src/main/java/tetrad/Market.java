@@ -108,16 +108,9 @@ class Market {
         // saves all info about the market to a unique file
         try {
             // determine correct save path
-            String fileName;
-            if (Main.PROD) {
-                String savePath = System.getenv("APPDATA") + "\\TerminalTrader\\gen\\";
-                fileName = savePath + "mkt.txt";
-            }
-            else {
-                fileName = "gen/mkt.txt";
-            }
-
-            PrintWriter writer = new PrintWriter(new FileWriter(fileName));
+            String filePath = Main.getSource("gen") + "mkt.txt";
+            File file = new File(filePath);
+            PrintWriter writer = new PrintWriter(new FileWriter(filePath));
 
             writer.println("---MARKET-INFO---");
 
