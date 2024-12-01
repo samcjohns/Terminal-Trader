@@ -217,8 +217,16 @@ public class Game {
      * @throws InitException throws if user save file is not present
      */
     public void loadGame(String username) throws InitException {
-        mkt.load();
-        usr.load(username, mkt);
+        try {
+            mkt.load();
+            usr.load(username, mkt);
+        } 
+        catch (NumberFormatException | NoSuchElementException e) {
+            // user has an older form of the game and must regenerate their stock/market files
+            createGen(); // repair
+            mkt.load();
+            usr.load(username, mkt);
+        }
     }
 
     /**
