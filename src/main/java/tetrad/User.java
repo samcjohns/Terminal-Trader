@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -45,6 +46,7 @@ class User {
     private double cash; // total amount of liquid cash
     private int advances; // number of advances user has done
     private Portfolio portfolio; // portfolio of share holdings
+    LocalDate startDate; // account start date
 
     /**
      * <p> True - if user is loaded in main game.
@@ -64,17 +66,18 @@ class User {
         acv = new Achievements(this, null);
     }
     User(Game game) {
-        this("null", 0, game);
+        this("null", 0, game, null);
     }
-    User(String name, double cash, Game game) {
+    User(String name, double cash, Game game, LocalDate startDate) {
         this.name = name;
         this.cash = cash;
         this.game = game;
+        this.startDate = startDate;
         
         main = true;
         advances = 0;
         portfolio = new Portfolio(this);
-        acv = new Achievements(this, game.news);
+        acv = new Achievements(this, game);
     }
     
     // gameplay functions
@@ -124,6 +127,11 @@ class User {
      */
     Portfolio getPortfolio() { return portfolio; }
 
+    /**
+     * @return the user's start date
+     */
+    LocalDate getStartDate() { return startDate; }
+
     // setters
     /**
      * Sets the username of the user
@@ -136,6 +144,12 @@ class User {
      * @param cash new amount of cash held
      */
     void setCash(double cash) { this.cash = cash; }
+
+    /**
+     * Sets a new start date for the user
+     * @param date
+     */
+    void setStartDate(LocalDate date) {this.startDate = date; }
 
     // save functions
     /**
@@ -152,6 +166,7 @@ class User {
             writer.println(name);
             writer.println(cash);
             writer.println(advances);
+            writer.println(startDate);
             writer.println("---INFO-END---");
     
             // label
@@ -190,6 +205,7 @@ class User {
             name = scanner.nextLine();
             cash = Double.parseDouble(scanner.nextLine());
             advances = Integer.parseInt(scanner.nextLine());
+            startDate = LocalDate.parse(scanner.nextLine());
 
             acv.load();
 

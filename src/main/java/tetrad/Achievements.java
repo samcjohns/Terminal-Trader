@@ -77,7 +77,7 @@ import static tetrad.Mutil.DB_LOG;
 public class Achievements {
     boolean[] acvList;               // where achievement status is stored
     private final User relevantUser; // who this belongs to
-    private final News channel;      // reference to News object for pushing Alerts
+    private final Game game;         // reference to game object for Alerts and date
 
     // statics
     static final int ACV_AMOUNT = 12;
@@ -96,9 +96,9 @@ public class Achievements {
     static final int   ADVANCE_100_TIMES = 10;
     static final int  ADVANCE_1000_TIMES = 11;
 
-    Achievements(User relevantUser, News channel) {
+    Achievements(User relevantUser, Game game) {
         this.relevantUser = relevantUser;
-        this.channel = channel;
+        this.game = game;
         acvList = new boolean[ACV_AMOUNT];
     }
 
@@ -161,8 +161,8 @@ public class Achievements {
         acvList[acv] = true;
         String msg = "Achievement Unlocked: ";
         msg += getAcvTitle(acv);
-        Alert acvAlert = new Alert(msg, Alert.ACHIEVEMENT);
-        channel.push(acvAlert);
+        Alert acvAlert = new Alert(msg, Alert.ACHIEVEMENT, game.cldr.getToday());
+        game.news.push(acvAlert);
     }
     // title for the given achievement
     protected String getAcvTitle(int acv) {

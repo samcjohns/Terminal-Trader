@@ -19,23 +19,29 @@ import java.time.temporal.TemporalAdjusters;
  *              another date.
  */
 public class Calendar {
-    
         private LocalDate today;
+
+        // reference to current game object for announcing holidays
+        private Game game;
     
         /**
          * Contruct the calendar with a custom start date
          * @param startDate start date for calendar object
          */
-        public Calendar(LocalDate startDate) {
+        public Calendar(LocalDate startDate, Game game) {
             this.today = startDate;
+            this.game = game;
         }
 
         /**
          * Defaults current date to right now
+         * @param game current game object
          */
-        public Calendar() {
+        public Calendar(Game game) {
             this.today = LocalDate.now();  // Use today's date
+            this.game = game;
         }
+
     
         /**
          * Advances the current date
@@ -65,7 +71,7 @@ public class Calendar {
          * @return days between current and given date
          */
         public int daysBetween(LocalDate date) {
-            return (int) ChronoUnit.DAYS.between(date, today);
+            return Math.abs((int) ChronoUnit.DAYS.between(date, today));
         }
     
         /** 
@@ -84,6 +90,16 @@ public class Calendar {
         public String getFormattedToday() {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
             return today.format(formatter);
+        }
+
+        /**
+         * Return date as a formatted string
+         * @param date given date
+         * @return formatted date
+         */
+        public String getFormattedDate(LocalDate date) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
+            return date.format(formatter);
         }
 
         /**

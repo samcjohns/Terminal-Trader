@@ -2,6 +2,7 @@ package tetrad;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
@@ -14,11 +15,14 @@ import static tetrad.Alert.BAD_STOCK;
 import static tetrad.Alert.GOOD_MARKET;
 import static tetrad.Alert.GOOD_STOCK;
 import static tetrad.Mutil.MENU_WIDTH;
+import static tetrad.Mutil.add;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.bold;
 import static tetrad.Mutil.cyan;
+import static tetrad.Mutil.dollar;
 import static tetrad.Mutil.green;
 import static tetrad.Mutil.magenta;
+import static tetrad.Mutil.numColor;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.yellow;
 
@@ -40,12 +44,14 @@ import static tetrad.Mutil.yellow;
  */
 
 public class News {
-    LinkedList<Alert> reel; // current alerts to be posted
+    private final LinkedList<Alert> reel; // current alerts to be posted
+    private final Game game; // reference to current game object for calendar
 
     private final int alertsPerPage = 12; // number of alerts per page in news feed
 
-    News() {
+    News(Game game) {
         this.reel = new LinkedList<>();
+        this.game = game;
     }
 
     /**
@@ -117,7 +123,6 @@ public class News {
      */
     public void page(int page) {
         int pageHeight = 26;
-        int alertsPerPage = 12;
         int totalPages = (int) Math.ceil(reel.size() / (double) alertsPerPage);
 
         // Check if the page number is within the valid range (1-based index)
@@ -128,13 +133,35 @@ public class News {
         // Display the specified page of alerts
         int alertsOnPage = 0;
         for (int i = (page - 1) * alertsPerPage; i < Math.min(reel.size(), page * alertsPerPage); i++) {
-            int age = reel.get(i).getAge();
+            String line = "";
+            Alert alert = reel.get(i);
+            int age = game.cldr.daysBetween(alert.getDate());
             switch (age) {
-                case 0 -> System.out.print(cyan("Today: "));
-                case 1 -> System.out.print(cyan("Yesterday: "));
-                default -> System.out.print(cyan(age + " Days Ago: "));
+                case 0 -> line += cyan("Today: ");
+                case 1 -> line += cyan("Yesterday: ");
+                default -> line += cyan(age + " Days Ago: ");
             }
-            System.out.println(headlineColor(reel.get(i).getHeadline(), reel.get(i).getType()) + "\n");
+
+            line += headlineColor(alert.getHeadline(), alert.getType());
+            String recentChange = "";
+            String currentValue = "";
+            String date = game.cldr.getFormattedDate(alert.getDate());
+
+            if (alert.getRelevantStock() != null) {
+                line = add(line, " | " + blue("Now: "), 85);
+                currentValue = dollar(alert.getRelevantStock().getValue());
+                line = add(line, numColor(alert.getRelevantStock().getChange()), 103);
+                line = add(line, currentValue, 132 - currentValue.length());
+                line = add(line, " | " + date, MENU_WIDTH + 15);
+            }
+            else {
+            }
+            
+            System.out.println(line);
+            String filler = "";
+            filler = add(filler, "|", 68);
+            filler = add(filler, "|", 100);
+            System.out.println(filler);
             alertsOnPage++;
         }
 
@@ -151,7 +178,6 @@ public class News {
         }
     }
 
-
     /**
      * @return number of pages in the News Feed
      */
@@ -160,13 +186,19 @@ public class News {
     }
 
     /**
-     * Updates the age of alerts after each advance.
+     * Updates the reel, removing alerts older than 90 days.
      */
     void update() {
-        for (int i = 0; i < reel.size(); i++) {
-            reel.get(i).incrementAge();
+        Iterator<Alert> iterator = reel.iterator();
+        while (iterator.hasNext()) {
+            Alert a = iterator.next();
+            int age = game.cldr.daysBetween(a.getDate());
+            if (age > 90) {
+                iterator.remove();
+            }
         }
     }
+    
 
     /**
      * Returns colored headlines based on the alert type.

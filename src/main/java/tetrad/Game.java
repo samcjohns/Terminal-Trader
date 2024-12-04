@@ -3,6 +3,7 @@ package tetrad;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -49,6 +50,7 @@ import static tetrad.Mutil.yellowB;
  * @see User
  * @see Market
  * @see News
+ * @see Calendar
  */
 
 public class Game {
@@ -56,14 +58,16 @@ public class Game {
     Market mkt;        // main market object
     News news;         // main news object
     SoundPlayer theme; // theme song control
+    Calendar cldr;     // game calendar
 
     static int headerSetting = -1; // color setting for the header
     static boolean ARCADE_MODE = false; // activates old stock behavior
 
     public Game() {
-        news = new News();
+        news = new News(this);
         mkt = new Market(this);
         usr = new User(this);
+        cldr = new Calendar(this);
         theme = new SoundPlayer("tetrad-theme");
     }
 
@@ -184,6 +188,7 @@ public class Game {
         mkt.advance();
         usr.update();
         news.update();
+        cldr.advance();
     }
 
     /**
@@ -221,7 +226,7 @@ public class Game {
             mkt.load();
             usr.load(username, mkt);
         } 
-        catch (NumberFormatException | NoSuchElementException e) {
+        catch (NumberFormatException | NoSuchElementException | DateTimeParseException e) {
             // user has an older form of the game and must regenerate their stock/market files
             createGen(); // repair
             mkt.load();
@@ -241,7 +246,7 @@ public class Game {
             createGen();
         }
 
-        usr = new User(username, User.STARTING_CASH, this);
+        usr = new User(username, User.STARTING_CASH, this, cldr.getToday());
         usr.save();
     }
 
@@ -747,7 +752,7 @@ public class Game {
 
         // user quick stats
         System.out.println("-".repeat(MENU_WIDTH));
-        System.out.print(red("Day: " + usr.getAdvances()) + " | ");
+        System.out.print(red(cldr.getFormattedToday()) + " | ");
         System.out.print(yellow("Cash: " + dollar(usr.getCash())) + " | ");
         System.out.print(yellow("Net Worth: " + dollar(usr.getNet())) + " | ");
         System.out.print(green("Trader Score: " + usr.getScore()) + " | ");
@@ -1178,7 +1183,7 @@ public class Game {
 
             // new!
             Stock s10 = new Stock(10, "Sam's Johns", 67.00, 1, 1);
-            Stock s11 = new Stock(11, "Jenna Gyms", 140.00, 2, 2);
+            Stock s11 = new Stock(11, "Jungle Gyms", 140.00, 2, 2);
             Stock s12 = new Stock(12, "Rockford Mine", 13000.00, 1, 3);
             Stock s13 = new Stock(13, "Colin Call-Center", 240.00, 2.9, 3);
             Stock s14 = new Stock(14, "Dave's Drive-In", 150.00, 1, 1);
