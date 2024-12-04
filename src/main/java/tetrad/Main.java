@@ -1,9 +1,12 @@
 package tetrad;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.center;
+import static tetrad.Mutil.clearLine;
 import static tetrad.Mutil.clearScreen;
 import static tetrad.Mutil.pause;
 import static tetrad.Mutil.red;
@@ -19,6 +22,7 @@ import static tetrad.Mutil.red;
 public class Main {    
     static String version = "1.0.3"; // current game version
     static boolean   PROD = false;    // false when testing in VSCode
+    static boolean   INIT = false;
     
     public static void main(String[] args) {
         Game game = null; // main game object
@@ -28,6 +32,7 @@ public class Main {
             }
 
             Scanner scanner = new Scanner(System.in);
+            startup(scanner); // init dialogue
     
             while (true) {
                 game = new Game();
@@ -89,7 +94,7 @@ public class Main {
      * @param dir save directory
      * @return file path of the save file
      */
-    public static String getSource(String dir) {
+    static String getSource(String dir) {
         String os = System.getProperty("os.name").toLowerCase();
         
         // Windows
@@ -153,7 +158,35 @@ public class Main {
         return dir + "/";
     }
 
-    public static void systemCheck(String[] args) {
+    static void startup(Scanner scanner) {
+        clearScreen();
+        // checks if init file exists, if it does, this is first startup
+        String filePath = getSource("gen") + "init";
+        File file = new File(filePath);
+        if (!file.exists()) {
+            try {
+                if (file.createNewFile()) {
+                    INIT = true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            INIT = false;
+        }
+
+        // configuration message
+        if (INIT) {
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println(red(center("ATTENTION", MENU_WIDTH)));
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println("\nIt is strongly recommended that Terminal Trader is played in a terminal 120 characters wide by 36 lines tall.");
+            System.out.println("Please set the correct dimensions and restart the game. You may also play in fullscreen and ignore this message.\n");
+            pause(scanner);
+            clearLine();
+        }
+
         String os = System.getProperty("os.name").toLowerCase();
 
         if (os.contains("win")) {
@@ -166,19 +199,7 @@ public class Main {
             System.out.println("Unknown operating system");
         }
 
-        String term = System.getenv("TERM");
-        if (term != null) {
-            System.out.println("Terminal detected: " + term);
-        } else {
-            System.out.println("No terminal detected");
-        }
-
-        boolean isHeadless = java.awt.GraphicsEnvironment.isHeadless();
-        if (isHeadless) {
-            System.out.println("Running in a headless environment (likely a console).");
-        } else {
-            System.out.println("Running in a graphical environment.");
-        }
+        pause (500); // pause for effect ;)
 
         String term1 = System.getenv("TERM");
         String wtSession = System.getenv("WT_SESSION"); // Windows Terminal
@@ -186,15 +207,22 @@ public class Main {
         String colorterm = System.getenv("COLORTERM");  // Common in modern terminals
 
         if (wtSession != null) {
+            pause(500);
             System.out.println("Running in Windows Terminal.");
         } else if (conemu != null) {
+            pause(500);
             System.out.println("Running in ConEmu or Cmder.");
         } else if (colorterm != null) {
+            pause(500);
             System.out.println("Running in a color-capable terminal: " + colorterm);
         } else if (term1 != null) {
+            pause(500);
             System.out.println("Terminal detected: " + term1);
         } else {
+            pause(500);
             System.out.println("No terminal environment variables detected.");
         }
+        System.out.println("Starting now...");
+        pause(1000);
     }
 }
