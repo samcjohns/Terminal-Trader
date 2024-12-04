@@ -122,11 +122,13 @@ public class Achievements {
         if (!acvList[SUNDAY_BUY] && game.cldr.getDayOfWeek().equals("SUNDAY")) {
             earnAcv(SUNDAY_BUY);
         }
-        if (!acvList[VALENTINES_BUY] && game.cldr.holidayGreeting(game.cldr.getToday()).equals("Happy Valentine's Day")) {
-            earnAcv(VALENTINES_BUY);
-        }
-        if (!acvList[INDEPENDENCE_BUY] && game.cldr.holidayGreeting(game.cldr.getToday()).equals("Happy Independence Day")) {
-            earnAcv(INDEPENDENCE_BUY);
+        if (game.cldr.isHoliday(game.cldr.getToday())) {
+            if (!acvList[VALENTINES_BUY] && game.cldr.holidayGreeting(game.cldr.getToday()).equals("Happy Valentine's Day")) {
+                earnAcv(VALENTINES_BUY);
+            }
+            if (!acvList[INDEPENDENCE_BUY] && game.cldr.holidayGreeting(game.cldr.getToday()).equals("Happy Independence Day")) {
+                earnAcv(INDEPENDENCE_BUY);
+            }
         }
     }
     /** Checks for any achievements gained after a stock sale */

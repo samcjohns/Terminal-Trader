@@ -232,6 +232,9 @@ public class Game {
             mkt.load();
             usr.load(username, mkt);
         }
+
+        // update calendar to properly reflect user advances
+        cldr.advance(usr.getAdvances());
     }
 
     /**
@@ -532,10 +535,8 @@ public class Game {
                     }
                 }
                 case "." -> doBuy(scanner, view);
-                case "/" -> {
-                    advance();
-                    pause(500);
-                }
+                case "/" -> advance();
+                
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(1000);

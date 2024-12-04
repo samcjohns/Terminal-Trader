@@ -213,7 +213,7 @@ class Market {
                     line = add(line, String.format("$%.2f", stock.getValue()), 35); // Current Price
                     line = add(line, numColor(String.format("%.2f", stock.getChange())), 55); // Recent Change
                     line = add(line, numColor(String.format("%.2f", stock.getChange(10))), 79); // 10-Day Change
-                    line = add(line, numColor(String.format("%.2f", stock.getChange(10))), 105); // 100-Day Change
+                    line = add(line, numColor(String.format("%.2f", stock.getChange(100))), 105); // 100-Day Change
                 }
                 catch (IllegalArgumentException e) {
                     // some number is unexpectedly large
