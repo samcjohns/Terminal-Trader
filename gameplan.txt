@@ -1,4 +1,4 @@
-Current Version: v1.0.4
+Current Version: v1.1.0 (in dev)
 Game Name: Terminal Trader
 Shorthand: tetrad
 

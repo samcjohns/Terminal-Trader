@@ -20,7 +20,7 @@ import static tetrad.Mutil.red;
  */
 
 public class Main {    
-    static String version = "1.0.4"; // current game version
+    static String version = "1.1.0"; // current game version
     static boolean   PROD = false;    // false when testing in VSCode
     static boolean   INIT = false;
     

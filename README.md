@@ -2,7 +2,7 @@
 <pre>
 A text-based, stock trader within the terminal.
 
-Current Version: v1.0.4
+Current Version: v1.1.0
 Game Name: Terminal Trader
 Shorthand: tetrad
 </pre>
