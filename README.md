@@ -6,8 +6,8 @@ Current Version: v1.0.4
 Game Name: Terminal Trader
 Shorthand: tetrad
 </pre>
-Creating New Installer (Current Method):
-1. When the code is ready run this in the terminal:
+Creating New Installer For Windows (Current Method):
+1. When the code is ready run, generate a .jar file:
 ```powershell
    mvn clean package
 ```
@@ -24,3 +24,10 @@ jlink `
 ```
 2. Then open Inno Setup, run the installer with the proper versions and jars
 3. The finished installer will be named "Terminal-Trader-X.X.X-Installer.exe" on the left
+
+Creating New Installer For Mac (Current Method)
+1. When the code is ready, generate a .jar file
+```powershell
+   mvn clean package
+```
+3. Use JPackage to create 
