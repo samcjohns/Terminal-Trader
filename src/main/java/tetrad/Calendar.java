@@ -8,6 +8,8 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
+import static tetrad.Alert.HOLIDAY;
+
 /**
  * Centralized Data Class, stores current date and can calculate differences.
  * 
@@ -49,13 +51,17 @@ public class Calendar {
          */
         public void advance(int days) {
             today = today.plusDays(days);
+            if (isHoliday(today)) {
+                Alert alert = new Alert(holidayGreeting(today), HOLIDAY, today);
+                game.news.push(alert);
+            }
         }
 
         /**
          * Advances the current date by one day
          */
         public void advance() {
-            today = today.plusDays(1);
+            this.advance(1);
         }
     
         /**
@@ -300,5 +306,63 @@ public class Calendar {
             int month = (h + l - 7 * m + 114) / 31;
             int day = ((h + l - 7 * m + 114) % 31) + 1;
             return LocalDate.of(year, month, day);
+        }
+
+        /**
+         * Returns greeting for the holiday of a given date
+         * @param date given date
+         * @return String for the holiday greeting
+         */
+        public String holidayGreeting(LocalDate date) {
+            int day = date.getDayOfMonth();
+            Month month = date.getMonth();
+
+            // New Year's Day - January 1
+            if (month == Month.JANUARY && day == 1) {
+                return "Happy New Year! " + today.getYear();
+            }
+
+            // New Year's Eve - December 31
+            if (month == Month.DECEMBER && day == 31) {
+                return "Happy New Year's Eve";
+            }
+
+            // Valentine's Day - February 14
+            if (month == Month.FEBRUARY && day == 14) {
+                return "Happy Valentine's Day";
+            }
+
+            // St. Patrick's Day - March 17
+            if (month == Month.MARCH && day == 17) {
+                return "Happy St. Patrick's Day";
+            }
+
+            // Easter (variable date)
+            if (date.equals(getEasterSunday(date.getYear()))) {
+                return "Happy Easter! He is risen!";
+            }
+
+            // Fourth of July - Independence Day
+            if (month == Month.JULY && day == 4) {
+                return "Happy Independence Day";
+            }
+
+            // Labor Day (first Monday in September)
+            if (month == Month.SEPTEMBER && date.equals(date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)))) {
+                return "Happy Labor Day";
+            }
+
+            // Thanksgiving (fourth Thursday in November)
+            if (month == Month.NOVEMBER && date.equals(date.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.THURSDAY)))) {
+                return "Happy Thanksgiving";
+            }
+
+            // Christmas Day - December 25
+            if (month == Month.DECEMBER && day == 25) {
+                return "Merry Christmas!";
+            }
+
+            // Add more custom holiday checks here as needed
+            return null;
         }
 }

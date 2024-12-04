@@ -14,6 +14,7 @@ import static tetrad.Alert.BAD_MARKET;
 import static tetrad.Alert.BAD_STOCK;
 import static tetrad.Alert.GOOD_MARKET;
 import static tetrad.Alert.GOOD_STOCK;
+import static tetrad.Alert.HOLIDAY;
 import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.add;
 import static tetrad.Mutil.blue;
@@ -213,6 +214,7 @@ public class News {
             case BAD_MARKET -> bold(red(headline));
             case GOOD_MARKET -> bold(green(headline));
             case ALERT_MARKET -> bold(yellow(headline));
+            case HOLIDAY -> cyan(headline);
             default -> headline; // No color
         };
     }

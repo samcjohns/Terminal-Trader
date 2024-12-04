@@ -37,6 +37,7 @@ class Alert {
     final static int   BAD_MARKET = 4;
     final static int  GOOD_MARKET = 5;
     final static int ALERT_MARKET = 6;
+    final static int      HOLIDAY = 7;
 
     Alert(String headline, int type, LocalDate date) {
         this.headline = headline;
