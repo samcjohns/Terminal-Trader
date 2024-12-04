@@ -1,10 +1,10 @@
 [Setup]
 AppName=Terminal Trader
-AppVerName=Terminal Trader 1.0.2
+AppVerName=Terminal Trader 1.0.3
 DefaultDirName={pf}\Terminal Trader
 DefaultGroupName=Terminal Trader
 OutputDir=.
-OutputBaseFilename=Terminal-Trader-1.0.2-Installer
+OutputBaseFilename=Terminal-Trader-1.0.3-Installer
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
@@ -22,15 +22,15 @@ Name: "{userappdata}\Terminal Trader\saves"
 Name: "{userappdata}\Terminal Trader\gen"
 
 [Files]
-Source: ".\cmd\start-1.0.2.cmd"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\target\tetrad-1.0.2.jar"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\cmd\start-1.0.3.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\target\tetrad-1.0.3.jar"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\icons\tetradicon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ".\runtime\*"; DestDir: "{app}\runtime"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{commondesktop}\Terminal Trader"; Filename: "{app}\start-1.0.2.cmd"; IconFilename: "{app}\tetradicon.ico"; Tasks: desktopicon
-Name: "{group}\Terminal Trader"; Filename: "{app}\start-1.0.2.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\tetradicon.ico"
+Name: "{commondesktop}\Terminal Trader"; Filename: "{app}\start-1.0.3.cmd"; IconFilename: "{app}\tetradicon.ico"; Tasks: desktopicon
+Name: "{group}\Terminal Trader"; Filename: "{app}\start-1.0.3.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\tetradicon.ico"
 
 [Run]
-Filename: "{app}\start-1.0.2.cmd"; Description: "Launch Terminal Trader"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\start-1.0.3.cmd"; Description: "Launch Terminal Trader"; Flags: nowait postinstall skipifsilent

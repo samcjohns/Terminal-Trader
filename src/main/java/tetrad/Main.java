@@ -2,7 +2,11 @@ package tetrad;
 
 import java.util.Scanner;
 
+import static tetrad.Mutil.MENU_WIDTH;
+import static tetrad.Mutil.center;
+import static tetrad.Mutil.clearScreen;
 import static tetrad.Mutil.pause;
+import static tetrad.Mutil.red;
 
 /**
  * Top-level functionality class
@@ -13,9 +17,11 @@ import static tetrad.Mutil.pause;
  */
 
 public class Main {    
-    static boolean PROD = false; // false when testing in VSCode
+    static String version = "1.0.3"; // current game version
+    static boolean   PROD = false;    // false when testing in VSCode
     
     public static void main(String[] args) {
+        Game game = null; // main game object
         try {
             if (args.length > 0) {
                 PROD = args[0].equals("-PROD");
@@ -24,7 +30,7 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
     
             while (true) {
-                Game game = new Game();
+                game = new Game();
                 // exits if user selects exit
                 if (!game.startGame(scanner)) {
                     scanner.close();
@@ -35,9 +41,44 @@ public class Main {
             }
         }
         catch (Exception e) {
+            // fatal error report
+            // save user's progress
+            if (game != null) {
+                game.saveGame();
+            }
+            else {
+                // fatal error in Main, exit
+                return;
+            }
+            
+            // error message screen
+            clearScreen();
+            System.out.println("-".repeat(MENU_WIDTH)); 
+            System.out.println(red(center("Fatal Error Report", MENU_WIDTH)));
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println(red("""
+                    Uh oh! A fatal error has occured. Don't worry, your progress has been saved.
+
+                    If you would like to contribute to the developement of Terminal Trader, please feel free to screenshot this error 
+                    message. You can submit it as an issue in the public Github Repository or send it directly to Samuel Johns.
+
+                    Github: www.github.com/samcjohns/Terminal-Trader
+                    Email: samueljohns@cedarville.edu
+
+                    This error dialogue will automatically close in 60 seconds. """));
+            System.out.println("-".repeat(MENU_WIDTH));
+            System.out.println("Message: " + e.getMessage());
+            System.out.println("Version: " + version);
+            System.out.println("Advances: " + game.usr.getAdvances());
+            System.out.println("Cash: " + game.usr.getCash());
+            System.out.println("OS: " + System.getProperty("os.name"));
+            System.out.println("Max Memory: " + Runtime.getRuntime().maxMemory() / 1024 / 1024 + " MB");
+            System.out.println("Total Memory: " + Runtime.getRuntime().totalMemory() / 1024 / 1024 + " MB");
+            System.out.println("Free Memory: " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " MB");
+
+            System.out.println("\nStack Trace:");
             e.printStackTrace();
-            System.out.println(e.getMessage());
-            pause(10000);
+            pause(60000);
         }
     }
 

@@ -1,4 +1,4 @@
-Current Version: v1.0.2
+Current Version: v1.0.3
 Game Name: Terminal Trader
 Shorthand: tetrad
 
@@ -9,3 +9,34 @@ Update Ideas:
 - History of stock purchases with time stamps
 - System.in.read() for instant commands rather than numbers and enter
 - "Challenge Saves" saves that lock down at 
+
+Investment Firm Update
+* Employees that each focus on their own stock
+  - Star rating based on how accurate their investments Advertisement
+  - Percent chance investing while current value is below target
+  - Randomly generated names
+
+* Different "investments" that grow the company
+  - Secretary
+    - First one, allows for outside funding
+  - Advertisement Campaign
+    - Increasing amounts deposited into accounts
+    - (requires Secretary)
+  - HR
+    - Allows for hiring more employees
+    - Different levels allow for more employees
+      - Level 1: 2
+      - Level 2: 5
+      - Level 3: 10
+      - Level 4: 15
+      - Level 5: Unlimited
+  
+- operate() functions that is similar to advance() or update() where it 
+  determines whether employees advance or new accounts are created.
+
+Instance variables
+- total holdings
+- number of accounts
+
+Let new accounts have some randomness to the values they contribute, keeping
+track of individual accounts is not necessary.
