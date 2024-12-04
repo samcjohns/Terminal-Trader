@@ -83,7 +83,7 @@ public class Achievements {
     private final Game game;         // reference to game object for Alerts and date
 
     // statics
-    static final int ACV_AMOUNT = 17;
+    static final int ACV_AMOUNT = 18;
 
     // index for given achievements
     static final int       FIRST_ADVANCE = 0;
@@ -202,6 +202,7 @@ public class Achievements {
             case GAIN_100K -> "Going Pro";
             case GAIN_1M -> "Hall of Fame";
             case GAIN_1B -> "Extraterrestrial";
+            case GAIN_1T -> "Divine";
             case CASH_LT_DOLLAR -> "All In";
             case ADVANCE_W_NO_STOCKS -> "Watcher";
             case ADVANCE_100_TIMES -> "Veteran";
@@ -226,6 +227,7 @@ public class Achievements {
             case GAIN_100K -> "Have 100 thousand in cash";
             case GAIN_1M -> "Have 1 million in cash";
             case GAIN_1B -> "Have 1 billion in cash";
+            case GAIN_1T -> "Have 1 trillion in cash";
             case CASH_LT_DOLLAR -> "Hold less than a dollar in cash";
             case ADVANCE_W_NO_STOCKS -> "Advance while holding no stocks";
             case ADVANCE_100_TIMES -> "Advance 100 times";
