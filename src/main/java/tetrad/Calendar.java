@@ -79,6 +79,28 @@ public class Calendar {
         public int daysBetween(LocalDate date) {
             return Math.abs((int) ChronoUnit.DAYS.between(date, today));
         }
+
+        /**
+         * Calculates the number of full months between the current date and a given date.
+         * A full month is counted only if the day of the month is the same or has passed.
+         * 
+         * @param date the target date
+         * @return the number of full months between the current date and the given date
+         */
+        public int monthsBetween(LocalDate date) {
+            LocalDate start = today.withDayOfMonth(1);  // Start of the current month
+            LocalDate end = date.withDayOfMonth(1);     // Start of the target month
+
+            int monthsBetween = (int) ChronoUnit.MONTHS.between(start, end);
+
+            // Check if we need to adjust based on days of the month
+            if (today.getDayOfMonth() > date.getDayOfMonth()) {
+                monthsBetween--;
+            }
+
+            return Math.abs(monthsBetween);
+        }
+
     
         /** 
          * Get the date that corresponds to the given number of days from the current date 
@@ -366,3 +388,4 @@ public class Calendar {
             return null;
         }
 }
+ 

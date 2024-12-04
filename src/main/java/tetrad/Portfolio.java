@@ -42,6 +42,7 @@ class Portfolio {
     protected           double        value; // total valuation of all stocks
     protected      Log<Double>      history; // history of value
     protected Log<Transaction> transactions; // history of transactions
+    protected          double realizedGains; // total realized gains
 
     protected int size; // amount of unique stocks currently owned
 
@@ -206,6 +207,10 @@ class Portfolio {
                 // Case 1: Stock exists, sufficient amount
                 if (amounts[i] >= amount) {
                     amounts[i] -= amount; // Decrease the amount of stock
+
+                    // assess gain
+                    realizedGains += (stock.getValue() - prices[i]) * amount;
+                    
                     if (amounts[i] == 0) {
                         removeStock(i); // Remove stock entirely if no more shares
                     }

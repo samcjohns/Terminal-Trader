@@ -151,6 +151,22 @@ class User {
      */
     void setStartDate(LocalDate date) {this.startDate = date; }
 
+    /**
+     * Returns the amount of taxable income attributed to the user for the
+     * current tax period.
+     * @return double of taxable income
+     */
+    double getTaxData() {
+        return portfolio.realizedGains;
+    }
+    
+    /**
+     * Resets tax information after successful payment to the Taxman
+     */
+    void clearTaxData() {
+        portfolio.realizedGains = 0;
+    }
+
     // save functions
     /**
      * Saves the information of the user to <username>.txt
