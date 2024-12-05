@@ -1225,7 +1225,9 @@ public class Game {
         }
 
         // advance time to generate histories so early game graphs aren't empty
+        DO_TAXMAN = false; // disable taxman
         advance(120);
+        DO_TAXMAN = true;  // reenable taxman
 
         // save files
         mkt.save();

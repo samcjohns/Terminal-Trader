@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.Scanner;
 
 import static tetrad.Mutil.MENU_WIDTH;
-import static tetrad.Mutil.clearLine;
+import static tetrad.Mutil.center;
 import static tetrad.Mutil.clearScreen;
 import static tetrad.Mutil.cursorUp;
 import static tetrad.Mutil.dollar;
@@ -42,9 +42,10 @@ public class Taxman {
         this.lastVisit = game.cldr.getToday();
         
         // default values
-        this.cooldown = 1;
+        this.cooldown = 3;
         this.bribePrice = 100;
         this.lastTax = 0;
+        this.rate = 0.3;
     }
 
     /**
@@ -53,30 +54,31 @@ public class Taxman {
      */
     public void visit(Scanner scanner) {
         // check if wrong day
-        // if (game.cldr.monthsBetween(lastVisit) < cooldown || !game.cldr.isFirstDayOfMonth()) {
-        //     return; // don't visit today
-        // }
+        if (game.cldr.monthsBetween(lastVisit) < cooldown || !game.cldr.isFirstDayOfMonth()) {
+            return; // don't visit today
+        }
 
         double gains = user.getTaxData();
 
         // check if no taxes
-        // if (gains == 0) {
-        //     return;
-        // }
+        if (gains == 0) {
+            return;
+        }
 
         // calculate values
-        double tax = rate * user.getTaxData();
-        bribePrice = sigRound(user.getTaxData()/10 + bribePrice, 2);
+        double tax = rate * gains;
+        bribePrice = sigRound(gains/10 + bribePrice, 2);
 
         // right day, do visit
         clearScreen();
         Game.printHeader();
         printTaxman();
         System.out.println("-".repeat(MENU_WIDTH));
-        System.out.println("\n" + "-".repeat(MENU_WIDTH));
+        System.out.println();
+        System.out.println("-".repeat(MENU_WIDTH));
         cursorUp(2);
+
         subtitlePrint("Hello " + user.getName() + ".", 2000);
-        subtitlePrint("", 2000);
 
         if (tax > lastTax) {
             subtitlePrint("I see you have been doing well for yourself...", 2000);
@@ -89,12 +91,16 @@ public class Taxman {
         subtitlePrint("However, for only " + dollar(bribePrice) + ", I can forget about your debts this month", 2000);
         System.out.print("What do you say...? (Y/N): ");
         
-        boolean prison = false;
+        boolean prison   = false;
         while (true) {
+            boolean again = false;
             String input = scanner.nextLine().toUpperCase();
             switch (input) {
                 case "Y" -> {
-                    clearLine();
+                    cursorUp(1);
+                    System.out.println("\r" + " ".repeat(MENU_WIDTH));
+                    System.out.println("\r");
+                    cursorUp(2);
                     if (user.getCash() < bribePrice) {
                         subtitlePrint("Uh oh! Looks like we both are going to have a bad day...", 2000);
                         prison = true;
@@ -105,20 +111,25 @@ public class Taxman {
                     }
                 }
                 case "N" -> {
-                    clearLine();
+                    cursorUp(1);
+                    System.out.println("\r" + " ".repeat(MENU_WIDTH));
+                    System.out.println("\r");
+                    cursorUp(2);
                     if (user.getCash() < tax) {
                         subtitlePrint("Uh oh! Should have been more prepared " + user.getName(), 2000);
-                        prison  =true;
+                        prison = true;
                     }
                     else {
-                        subtitlePrint("Uh oh! Should have been more prepared " + user.getName(), 2000);
+                        subtitlePrint("Look at the upstanding citizen.", 2000);
+                        user.clearTaxData();
                     }
                 }
                 default -> {
                     subtitlePrint("I didn't quite hear that...", 1000);
+                    again = true;
                 }
             }
-            if (prison) {
+            if (!again) {
                 break;
             }
         }
@@ -139,11 +150,11 @@ public class Taxman {
      */
     private static void printTaxman() {
         String filePath = Main.getSource("assets");
-        filePath += "taxman49.txt";
+        filePath += "taxman.txt";
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println("|" + line + "|");
+                System.out.println(center(line, MENU_WIDTH));
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
@@ -172,12 +183,14 @@ public class Taxman {
         // Print each character one by one with a delay.
         for (char c : message.toCharArray()) {
             System.out.print(c);
-            pause(100); // Use the pause method for the delay.
+            pause(50); // Use the pause method for the delay.
         }
         
         pause(delay); // Pause briefly after printing the message for dramatic effect.
-        
+
         // Clear the line after the message is fully displayed.
-        clearLine();
+        System.out.println("\r" + " ".repeat(MENU_WIDTH));
+        System.out.println("\r");
+        cursorUp(2);
     }
 }
