@@ -52,7 +52,7 @@ public class Calendar {
         public void advance(int days) {
             today = today.plusDays(days);
             if (isHoliday(today)) {
-                Alert alert = new Alert(holidayGreeting(today), HOLIDAY, today);
+                Alert alert = new Alert(holidayGreeting(today), HOLIDAY, today, game.usr);
                 game.news.push(alert);
             }
         }

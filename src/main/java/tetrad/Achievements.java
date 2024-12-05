@@ -192,7 +192,7 @@ public class Achievements {
         acvList[acv] = true;
         String msg = "Achievement Unlocked: ";
         msg += getAcvTitle(acv);
-        Alert acvAlert = new Alert(msg, Alert.ACHIEVEMENT, game.cldr.getToday());
+        Alert acvAlert = new Alert(msg, Alert.ACHIEVEMENT, game.cldr.getToday(), game.usr);
         game.news.push(acvAlert);
     }
     // title for the given achievement

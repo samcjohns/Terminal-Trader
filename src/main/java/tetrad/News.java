@@ -124,10 +124,10 @@ public class News {
      */
     public void page(int page) {
         int pageHeight = 26;
-        int totalPages = (int) Math.ceil(reel.size() / alertsPerPage);
+        int totalPages = reel.size() / alertsPerPage;
 
         // Check if the page number is within the valid range (1-based index)
-        if (page < 1 || (page > totalPages && totalPages != 0)) {
+        if (page < 1 || (page > totalPages + 1 && totalPages != 0)) {
             return;
         }
 
@@ -155,7 +155,14 @@ public class News {
                 line = add(line, currentValue, 132 - currentValue.length());
                 line = add(line, " | " + date, MENU_WIDTH + 15);
             }
-            else {
+            else if (alert.getHeadline().contains("Unlocked")) {
+                line = add(line, "|", 94);
+                line = add(line, "|", 126);
+            }
+            else if (alert.getRelevantUser() != null) {
+                // hack for holiday detection
+                line = add(line, "|", 86);
+                line = add(line, "|", 118);
             }
             
             System.out.println(line);
