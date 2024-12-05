@@ -53,16 +53,16 @@ public class Taxman {
      */
     public void visit(Scanner scanner) {
         // check if wrong day
-        if (game.cldr.monthsBetween(lastVisit) < cooldown || !game.cldr.isFirstDayOfMonth()) {
-            return; // don't visit today
-        }
+        // if (game.cldr.monthsBetween(lastVisit) < cooldown || !game.cldr.isFirstDayOfMonth()) {
+        //     return; // don't visit today
+        // }
 
         double gains = user.getTaxData();
 
         // check if no taxes
-        if (gains == 0) {
-            return;
-        }
+        // if (gains == 0) {
+        //     return;
+        // }
 
         // calculate values
         double tax = rate * user.getTaxData();
@@ -86,8 +86,52 @@ public class Taxman {
         }
 
         subtitlePrint("I've been looking at your account, and you seem to owe us " + dollar(tax), 3000);
-
+        subtitlePrint("However, for only " + dollar(bribePrice) + ", I can forget about your debts this month", 2000);
+        System.out.print("What do you say...? (Y/N): ");
         
+        boolean prison = false;
+        while (true) {
+            String input = scanner.nextLine().toUpperCase();
+            switch (input) {
+                case "Y" -> {
+                    clearLine();
+                    if (user.getCash() < bribePrice) {
+                        subtitlePrint("Uh oh! Looks like we both are going to have a bad day...", 2000);
+                        prison = true;
+                    }
+                    else {
+                        user.setCash(user.getCash() - bribePrice);
+                        subtitlePrint("Pleasure doing business with you. Goodbye.", 3000);
+                    }
+                }
+                case "N" -> {
+                    clearLine();
+                    if (user.getCash() < tax) {
+                        subtitlePrint("Uh oh! Should have been more prepared " + user.getName(), 2000);
+                        prison  =true;
+                    }
+                    else {
+                        subtitlePrint("Uh oh! Should have been more prepared " + user.getName(), 2000);
+                    }
+                }
+                default -> {
+                    subtitlePrint("I didn't quite hear that...", 1000);
+                }
+            }
+            if (prison) {
+                break;
+            }
+        }
+
+        if (prison) {
+            // determine sentence by wealth
+            int sentence = (int) user.getNet() / 10000;
+            game.advance(sentence);
+
+            Alert alert = new Alert("You fulfilled your " + sentence + " day sentence.", Alert.HOLIDAY, game.cldr.getToday());
+            game.news.push(alert);
+        }
+        clearScreen();
     }
 
     /**
@@ -95,7 +139,7 @@ public class Taxman {
      */
     private static void printTaxman() {
         String filePath = Main.getSource("assets");
-        filePath += "taxman70.txt";
+        filePath += "taxman49.txt";
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {

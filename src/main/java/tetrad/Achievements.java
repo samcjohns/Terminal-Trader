@@ -154,8 +154,10 @@ public class Achievements {
         if (!acvList[GAIN_1T] && relevantUser.getCash() >= 1000000000000.0) {
             earnAcv(GAIN_1T);
         }
-        if (!acvList[EASTER_SELL] && game.cldr.holidayGreeting(game.cldr.getToday()).equals("Happy Easter! He is risen!")) {
-            earnAcv(EASTER_SELL);
+        if (game.cldr.isHoliday(game.cldr.getToday())) {
+            if (!acvList[EASTER_SELL] && game.cldr.holidayGreeting(game.cldr.getToday()).equals("Happy Easter! He is risen!")) {
+                earnAcv(EASTER_SELL);
+            }
         }
     }
     /** Checks for any achievements gained after an advance */

@@ -62,6 +62,9 @@ public class Game {
     Taxman tm;         // taxman object
     Scanner scanner;   // user input scanner object
 
+    // settings (defaulted to true)
+    public static boolean DO_TAXMAN = true;
+
     static int headerSetting = -1; // color setting for the header
     static boolean ARCADE_MODE = false; // activates old stock behavior
 
@@ -71,6 +74,7 @@ public class Game {
         usr = new User(this);
         cldr = new Calendar(this);
         theme = new SoundPlayer("tetrad-theme");
+        tm = new Taxman(this);
         this.scanner = scanner;
     }
 
@@ -157,7 +161,9 @@ public class Game {
                 // enter command, then enter value
                 case "adv" -> {
                     input = scanner.nextLine();
+                    DO_TAXMAN = false; // disable taxman
                     advance(Integer.parseInt(input));
+                    DO_TAXMAN = true; // reenable taxman
                 }
                 case "give" -> {
                     input = scanner.nextLine();
@@ -185,13 +191,14 @@ public class Game {
      * Main time advancement method, used to simulate a single day passing
      * across all objects.
      */
-    private void advance() {
+    public void advance() {
         mkt.advance();
         usr.update();
         news.update();
         cldr.advance();
-        tm.visit(scanner); // FIXME I need a new solution
-        
+        if (DO_TAXMAN) {
+            tm.visit(scanner);
+        }
     }
 
     /**
@@ -199,7 +206,7 @@ public class Game {
      * across all objects.
      * @param times number of times to advance
      */
-    private void advance(int times) {
+    public void advance(int times) {
         for (int i = 0; i < times; i++) {
             this.advance();
         }
