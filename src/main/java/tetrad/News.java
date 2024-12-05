@@ -124,7 +124,7 @@ public class News {
      */
     public void page(int page) {
         int pageHeight = 26;
-        int totalPages = (int) Math.ceil(reel.size() / (double) alertsPerPage);
+        int totalPages = (int) Math.ceil(reel.size() / alertsPerPage);
 
         // Check if the page number is within the valid range (1-based index)
         if (page < 1 || (page > totalPages && totalPages != 0)) {

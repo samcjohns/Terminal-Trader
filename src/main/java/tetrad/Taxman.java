@@ -91,13 +91,13 @@ public class Taxman {
         System.out.println(yellow("-".repeat(MENU_WIDTH)));
         cursorUp(2);
 
-        subtitlePrint("Hello " + user.getName() + ".", 2000);
+        subtitlePrint("Hello " + user.getName() + ". ", 2000);
 
         if (tax > lastTax) {
-            subtitlePrint("I see you have been doing well for yourself...", 2000);
+            subtitlePrint("I see you have been doing well for yourself... ", 2000);
         }
         else {
-            subtitlePrint("I see you've had a rough month...", 2000);
+            subtitlePrint("I see you've had a rough month... ", 2000);
         }
 
         subtitlePrint("I've been looking at your account, and you seem to owe us " + dollar(tax), 3000);
@@ -115,15 +115,15 @@ public class Taxman {
                     cursorUp(1);
                     System.out.print("\r" + " ".repeat(MENU_WIDTH) + "\r");
                     if (user.getCash() < tax) {
-                        subtitlePrint("Uh oh! Should have been more prepared " + user.getName() + ".", 1000);
-                        subtitlePrint("You can't afford your taxes.", 2000);
+                        subtitlePrint("Uh oh! Should have been more prepared " + user.getName() + ". ", 1000);
+                        subtitlePrint("You can't afford your taxes. ", 2000);
                         again = true;
                         prison = true;
                     }
                     else {
                         user.setCash(user.getCash() - bribePrice);
-                        subtitlePrint("Thank your for supporting your local goverment.", 2000);
-                        subtitlePrint("Goodbye.", 1000);
+                        subtitlePrint("Thank your for supporting your local goverment. ", 2000);
+                        subtitlePrint("Goodbye. ", 1000);
                         bribePrice = 0; // reset bribe price
                     }
                 }
@@ -155,6 +155,7 @@ public class Taxman {
                         subtitlePrint("Very well, until next time...", 2000);
                         user.setCash(user.getCash() - bribe);
                     }
+                    // reject case
                     else {
                         System.out.print("\r" + " ".repeat(MENU_WIDTH) + "\r");
                         subtitlePrint("It would take much more than that to buy my integrity " + user.getName() + "...", 2000);
@@ -171,8 +172,27 @@ public class Taxman {
                 case "'" -> {
                     cursorUp(1);
                     System.out.print("\r" + " ".repeat(MENU_WIDTH) + "\r");
+                    // already requested delay
                     if (cooldown != DEFAULT_COOLDOWN) {
-
+                        subtitlePrint("I've already given you enough time... ", 1000);
+                        if (user.getNet() >= tax) {
+                            subtitlePrint("I'm sorry, " + user.getName() + ". ", 1000);
+                            subtitlePrint("No more second chances... ", 2000);
+                            prison = true;
+                        }
+                        else {
+                            subtitlePrint("I wish it didn't come to this... ", 2000);
+                            subtitlePrint("... ", 2000);
+                            userLiquidate();
+                            subtitlePrint("I've liquidated your portfolio to cover your costs", 2000);
+                            subtitlePrint("Please be prepared next time... ", 2000);
+                            subtitlePrint("Goodbye. ", 1000);
+                        }
+                        cooldown = DEFAULT_COOLDOWN;
+                    }
+                    else {
+                        subtitlePrint("You have one month, please be prepared... ", 2000);
+                        cooldown = 1;
                     }
                 }
                 default -> {
@@ -189,17 +209,7 @@ public class Taxman {
 
         if (prison) {
             // sell all stocks in porfolio
-            Portfolio pf = user.getPortfolio();
-            for (int i = 0; i < pf.size(); i++) {
-                try {
-                    int amount = pf.amountAt(i);
-                    Stock stock = pf.stockAt(i);
-                    user.sell(stock, amount);
-                }
-                catch (InvalidSelectionException e) {
-                    // move on
-                }
-            }
+            userLiquidate();
 
             // apply fine
             user.setCash(user.getCash() / 100);
@@ -274,5 +284,22 @@ public class Taxman {
         System.out.println("\r" + " ".repeat(MENU_WIDTH));
         System.out.println("\r");
         cursorUp(2);
+    }
+
+    /**
+     * Sells all stocks in the users portfolio
+     */
+    private void userLiquidate() {
+        Portfolio pf = user.getPortfolio();
+        for (int i = 0; i < pf.size(); i++) {
+            try {
+                int amount = pf.amountAt(i);
+                Stock stock = pf.stockAt(i);
+                user.sell(stock, amount);
+            }
+            catch (InvalidSelectionException e) {
+                // move on
+            }
+        }
     }
 }
