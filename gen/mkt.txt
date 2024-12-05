@@ -1,7 +1,7 @@
 ---MARKET-INFO---
 ---ATTRIBUTES---
 DATA: trend vol number_of_stocks
-1.7286778146354256 5.687459254827618 20 
+2.4144107269496877 6.444985388471704 20 
 ---INFO-END---
 For Terminal Trader, a text-based stock game.
 Developed and Designed by Samuel Johns

@@ -1,7 +1,7 @@
 ---PORTFOLIO-INFO---
 DATA: stockID amount originalPrice
 ---HISTORY---
-
+1000.0 1000.0 
 ---HISTORY-END---
 ---TRANSACTIONS-LOG---
 

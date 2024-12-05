@@ -55,7 +55,7 @@ class User {
      */
     private boolean main;
 
-    private Achievements acv; // keeps track of achievements for user
+    protected Achievements acv; // keeps track of achievements for user
     private Game game; // reference back to the current game for advancing while in portfolio
 
     static final double STARTING_CASH = 1000.0;
