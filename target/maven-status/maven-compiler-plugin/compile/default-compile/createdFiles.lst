@@ -5,6 +5,7 @@ tetrad\Transaction.class
 tetrad\Main.class
 tetrad\User.class
 tetrad\Market.class
+tetrad\Taxman.class
 tetrad\Game.class
 tetrad\Mutil.class
 tetrad\InitException.class
