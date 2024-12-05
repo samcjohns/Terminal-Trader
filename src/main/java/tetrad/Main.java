@@ -35,13 +35,13 @@ public class Main {
             startup(scanner); // init dialogue
     
             while (true) {
-                game = new Game();
+                game = new Game(scanner);
                 // exits if user selects exit
-                if (!game.startGame(scanner)) {
+                if (!game.startGame()) {
                     scanner.close();
                     return;
                 }
-                game.play(scanner);
+                game.play();
                 game.endGame();
             }
         }

@@ -59,25 +59,27 @@ public class Game {
     News news;         // main news object
     SoundPlayer theme; // theme song control
     Calendar cldr;     // game calendar
+    Taxman tm;         // taxman object
+    Scanner scanner;   // user input scanner object
 
     static int headerSetting = -1; // color setting for the header
     static boolean ARCADE_MODE = false; // activates old stock behavior
 
-    public Game() {
+    public Game(Scanner scanner) {
         news = new News(this);
         mkt = new Market(this);
         usr = new User(this);
         cldr = new Calendar(this);
         theme = new SoundPlayer("tetrad-theme");
+        this.scanner = scanner;
     }
 
     /**
      * Top-level initialization function; Functions as the main menu and
      * handles new game creation or loading from an existing file.
-     * @param scanner user input scanner
      * @return false if the user selects to exit the program
      */
-    public boolean startGame(Scanner scanner) {
+    public boolean startGame() {
         theme.play();
         while(true) {
             showMainMenu();
@@ -113,7 +115,7 @@ public class Game {
                     initAdvance();
                     return true; // move on
                 }
-                case "3" -> doExtras(scanner);
+                case "3" -> doExtras();
                 case "4" -> {
                     theme.stop();
                     return false; // exit program
@@ -131,10 +133,9 @@ public class Game {
 
     /**
      * Main gameplay function, handles all gameplay until the user chooses to
-     * exit. Use this method after calling startGame(). 
-     * @param scanner user input scanner
+     * exit. Use this method after calling startGame()..
      */
-    public void play(Scanner scanner) {
+    public void play() {
         while (true) {
             clearScreen();
             printHeader();
@@ -142,11 +143,11 @@ public class Game {
             System.out.print("---[Select]: ");
             String input = scanner.nextLine();
             switch (input) {
-                case "1" -> portfolioMenu(scanner); // show portfolio
-                case "2" -> marketMenu(scanner);    // show stock exchange
-                case "3" -> statsMenu(scanner);     // user stats menu
-                case "4" -> acvMenu(scanner);
-                case "5" -> newsFeedMenu(scanner);
+                case "1" -> portfolioMenu(); // show portfolio
+                case "2" -> marketMenu();    // show stock exchange
+                case "3" -> statsMenu();     // user stats menu
+                case "4" -> acvMenu();
+                case "5" -> newsFeedMenu();
                 case "6" -> {
                     saveGame();
                     return;
@@ -189,6 +190,8 @@ public class Game {
         usr.update();
         news.update();
         cldr.advance();
+        tm.visit(scanner); // FIXME I need a new solution
+        
     }
 
     /**
@@ -254,10 +257,9 @@ public class Game {
     }
 
     /**
-     * Portfolio menu method, handles all game behavior within the menu
-     * @param scanner user input scanner
+     * Portfolio menu method, handles all game behavior within the men.
      */
-    private void portfolioMenu(Scanner scanner) {
+    private void portfolioMenu() {
         while (true) {
             clearScreen();
             printHeader();
@@ -277,7 +279,7 @@ public class Game {
             switch (command) {
                 case "" -> { return; }
                 case "/" -> advance();
-                case "." -> doSell(scanner);
+                case "." -> doSell();
                 case ";" ->  {
                     /**
                      * FIXME
@@ -301,10 +303,9 @@ public class Game {
     }
 
     /**
-     * Market menu method, handles all game behavior within the market menu
-     * @param scanner user input scanner
+     * Market menu method, handles all game behavior within the market men.
      */
-    private void marketMenu(Scanner scanner) {
+    private void marketMenu() {
         while (true) {
             clearScreen();
             printHeader();
@@ -323,10 +324,8 @@ public class Game {
                     return;
                 }
                 case "/" -> advance();
-                case "," -> stockView(scanner);
-                case "." -> {
-                    doBuy(scanner);
-                }
+                case "," -> stockView();
+                case "." -> doBuy();
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(1000);
@@ -339,9 +338,8 @@ public class Game {
     /**
      * Shows the alerts in the news reel, allowing the user to navigate each 
      * page. Will return when the user is finished.
-     * @param scanner user input scanner
      */
-    private void newsFeedMenu(Scanner scanner) {
+    private void newsFeedMenu() {
         int currentPage = 1;
         while (true) {
             // keep circular pages
@@ -393,9 +391,8 @@ public class Game {
     /**
      * Shows the achievements for the user, allowing the user to navigate each
      * page. Will return when the user is finished.
-     * @param scanner user input scanner
      */
-    private void acvMenu(Scanner scanner) {
+    private void acvMenu() {
         int pages = Achievements.ACV_AMOUNT / 7 + 1;
         int currentPage = 1;
         while (true) {
@@ -448,7 +445,7 @@ public class Game {
      * Shows the users stats and exits when they press enter
      * @param scanner
      */
-    private void statsMenu(Scanner scanner) {
+    private void statsMenu() {
         // user stats
         clearScreen();
         printHeader();
@@ -462,10 +459,9 @@ public class Game {
 
     /**
      * Shows information about a selected stock, handles all behavior within
-     * the stock view menu
-     * @param scanner user input scanner
+     * the stock view men.
      */
-    private void stockView(Scanner scanner) {
+    private void stockView() {
         Stock stock = null;
         int view = -1;
         while(true) {
@@ -534,7 +530,7 @@ public class Game {
                         view = 1;
                     }
                 }
-                case "." -> doBuy(scanner, view);
+                case "." -> doBuy(view);
                 case "/" -> advance();
                 
                 default -> {
@@ -547,10 +543,9 @@ public class Game {
     }
 
     /**
-     * Extras menu method, directs control to other Extras menus
-     * @param scanner user input scanner
+     * Extras menu method, directs control to other Extras menu.
      */
-    private void doExtras(Scanner scanner) {
+    private void doExtras() {
         clearScreen();
         printHeader();
         System.out.println();
@@ -568,23 +563,23 @@ public class Game {
             clearLine();
             switch (input) {
                 case "1" -> {
-                    eSettings(scanner);
+                    eSettings();
                     return;
                 }
                 case "2" -> {
-                    eDevTools(scanner);
+                    eDevTools();
                     return;
                 }
                 case "3" -> {
-                    eHelp(scanner);
+                    eHelp();
                     return;
                 }
                 case "4" -> {
-                    eMiniGames(scanner);
+                    eMiniGames();
                     return;
                 }
                 case "5" -> {
-                    eCredits(scanner);
+                    eCredits();
                     return;
                 }
                 case "6" -> {
@@ -602,9 +597,8 @@ public class Game {
     /**
      * Sell method, gets stock and amount to be sold and makes sale. Handles
      * errors appropriately and returns when user is finished.
-     * @param scanner user input scanner
      */
-    private void doSell(Scanner scanner) {
+    private void doSell() {
         while (true) {
             try {
                 System.out.print("--[Stock (0 to Exit)]: ");
@@ -641,9 +635,8 @@ public class Game {
     /**
      * Buy method, gets stock and amount to be bought and makes sale. Handles
      * errors appropriately and returns when user is finished.
-     * @param scanner user input scanner
      */
-    private void doBuy(Scanner scanner) {
+    private void doBuy() {
         int selection;
         while(true) {
             try {
@@ -665,17 +658,16 @@ public class Game {
                 clearLine();
             }
         }
-        doBuy(scanner, selection);
+        doBuy(selection);
     }
 
     /**
      * Buy method, gets amount of stock given by selection to be bought and 
      * makes sale. Handles errors appropriately and returns when user is 
      * finished.
-     * @param scanner user input scanner
      * @param selection stock selected
      */
-    private void doBuy(Scanner scanner, int selection) {
+    private void doBuy(int selection) {
         while(true) {
             double cash = usr.getCash();
             try {
@@ -837,9 +829,8 @@ public class Game {
     /**
      * Settings menu method, handles everything in Settings and returns when
      * the user is finished.
-     * @param scanner user input scanner
      */
-    private void eSettings(Scanner scanner) {
+    private void eSettings() {
         while (true) { 
             clearScreen();
             printHeader();
@@ -910,9 +901,8 @@ public class Game {
     /**
      * Helps menu method, handles everything within help and returns when user
      * is finished.
-     * @param scanner user input scanner
      */
-    private void eHelp(Scanner scanner) {
+    private void eHelp() {
         clearScreen();
         printHeader();
         System.out.print("\n\n"); // spacing
@@ -946,9 +936,8 @@ public class Game {
     /**
      * Minigames menu method, handles everything for mini games and returns 
      * when the user is finished.
-     * @param scanner user input scanner
      */
-    private void eMiniGames(Scanner scanner) {
+    private void eMiniGames() {
         clearScreen();
         printHeader();
         System.out.println(center(" Mini Games ", MENU_WIDTH, "!"));
@@ -972,9 +961,8 @@ public class Game {
 
     /**
      * Prints credits and waits for user to press enter.
-     * @param scanner user input scanner
      */
-    private void eCredits(Scanner scanner) {
+    private void eCredits() {
         clearScreen();
         printHeader();
         System.out.print("\n\n"); // spacing
@@ -1000,9 +988,8 @@ public class Game {
     /**
      * Dev Tools menu method, handles everything for Dev Tools and returns when
      * the user is finished.
-     * @param scanner user input scanner
      */
-    private void eDevTools(Scanner scanner) {
+    private void eDevTools() {
         while (true) {
             clearScreen();
             printHeader();

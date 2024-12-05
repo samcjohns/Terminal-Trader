@@ -10,6 +10,7 @@ import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.clearLine;
 import static tetrad.Mutil.clearScreen;
 import static tetrad.Mutil.cursorUp;
+import static tetrad.Mutil.dollar;
 import static tetrad.Mutil.pause;
 
 /**
@@ -25,7 +26,9 @@ import static tetrad.Mutil.pause;
 public class Taxman {
     private LocalDate lastVisit; // last time visited the player
     private int        cooldown; // months taxman will wait before returning
+    private double         rate; // amount of realized gains taken
     private double   bribePrice; // bribing price for the taxman to spare user
+    private double      lastTax; // last amount taxed from the player
     private final Game game; // reference to the current game object
     private final User user; // player that the taxman visits
 
@@ -41,6 +44,7 @@ public class Taxman {
         // default values
         this.cooldown = 1;
         this.bribePrice = 100;
+        this.lastTax = 0;
     }
 
     /**
@@ -53,6 +57,17 @@ public class Taxman {
             return; // don't visit today
         }
 
+        double gains = user.getTaxData();
+
+        // check if no taxes
+        if (gains == 0) {
+            return;
+        }
+
+        // calculate values
+        double tax = rate * user.getTaxData();
+        bribePrice = sigRound(user.getTaxData()/10 + bribePrice, 2);
+
         // right day, do visit
         clearScreen();
         Game.printHeader();
@@ -60,10 +75,18 @@ public class Taxman {
         System.out.println("-".repeat(MENU_WIDTH));
         System.out.println("\n" + "-".repeat(MENU_WIDTH));
         cursorUp(2);
-        subtitlePrint("", cooldown);
+        subtitlePrint("Hello " + user.getName() + ".", 2000);
+        subtitlePrint("", 2000);
 
-        
-        bribePrice = sigRound(user.getTaxData()/10 + bribePrice, 2);
+        if (tax > lastTax) {
+            subtitlePrint("I see you have been doing well for yourself...", 2000);
+        }
+        else {
+            subtitlePrint("I see you've had a rough month...", 2000);
+        }
+
+        subtitlePrint("I've been looking at your account, and you seem to owe us " + dollar(tax), 3000);
+
         
     }
 
