@@ -102,11 +102,11 @@ public class Taxman {
 
         subtitlePrint("I've been looking at your account, and you seem to owe us " + dollar(tax), 3000);
         subtitlePrint("How would you like to pay?", 2000);
-        System.out.print(blue("[/] - Pay Taxes | [.] - Bribe Taxman | [,] - Refuse | ['] - Request Delay | ") 
-                        + yellow("Cash: " + dollar(user.getCash())) + " | Choose: ");
         
         boolean prison   = false;
         while (true) {
+            System.out.print(blue("[/] - Pay Taxes | [.] - Bribe Taxman | [,] - Refuse | ['] - Request Delay | ") 
+                        + yellow("Cash: " + dollar(user.getCash())) + " | Choose: ");
             boolean again = false;
             String input = scanner.nextLine().toUpperCase();
             switch (input) {
@@ -117,7 +117,6 @@ public class Taxman {
                     if (user.getCash() < tax) {
                         subtitlePrint("Uh oh! Should have been more prepared " + user.getName() + ". ", 1000);
                         subtitlePrint("You can't afford your taxes. ", 2000);
-                        again = true;
                         prison = true;
                     }
                     else {
@@ -175,7 +174,7 @@ public class Taxman {
                     // already requested delay
                     if (cooldown != DEFAULT_COOLDOWN) {
                         subtitlePrint("I've already given you enough time... ", 1000);
-                        if (user.getNet() >= tax) {
+                        if (user.getNet() < tax) {
                             subtitlePrint("I'm sorry, " + user.getName() + ". ", 1000);
                             subtitlePrint("No more second chances... ", 2000);
                             prison = true;
