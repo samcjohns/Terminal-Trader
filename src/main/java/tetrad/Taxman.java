@@ -4,14 +4,17 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.MENU_WIDTH;
+import static tetrad.Mutil.blue;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.clearScreen;
 import static tetrad.Mutil.cursorUp;
 import static tetrad.Mutil.dollar;
 import static tetrad.Mutil.pause;
+import static tetrad.Mutil.yellow;
 
 /**
  * Class for Taxman feature added in 1.1
@@ -53,21 +56,23 @@ public class Taxman {
      * with the player. If it is not time yet, method will return immediately.
      */
     public void visit(Scanner scanner) {
-        // check if wrong day
-        if (game.cldr.monthsBetween(lastVisit) < cooldown || !game.cldr.isFirstDayOfMonth()) {
-            return; // don't visit today
-        }
+        // // check if wrong day
+        // if (game.cldr.monthsBetween(lastVisit) < cooldown || !game.cldr.isFirstDayOfMonth()) {
+        //     return; // don't visit today
+        // }
 
-        double gains = user.getTaxData();
+        // double gains = user.getTaxData();
 
-        // check if no taxes
-        if (gains == 0) {
-            return;
-        }
+        // // check if no taxes
+        // if (gains == 0) {
+        //     return;
+        // }
+
+        double gains = 1254.34;
 
         // calculate values
         double tax = rate * gains;
-        bribePrice = sigRound(gains/10 + bribePrice, 2);
+        bribePrice = sigRound((gains + bribePrice)/10, 2);
 
         // right day, do visit
         clearScreen();
@@ -88,40 +93,60 @@ public class Taxman {
         }
 
         subtitlePrint("I've been looking at your account, and you seem to owe us " + dollar(tax), 3000);
-        subtitlePrint("However, for only " + dollar(bribePrice) + ", I can forget about your debts this month", 2000);
-        System.out.print("What do you say...? (Y/N): ");
+        System.out.print(blue("[/] - Pay Taxes | [.] - Bribe Taxman | [,] - Refuse | ") + yellow("Cash: " + dollar(user.getCash())));
         
         boolean prison   = false;
         while (true) {
             boolean again = false;
             String input = scanner.nextLine().toUpperCase();
             switch (input) {
-                case "Y" -> {
+                case "/" -> {
+                    // pay taxes
                     cursorUp(1);
-                    System.out.println("\r" + " ".repeat(MENU_WIDTH));
-                    System.out.println("\r");
-                    cursorUp(2);
-                    if (user.getCash() < bribePrice) {
-                        subtitlePrint("Uh oh! Looks like we both are going to have a bad day...", 2000);
+                    System.out.print("\r" + " ".repeat(MENU_WIDTH));
+                    System.out.print("\r");
+                    if (user.getCash() < tax) {
+                        subtitlePrint("Uh oh! Should have been more prepared " + user.getName() + ". You can't afford your taxes.", 2000);
+                        again = true;
                         prison = true;
                     }
                     else {
                         user.setCash(user.getCash() - bribePrice);
-                        subtitlePrint("Pleasure doing business with you. Goodbye.", 3000);
+                        subtitlePrint("Thank your for supporting your local goverment.", 2000);
+                        subtitlePrint("Goodbye.", 1000);
                     }
                 }
-                case "N" -> {
+                case "." -> {
+                    // bribe taxman
                     cursorUp(1);
-                    System.out.println("\r" + " ".repeat(MENU_WIDTH));
-                    System.out.println("\r");
-                    cursorUp(2);
-                    if (user.getCash() < tax) {
-                        subtitlePrint("Uh oh! Should have been more prepared " + user.getName(), 2000);
-                        prison = true;
+                    System.out.print("\r" + " ".repeat(MENU_WIDTH));
+                    System.out.print("\r");
+                    System.out.print("Offer Amount: ");
+                    double bribe = 0;
+                    input = scanner.nextLine();
+
+                    // invalid bribe
+                    try {
+                        bribe = Double.parseDouble(input);
+                    } 
+                    catch (NumberFormatException e) {
+                        System.out.print("Invalid Bribe");
+                        again = true;
+                        break;
+                    }
+
+                    // valid bribe
+                    // random chance he accepts it based on amount
+                    Random rand = new Random();
+                    // accept case
+                    if (rand.nextDouble() >= bribe/bribePrice) {
+                        subtitlePrint("Very well, until next time...", 2000);
+                        user.setCash(user.getCash() - bribe);
                     }
                     else {
-                        subtitlePrint("Look at the upstanding citizen.", 2000);
-                        user.clearTaxData();
+                        subtitlePrint("It would take much more than that to be my integrity " + user.getName(), 2000);
+                        subtitlePrint("Perhaps prison will give you time to reconsider your morals...", 2000);
+                        prison = true;
                     }
                 }
                 default -> {
@@ -154,7 +179,7 @@ public class Taxman {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(center(line, MENU_WIDTH));
+                System.out.println("|" + center(line, MENU_WIDTH -2) + "|");
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
