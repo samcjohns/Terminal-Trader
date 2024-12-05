@@ -175,12 +175,7 @@ public class Game {
                 case "acv" -> {
                     input = scanner.nextLine();
                     int num = Integer.parseInt(input);
-                    if(usr.acv.acvList[num]) {
-                        usr.acv.acvList[num] = false;
-                    }
-                    else {
-                        usr.acv.acvList[num] = true;
-                    }
+                    usr.acv.acvList[num] = !usr.acv.acvList[num];
                 }
                 default -> {
                     // help case

@@ -1,7 +1,7 @@
 [Setup]
 AppName=Terminal Trader
 AppVerName=Terminal Trader 1.1.0
-DefaultDirName={pf}\Terminal Trader
+DefaultDirName=C:\Program Files\Terminal Trader
 DefaultGroupName=Terminal Trader
 OutputDir=.
 OutputBaseFilename=Terminal-Trader-1.1.0-Installer

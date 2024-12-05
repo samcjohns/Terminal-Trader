@@ -37,6 +37,11 @@ public class Taxman {
     private final Game game; // reference to the current game object
     private final User user; // player that the taxman visits
 
+    // default values
+    private static    int   DEFAULT_COOLDOWN = 3;
+    private static double DEFAULT_BRIBEPRICE = 100;
+    private static double       DEFAULT_RATE = 0.3;
+
     /**
      * Creates a new Taxman for this game instance
      * @param game this game instance
@@ -47,10 +52,10 @@ public class Taxman {
         this.lastVisit = game.cldr.getToday();
         
         // default values
-        this.cooldown = 3;
-        this.bribePrice = 100;
+        this.cooldown = DEFAULT_COOLDOWN;
+        this.bribePrice = DEFAULT_BRIBEPRICE;
+        this.rate = DEFAULT_RATE;
         this.lastTax = 0;
-        this.rate = 0.3;
     }
 
     /**
@@ -163,7 +168,16 @@ public class Taxman {
                     subtitlePrint("There are only two inevitables in life. Death and taxes...", 2000);
                     again = true;
                 }
+                case "'" -> {
+                    cursorUp(1);
+                    System.out.print("\r" + " ".repeat(MENU_WIDTH) + "\r");
+                    if (cooldown != DEFAULT_COOLDOWN) {
+
+                    }
+                }
                 default -> {
+                    cursorUp(1);
+                    System.out.print("\r" + " ".repeat(MENU_WIDTH) + "\r");
                     subtitlePrint("I didn't quite hear that...", 1000);
                     again = true;
                 }
@@ -212,7 +226,7 @@ public class Taxman {
     public void visit(Scanner scanner) {
         this.visit(scanner, false);
     }
-    
+
     /**
      * Prints ASCII art for the Taxman
      */
