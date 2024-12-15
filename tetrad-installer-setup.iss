@@ -20,9 +20,11 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Dirs]
 Name: "{userappdata}\Terminal Trader\saves"
 Name: "{userappdata}\Terminal Trader\gen"
+Name: "{app}\wav"
 
 [Files]
 Source: ".\cmd\start-1.1.0.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\cmd\get-sounds-1.1.0.cmd"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\target\tetrad-1.1.0.jar"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\icons\tetradicon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -33,4 +35,5 @@ Name: "{commondesktop}\Terminal Trader"; Filename: "{app}\start-1.1.0.cmd"; Icon
 Name: "{group}\Terminal Trader"; Filename: "{app}\start-1.1.0.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\tetradicon.ico"
 
 [Run]
+Filename: "{app}\get-sounds-1.1.0.cmd"; Description: "Download Sound Pack (Recommended)"; Flags: runhidden runascurrentuser postinstall skipifsilent
 Filename: "{app}\start-1.1.0.cmd"; Description: "Launch Terminal Trader"; Flags: nowait postinstall skipifsilent

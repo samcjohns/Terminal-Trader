@@ -28,7 +28,7 @@ public class SoundPlayer {
      */
     public SoundPlayer(String fileName) {
         // determine correct save path
-        String filePath = Main.getSource("assets");
+        String filePath = Main.getSource("wav");
         filePath += fileName + ".wav";
 
         try {

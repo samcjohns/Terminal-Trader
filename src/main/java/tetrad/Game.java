@@ -73,7 +73,7 @@ public class Game {
         mkt = new Market(this);
         usr = new User(this);
         cldr = new Calendar(this);
-        theme = new SoundPlayer("tetrad-theme");
+        theme = new SoundPlayer("2018-08-02 - Doctor Dreamchip");
         tm = new Taxman(this);
         this.scanner = scanner;
     }
