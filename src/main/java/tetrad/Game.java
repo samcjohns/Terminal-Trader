@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
@@ -73,9 +74,28 @@ public class Game {
         mkt = new Market(this);
         usr = new User(this);
         cldr = new Calendar(this);
-        theme = new SoundPlayer("2018-08-02 - Doctor Dreamchip");
         tm = new Taxman(this);
         this.scanner = scanner;
+
+        // choose a random song to play
+        String filePath;
+        Random rand = new Random();
+        int num = rand.nextInt(9);
+        switch (num) {
+            case 0 -> filePath = "2018-08-02 - Doctor Dreamchip";
+            case 1 -> filePath = "Chiptune Dream - Tim Beek";
+            case 2 -> filePath = "Funk Modulator - RoccoW";
+            case 3 -> filePath = "Gamer's Rush - Gingerbru";
+            case 4 -> filePath = "Jam Jam Jam - RoccoW";
+            case 5 -> filePath = "Jazz Blue - RoccoW";
+            case 6 -> filePath = "Party's Cancelled - RoccoW";
+            case 7 -> filePath = "PhilosophicalSongTitle - RoccoW";
+            case 8 -> filePath = "The Crow - RoccoW";
+            case 9 -> filePath = "The Origin - Legna Zeg";
+            default -> throw new AssertionError();
+        }
+
+        theme = new SoundPlayer(filePath);
     }
 
     /**
@@ -206,6 +226,11 @@ public class Game {
         cldr.advance();
         if (DO_TAXMAN) {
             tm.visit(scanner);
+        }
+
+        // save game every 10 days
+        if (usr.getAdvances() % 10 == 0) {
+            saveGame();
         }
     }
 
@@ -733,7 +758,7 @@ public class Game {
         printHeader();
 
         // main menu options
-        System.out.println(center("Welcome to the show!", MENU_WIDTH));
+        System.out.println(blue(italic(center("Now Playing: " + theme.getSongTitle(), MENU_WIDTH))));
         System.out.println(italic(center("Version " + Main.version, MENU_WIDTH)));
 
         printMenuArt(0);
@@ -820,7 +845,8 @@ public class Game {
     private void printMenuArt(int less) {
         // main menu art
         String filePath = Main.getSource("assets");
-        filePath += "city-skyline-120.txt";
+        filePath += "city-1.txt";
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
