@@ -225,6 +225,7 @@ public class Taxman {
 
         clearScreen();
         lastTax = tax;
+        lastVisit = game.cldr.getToday();
     }
 
     /**

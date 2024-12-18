@@ -268,7 +268,10 @@ public class Game {
         try {
             mkt.load();
             usr.load(username, mkt);
-        } 
+
+            // reinit taxman with new user
+            tm = new Taxman(this);
+        }
         catch (NumberFormatException | NoSuchElementException | DateTimeParseException e) {
             // user has an older form of the game and must regenerate their stock/market files
             createGen(); // repair
