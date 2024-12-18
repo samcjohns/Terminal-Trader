@@ -277,6 +277,9 @@ public class Game {
             createGen(); // repair
             mkt.load();
             usr.load(username, mkt);
+
+            Alert issue = new Alert("Detected Older Version, Repaired Files", Alert.BAD_MARKET, cldr.getToday());
+            news.push(issue);
         }
 
         // update calendar to properly reflect user advances
