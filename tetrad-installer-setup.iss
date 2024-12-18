@@ -23,17 +23,17 @@ Name: "{userappdata}\Terminal Trader\gen"
 Name: "{app}\wav"
 
 [Files]
-Source: ".\cmd\start-1.1.1.cmd"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\cmd\get-sounds-1.1.1.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\cmd\start-tetrad.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\cmd\get-sounds.cmd"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\target\tetrad-1.1.1.jar"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\icons\tetradicon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ".\runtime\*"; DestDir: "{app}\runtime"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{commondesktop}\Terminal Trader"; Filename: "{app}\start-1.1.1.cmd"; IconFilename: "{app}\tetradicon.ico"; Tasks: desktopicon
-Name: "{group}\Terminal Trader"; Filename: "{app}\start-1.1.1.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\tetradicon.ico"
+Name: "{commondesktop}\Terminal Trader"; Filename: "{app}\start-tetrad.cmd"; IconFilename: "{app}\tetradicon.ico"; Tasks: desktopicon
+Name: "{group}\Terminal Trader"; Filename: "{app}\start-tetrad.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\tetradicon.ico"
 
 [Run]
-Filename: "{app}\get-sounds-1.1.1.cmd"; Description: "Download Sound Pack (Recommended)"; Flags: runhidden runascurrentuser postinstall skipifsilent
-Filename: "{app}\start-1.1.1.cmd"; Description: "Launch Terminal Trader"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\get-sounds.cmd"; Description: "Download Sound Pack (Recommended)"; Flags: runhidden runascurrentuser postinstall skipifsilent
+Filename: "{app}\start-tetrad.cmd"; Description: "Launch Terminal Trader"; Flags: nowait postinstall skipifsilent
