@@ -20,7 +20,7 @@ import static tetrad.Mutil.red;
  */
 
 public class Main {    
-    static String version = "1.0.3"; // current game version
+    static String version = "1.1.0"; // current game version
     static boolean   PROD = false;    // false when testing in VSCode
     static boolean   INIT = false;
     
@@ -35,13 +35,13 @@ public class Main {
             startup(scanner); // init dialogue
     
             while (true) {
-                game = new Game();
+                game = new Game(scanner);
                 // exits if user selects exit
-                if (!game.startGame(scanner)) {
+                if (!game.startGame()) {
                     scanner.close();
                     return;
                 }
-                game.play(scanner);
+                game.play();
                 game.endGame();
             }
         }
@@ -199,30 +199,26 @@ public class Main {
             System.out.println("Unknown operating system");
         }
 
-        pause (500); // pause for effect ;)
+        pause (250); // pause for effect ;)
 
         String term1 = System.getenv("TERM");
         String wtSession = System.getenv("WT_SESSION"); // Windows Terminal
         String conemu = System.getenv("ConEmu");        // ConEmu/Cmder
         String colorterm = System.getenv("COLORTERM");  // Common in modern terminals
 
+        pause(250);
         if (wtSession != null) {
-            pause(500);
             System.out.println("Running in Windows Terminal.");
         } else if (conemu != null) {
-            pause(500);
             System.out.println("Running in ConEmu or Cmder.");
         } else if (colorterm != null) {
-            pause(500);
             System.out.println("Running in a color-capable terminal: " + colorterm);
         } else if (term1 != null) {
-            pause(500);
             System.out.println("Terminal detected: " + term1);
         } else {
-            pause(500);
             System.out.println("No terminal environment variables detected.");
         }
         System.out.println("Starting now...");
-        pause(1000);
+        pause(500);
     }
 }

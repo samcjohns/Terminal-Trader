@@ -1,0 +1,16 @@
+*.class
+*.log
+*.tmp
+*.bak
+*.swp
+*.jar
+*.war
+*.ear
+
+/target/
+/runtime/
+/output/
+.vscode/
+
+/gen/
+/saves/

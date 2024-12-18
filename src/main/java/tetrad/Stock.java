@@ -200,7 +200,7 @@ class Stock {
         if (value > recordHigh) {
             recordHigh = value;
             if (alertCooldown == 0) {
-                Alert alert = new Alert(name + " reaches record highs.", Alert.GOOD_STOCK);
+                Alert alert = new Alert(name + " reaches record highs.", Alert.GOOD_STOCK, game.cldr.getToday(), this);
                 channel.push(alert);
                 alertCooldown = 4;
             }
@@ -209,7 +209,7 @@ class Stock {
         else if (value < recordLow) {
             recordLow = value;
             if (alertCooldown == 0) {
-                Alert alert = new Alert(name + " hits record lows", Alert.BAD_STOCK);
+                Alert alert = new Alert(name + " hits record lows", Alert.BAD_STOCK, game.cldr.getToday(), this);
                 channel.push(alert);
                 alertCooldown = 4;
             }
@@ -441,8 +441,8 @@ class Stock {
 
     // private helper functions
     private void randomEvent() {
-        // channel for pushing alerts
-        News channel = game.news;
+        News channel = game.news; // channel for pushing alerts
+        Alert alert = null;       // alert to be pushed
 
         Random rand = new Random();
 
@@ -454,38 +454,36 @@ class Stock {
                 // stock boom
                 target_value *= 1.0 + (2.0 * rand.nextDouble()); // Random value between 1.0 and 3.0
                 target_value = Math.max(10.0, Math.min(1000000, target_value)); // cap
-                Alert alert = new Alert("Analysts predict strong rise for " + name, Alert.GOOD_STOCK);
-                channel.push(alert);
+                alert = new Alert("Analysts predict strong rise for " + name, Alert.GOOD_STOCK, game.cldr.getToday(), this);
             }
             case 2 -> {
                 // stock crash
                 target_value /= 1.0 + (2.0 * rand.nextDouble()); // Random value between 1.0 and 3.0
                 target_value = Math.max(10.0, Math.min(1000000, target_value)); // cap
-                Alert alert = new Alert("Major investors abandon " + name, Alert.BAD_STOCK);
-                channel.push(alert);
+                alert = new Alert("Major investors abandon " + name, Alert.BAD_STOCK, game.cldr.getToday(), this);
             }
             case 3 -> {
                 // vol decrease
                 target_vol /= 1.0 + (2.0 * rand.nextDouble()); // Random value between 1.0 and 3.0
                 target_vol = Math.max(0.0, Math.min(5, target_vol)); // cap
-                Alert alert = new Alert("Analysts expect calm year for " + name, Alert.GOOD_STOCK);
-                channel.push(alert);
+                alert = new Alert("Analysts expect calm year for " + name, Alert.GOOD_STOCK, game.cldr.getToday(), this);
             }
             case 4 -> {
                 // vol increase
                 target_vol *= 1.0 + (3.0 * rand.nextDouble()); // Random value between 1.0 and 3.0
                 target_vol = Math.max(0.0, Math.min(5, target_vol)); // cap
-                Alert alert = new Alert(name + " under high watch this season", Alert.ALERT_STOCK);
-                channel.push(alert);
+                alert = new Alert(name + " under high watch this season", Alert.ALERT_STOCK, game.cldr.getToday(), this);
             }
             case 5 -> {
                 // risk change
                 if (risk == 1) { risk++; }
                 else { risk += (rand.nextInt() % 2 == 0) ? -1 : 1; }
-                Alert alert = new Alert(name + " under new management", Alert.ALERT_STOCK);
-                channel.push(alert);
+                alert = new Alert(name + " under new management", Alert.ALERT_STOCK, game.cldr.getToday(), this);
             }
         }
+
+        // push alert
+        channel.push(alert);
     }
     // old behavior for stocks
     private void arcadeBehavior() {
@@ -527,35 +525,35 @@ class Stock {
                     // stock boom
                     target_value *= 2.0 + (3.0 * rand.nextDouble()); // Random value between 2.0 and 5.0
                     target_value = Math.max(10.0, Math.min(1000000, target_value)); // cap
-                    Alert alert = new Alert("Analysts predict strong rise for " + name, Alert.GOOD_STOCK);
+                    Alert alert = new Alert("Analysts predict strong rise for " + name, Alert.GOOD_STOCK, game.cldr.getToday());
                     channel.push(alert);
                 }
                 case 2 -> {
                     // stock crash
                     target_value /= 1.0 + (2.0 * rand.nextDouble()); // Random value between 1.0 and 3.0
                     target_value = Math.max(10.0, Math.min(1000000, target_value)); // cap
-                    Alert alert = new Alert("Major investors abandon " + name, Alert.BAD_STOCK);
+                    Alert alert = new Alert("Major investors abandon " + name, Alert.BAD_STOCK, game.cldr.getToday());
                     channel.push(alert);
                 }
                 case 3 -> {
                     // vol decrease
                     target_vol /= 1.0 + rand.nextDouble(); // Random value between 1.0 and 2.0
                     target_vol = Math.max(0.0, Math.min(5, target_vol)); // cap
-                    Alert alert = new Alert("Analysts expect calm year for " + name, Alert.GOOD_STOCK);
+                    Alert alert = new Alert("Analysts expect calm year for " + name, Alert.GOOD_STOCK, game.cldr.getToday());
                     channel.push(alert);
                 }
                 case 4 -> {
                     // vol increase
                     target_vol *= 2.0 + (3.0 * rand.nextDouble()); // Random value between 2.0 and 5.0
                     target_vol = Math.max(0.0, Math.min(5, target_vol)); // cap
-                    Alert alert = new Alert(name + " under high watch this season", Alert.ALERT_STOCK);
+                    Alert alert = new Alert(name + " under high watch this season", Alert.ALERT_STOCK, game.cldr.getToday());
                     channel.push(alert);
                 }
                 case 5 -> {
                     // risk change
                     if (risk == 0) { risk++; }
                     else { risk += (rand.nextInt() % 2 == 0) ? -1 : 1; }
-                    Alert alert = new Alert(name + " under new management", Alert.ALERT_STOCK);
+                    Alert alert = new Alert(name + " under new management", Alert.ALERT_STOCK, game.cldr.getToday());
                     channel.push(alert);
                 }
             }

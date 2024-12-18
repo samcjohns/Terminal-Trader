@@ -19,6 +19,7 @@ import static tetrad.Mutil.DB_LOG;
  */
 
 public class SoundPlayer {
+    private String songTitle;
     private Clip clip;
 
     /**
@@ -27,8 +28,10 @@ public class SoundPlayer {
      * @param filePath The path to the sound file (.wav format).
      */
     public SoundPlayer(String fileName) {
+        songTitle = fileName;
+
         // determine correct save path
-        String filePath = Main.getSource("assets");
+        String filePath = Main.getSource("wav");
         filePath += fileName + ".wav";
 
         try {
@@ -40,6 +43,14 @@ public class SoundPlayer {
             e.printStackTrace(System.err);
             DB_LOG("Error loading sound file: " + filePath + " (" + e.getMessage() + ")");
         }
+    }
+
+    /**
+     * Returns the name of the song currently playing
+     * @return current song title
+     */
+    public String getSongTitle() { 
+        return songTitle;
     }
 
     /**

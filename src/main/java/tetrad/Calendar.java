@@ -8,6 +8,8 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
+import static tetrad.Alert.HOLIDAY;
+
 /**
  * Centralized Data Class, stores current date and can calculate differences.
  * 
@@ -19,23 +21,29 @@ import java.time.temporal.TemporalAdjusters;
  *              another date.
  */
 public class Calendar {
-    
         private LocalDate today;
+
+        // reference to current game object for announcing holidays
+        private Game game;
     
         /**
          * Contruct the calendar with a custom start date
          * @param startDate start date for calendar object
          */
-        public Calendar(LocalDate startDate) {
+        public Calendar(LocalDate startDate, Game game) {
             this.today = startDate;
+            this.game = game;
         }
 
         /**
          * Defaults current date to right now
+         * @param game current game object
          */
-        public Calendar() {
+        public Calendar(Game game) {
             this.today = LocalDate.now();  // Use today's date
+            this.game = game;
         }
+
     
         /**
          * Advances the current date
@@ -43,13 +51,17 @@ public class Calendar {
          */
         public void advance(int days) {
             today = today.plusDays(days);
+            if (isHoliday(today)) {
+                Alert alert = new Alert(holidayGreeting(today), HOLIDAY, today, game.usr);
+                game.news.push(alert);
+            }
         }
 
         /**
          * Advances the current date by one day
          */
         public void advance() {
-            today = today.plusDays(1);
+            this.advance(1);
         }
     
         /**
@@ -65,8 +77,30 @@ public class Calendar {
          * @return days between current and given date
          */
         public int daysBetween(LocalDate date) {
-            return (int) ChronoUnit.DAYS.between(date, today);
+            return Math.abs((int) ChronoUnit.DAYS.between(date, today));
         }
+
+        /**
+         * Calculates the number of full months between the current date and a given date.
+         * A full month is counted only if the day of the month is the same or has passed.
+         * 
+         * @param date the target date
+         * @return the number of full months between the current date and the given date
+         */
+        public int monthsBetween(LocalDate date) {
+            LocalDate start = today.withDayOfMonth(1);  // Start of the current month
+            LocalDate end = date.withDayOfMonth(1);     // Start of the target month
+
+            int monthsBetween = (int) ChronoUnit.MONTHS.between(start, end);
+
+            // Check if we need to adjust based on days of the month
+            if (today.getDayOfMonth() > date.getDayOfMonth()) {
+                monthsBetween--;
+            }
+
+            return Math.abs(monthsBetween);
+        }
+
     
         /** 
          * Get the date that corresponds to the given number of days from the current date 
@@ -84,6 +118,16 @@ public class Calendar {
         public String getFormattedToday() {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
             return today.format(formatter);
+        }
+
+        /**
+         * Return date as a formatted string
+         * @param date given date
+         * @return formatted date
+         */
+        public String getFormattedDate(LocalDate date) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
+            return date.format(formatter);
         }
 
         /**
@@ -285,4 +329,63 @@ public class Calendar {
             int day = ((h + l - 7 * m + 114) % 31) + 1;
             return LocalDate.of(year, month, day);
         }
+
+        /**
+         * Returns greeting for the holiday of a given date
+         * @param date given date
+         * @return String for the holiday greeting
+         */
+        public String holidayGreeting(LocalDate date) {
+            int day = date.getDayOfMonth();
+            Month month = date.getMonth();
+
+            // New Year's Day - January 1
+            if (month == Month.JANUARY && day == 1) {
+                return "Happy New Year! " + today.getYear();
+            }
+
+            // New Year's Eve - December 31
+            if (month == Month.DECEMBER && day == 31) {
+                return "Happy New Year's Eve";
+            }
+
+            // Valentine's Day - February 14
+            if (month == Month.FEBRUARY && day == 14) {
+                return "Happy Valentine's Day";
+            }
+
+            // St. Patrick's Day - March 17
+            if (month == Month.MARCH && day == 17) {
+                return "Happy St. Patrick's Day";
+            }
+
+            // Easter (variable date)
+            if (date.equals(getEasterSunday(date.getYear()))) {
+                return "Happy Easter! He is risen!";
+            }
+
+            // Fourth of July - Independence Day
+            if (month == Month.JULY && day == 4) {
+                return "Happy Independence Day";
+            }
+
+            // Labor Day (first Monday in September)
+            if (month == Month.SEPTEMBER && date.equals(date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)))) {
+                return "Happy Labor Day";
+            }
+
+            // Thanksgiving (fourth Thursday in November)
+            if (month == Month.NOVEMBER && date.equals(date.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.THURSDAY)))) {
+                return "Happy Thanksgiving";
+            }
+
+            // Christmas Day - December 25
+            if (month == Month.DECEMBER && day == 25) {
+                return "Merry Christmas!";
+            }
+
+            // Add more custom holiday checks here as needed
+            return null;
+        }
 }
+ 

@@ -3,7 +3,9 @@ package tetrad;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
@@ -49,6 +51,7 @@ import static tetrad.Mutil.yellowB;
  * @see User
  * @see Market
  * @see News
+ * @see Calendar
  */
 
 public class Game {
@@ -56,24 +59,51 @@ public class Game {
     Market mkt;        // main market object
     News news;         // main news object
     SoundPlayer theme; // theme song control
+    Calendar cldr;     // game calendar
+    Taxman tm;         // taxman object
+    Scanner scanner;   // user input scanner object
+
+    // settings (defaulted to true)
+    public static boolean DO_TAXMAN = true;
 
     static int headerSetting = -1; // color setting for the header
     static boolean ARCADE_MODE = false; // activates old stock behavior
 
-    public Game() {
-        news = new News();
+    public Game(Scanner scanner) {
+        news = new News(this);
         mkt = new Market(this);
         usr = new User(this);
-        theme = new SoundPlayer("tetrad-theme");
+        cldr = new Calendar(this);
+        tm = new Taxman(this);
+        this.scanner = scanner;
+
+        // choose a random song to play
+        String filePath;
+        Random rand = new Random();
+        int num = rand.nextInt(9);
+        switch (num) {
+            case 0 -> filePath = "2018-08-02 - Doctor Dreamchip";
+            case 1 -> filePath = "Chiptune Dream - Tim Beek";
+            case 2 -> filePath = "Funk Modulator - RoccoW";
+            case 3 -> filePath = "Gamer's Rush - Gingerbru";
+            case 4 -> filePath = "Jam Jam Jam - RoccoW";
+            case 5 -> filePath = "Jazz Blue - RoccoW";
+            case 6 -> filePath = "Party's Cancelled - RoccoW";
+            case 7 -> filePath = "PhilosophicalSongTitle - RoccoW";
+            case 8 -> filePath = "The Crow - RoccoW";
+            case 9 -> filePath = "The Origin - Legna Zeg";
+            default -> throw new AssertionError();
+        }
+
+        theme = new SoundPlayer(filePath);
     }
 
     /**
      * Top-level initialization function; Functions as the main menu and
      * handles new game creation or loading from an existing file.
-     * @param scanner user input scanner
      * @return false if the user selects to exit the program
      */
-    public boolean startGame(Scanner scanner) {
+    public boolean startGame() {
         theme.play();
         while(true) {
             showMainMenu();
@@ -109,7 +139,7 @@ public class Game {
                     initAdvance();
                     return true; // move on
                 }
-                case "3" -> doExtras(scanner);
+                case "3" -> doExtras();
                 case "4" -> {
                     theme.stop();
                     return false; // exit program
@@ -127,10 +157,9 @@ public class Game {
 
     /**
      * Main gameplay function, handles all gameplay until the user chooses to
-     * exit. Use this method after calling startGame(). 
-     * @param scanner user input scanner
+     * exit. Use this method after calling startGame()..
      */
-    public void play(Scanner scanner) {
+    public void play() {
         while (true) {
             clearScreen();
             printHeader();
@@ -138,11 +167,11 @@ public class Game {
             System.out.print("---[Select]: ");
             String input = scanner.nextLine();
             switch (input) {
-                case "1" -> portfolioMenu(scanner); // show portfolio
-                case "2" -> marketMenu(scanner);    // show stock exchange
-                case "3" -> statsMenu(scanner);     // user stats menu
-                case "4" -> acvMenu(scanner);
-                case "5" -> newsFeedMenu(scanner);
+                case "1" -> portfolioMenu(); // show portfolio
+                case "2" -> marketMenu();    // show stock exchange
+                case "3" -> statsMenu();     // user stats menu
+                case "4" -> acvMenu();
+                case "5" -> newsFeedMenu();
                 case "6" -> {
                     saveGame();
                     return;
@@ -152,11 +181,21 @@ public class Game {
                 // enter command, then enter value
                 case "adv" -> {
                     input = scanner.nextLine();
+                    DO_TAXMAN = false; // disable taxman
                     advance(Integer.parseInt(input));
+                    DO_TAXMAN = true; // reenable taxman
                 }
                 case "give" -> {
                     input = scanner.nextLine();
                     usr.setCash(Integer.parseInt(input) + usr.getCash());
+                }
+                case "taxman" -> {
+                    tm.visit(scanner, true);
+                }
+                case "acv" -> {
+                    input = scanner.nextLine();
+                    int num = Integer.parseInt(input);
+                    usr.acv.acvList[num] = !usr.acv.acvList[num];
                 }
                 default -> {
                     // help case
@@ -180,10 +219,19 @@ public class Game {
      * Main time advancement method, used to simulate a single day passing
      * across all objects.
      */
-    private void advance() {
+    public void advance() {
         mkt.advance();
         usr.update();
         news.update();
+        cldr.advance();
+        if (DO_TAXMAN) {
+            tm.visit(scanner);
+        }
+
+        // save game every 10 days
+        if (usr.getAdvances() % 10 == 0) {
+            saveGame();
+        }
     }
 
     /**
@@ -191,7 +239,7 @@ public class Game {
      * across all objects.
      * @param times number of times to advance
      */
-    private void advance(int times) {
+    public void advance(int times) {
         for (int i = 0; i < times; i++) {
             this.advance();
         }
@@ -221,12 +269,15 @@ public class Game {
             mkt.load();
             usr.load(username, mkt);
         } 
-        catch (NumberFormatException | NoSuchElementException e) {
+        catch (NumberFormatException | NoSuchElementException | DateTimeParseException e) {
             // user has an older form of the game and must regenerate their stock/market files
             createGen(); // repair
             mkt.load();
             usr.load(username, mkt);
         }
+
+        // update calendar to properly reflect user advances
+        cldr.advance(usr.getAdvances());
     }
 
     /**
@@ -241,15 +292,14 @@ public class Game {
             createGen();
         }
 
-        usr = new User(username, User.STARTING_CASH, this);
+        usr = new User(username, User.STARTING_CASH, this, cldr.getToday());
         usr.save();
     }
 
     /**
-     * Portfolio menu method, handles all game behavior within the menu
-     * @param scanner user input scanner
+     * Portfolio menu method, handles all game behavior within the men.
      */
-    private void portfolioMenu(Scanner scanner) {
+    private void portfolioMenu() {
         while (true) {
             clearScreen();
             printHeader();
@@ -269,7 +319,7 @@ public class Game {
             switch (command) {
                 case "" -> { return; }
                 case "/" -> advance();
-                case "." -> doSell(scanner);
+                case "." -> doSell();
                 case ";" ->  {
                     /**
                      * FIXME
@@ -293,10 +343,9 @@ public class Game {
     }
 
     /**
-     * Market menu method, handles all game behavior within the market menu
-     * @param scanner user input scanner
+     * Market menu method, handles all game behavior within the market men.
      */
-    private void marketMenu(Scanner scanner) {
+    private void marketMenu() {
         while (true) {
             clearScreen();
             printHeader();
@@ -315,10 +364,8 @@ public class Game {
                     return;
                 }
                 case "/" -> advance();
-                case "," -> stockView(scanner);
-                case "." -> {
-                    doBuy(scanner);
-                }
+                case "," -> stockView();
+                case "." -> doBuy();
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(1000);
@@ -331,9 +378,8 @@ public class Game {
     /**
      * Shows the alerts in the news reel, allowing the user to navigate each 
      * page. Will return when the user is finished.
-     * @param scanner user input scanner
      */
-    private void newsFeedMenu(Scanner scanner) {
+    private void newsFeedMenu() {
         int currentPage = 1;
         while (true) {
             // keep circular pages
@@ -385,9 +431,8 @@ public class Game {
     /**
      * Shows the achievements for the user, allowing the user to navigate each
      * page. Will return when the user is finished.
-     * @param scanner user input scanner
      */
-    private void acvMenu(Scanner scanner) {
+    private void acvMenu() {
         int pages = Achievements.ACV_AMOUNT / 7 + 1;
         int currentPage = 1;
         while (true) {
@@ -440,7 +485,7 @@ public class Game {
      * Shows the users stats and exits when they press enter
      * @param scanner
      */
-    private void statsMenu(Scanner scanner) {
+    private void statsMenu() {
         // user stats
         clearScreen();
         printHeader();
@@ -454,10 +499,9 @@ public class Game {
 
     /**
      * Shows information about a selected stock, handles all behavior within
-     * the stock view menu
-     * @param scanner user input scanner
+     * the stock view men.
      */
-    private void stockView(Scanner scanner) {
+    private void stockView() {
         Stock stock = null;
         int view = -1;
         while(true) {
@@ -526,11 +570,9 @@ public class Game {
                         view = 1;
                     }
                 }
-                case "." -> doBuy(scanner, view);
-                case "/" -> {
-                    advance();
-                    pause(500);
-                }
+                case "." -> doBuy(view);
+                case "/" -> advance();
+                
                 default -> {
                     System.out.println(red("Invalid Command"));
                     pause(1000);
@@ -541,10 +583,9 @@ public class Game {
     }
 
     /**
-     * Extras menu method, directs control to other Extras menus
-     * @param scanner user input scanner
+     * Extras menu method, directs control to other Extras menu.
      */
-    private void doExtras(Scanner scanner) {
+    private void doExtras() {
         clearScreen();
         printHeader();
         System.out.println();
@@ -562,23 +603,23 @@ public class Game {
             clearLine();
             switch (input) {
                 case "1" -> {
-                    eSettings(scanner);
+                    eSettings();
                     return;
                 }
                 case "2" -> {
-                    eDevTools(scanner);
+                    eDevTools();
                     return;
                 }
                 case "3" -> {
-                    eHelp(scanner);
+                    eHelp();
                     return;
                 }
                 case "4" -> {
-                    eMiniGames(scanner);
+                    eMiniGames();
                     return;
                 }
                 case "5" -> {
-                    eCredits(scanner);
+                    eCredits();
                     return;
                 }
                 case "6" -> {
@@ -596,9 +637,8 @@ public class Game {
     /**
      * Sell method, gets stock and amount to be sold and makes sale. Handles
      * errors appropriately and returns when user is finished.
-     * @param scanner user input scanner
      */
-    private void doSell(Scanner scanner) {
+    private void doSell() {
         while (true) {
             try {
                 System.out.print("--[Stock (0 to Exit)]: ");
@@ -635,9 +675,8 @@ public class Game {
     /**
      * Buy method, gets stock and amount to be bought and makes sale. Handles
      * errors appropriately and returns when user is finished.
-     * @param scanner user input scanner
      */
-    private void doBuy(Scanner scanner) {
+    private void doBuy() {
         int selection;
         while(true) {
             try {
@@ -659,17 +698,16 @@ public class Game {
                 clearLine();
             }
         }
-        doBuy(scanner, selection);
+        doBuy(selection);
     }
 
     /**
      * Buy method, gets amount of stock given by selection to be bought and 
      * makes sale. Handles errors appropriately and returns when user is 
      * finished.
-     * @param scanner user input scanner
      * @param selection stock selected
      */
-    private void doBuy(Scanner scanner, int selection) {
+    private void doBuy(int selection) {
         while(true) {
             double cash = usr.getCash();
             try {
@@ -720,7 +758,7 @@ public class Game {
         printHeader();
 
         // main menu options
-        System.out.println(center("Welcome to the show!", MENU_WIDTH));
+        System.out.println(blue(italic(center("Now Playing: " + theme.getSongTitle(), MENU_WIDTH))));
         System.out.println(italic(center("Version " + Main.version, MENU_WIDTH)));
 
         printMenuArt(0);
@@ -747,7 +785,7 @@ public class Game {
 
         // user quick stats
         System.out.println("-".repeat(MENU_WIDTH));
-        System.out.print(red("Day: " + usr.getAdvances()) + " | ");
+        System.out.print(red(cldr.getFormattedToday()) + " | ");
         System.out.print(yellow("Cash: " + dollar(usr.getCash())) + " | ");
         System.out.print(yellow("Net Worth: " + dollar(usr.getNet())) + " | ");
         System.out.print(green("Trader Score: " + usr.getScore()) + " | ");
@@ -807,7 +845,8 @@ public class Game {
     private void printMenuArt(int less) {
         // main menu art
         String filePath = Main.getSource("assets");
-        filePath += "city-skyline-120.txt";
+        filePath += "city-1.txt";
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
@@ -831,9 +870,8 @@ public class Game {
     /**
      * Settings menu method, handles everything in Settings and returns when
      * the user is finished.
-     * @param scanner user input scanner
      */
-    private void eSettings(Scanner scanner) {
+    private void eSettings() {
         while (true) { 
             clearScreen();
             printHeader();
@@ -904,9 +942,8 @@ public class Game {
     /**
      * Helps menu method, handles everything within help and returns when user
      * is finished.
-     * @param scanner user input scanner
      */
-    private void eHelp(Scanner scanner) {
+    private void eHelp() {
         clearScreen();
         printHeader();
         System.out.print("\n\n"); // spacing
@@ -940,9 +977,8 @@ public class Game {
     /**
      * Minigames menu method, handles everything for mini games and returns 
      * when the user is finished.
-     * @param scanner user input scanner
      */
-    private void eMiniGames(Scanner scanner) {
+    private void eMiniGames() {
         clearScreen();
         printHeader();
         System.out.println(center(" Mini Games ", MENU_WIDTH, "!"));
@@ -966,9 +1002,8 @@ public class Game {
 
     /**
      * Prints credits and waits for user to press enter.
-     * @param scanner user input scanner
      */
-    private void eCredits(Scanner scanner) {
+    private void eCredits() {
         clearScreen();
         printHeader();
         System.out.print("\n\n"); // spacing
@@ -994,9 +1029,8 @@ public class Game {
     /**
      * Dev Tools menu method, handles everything for Dev Tools and returns when
      * the user is finished.
-     * @param scanner user input scanner
      */
-    private void eDevTools(Scanner scanner) {
+    private void eDevTools() {
         while (true) {
             clearScreen();
             printHeader();
@@ -1178,7 +1212,7 @@ public class Game {
 
             // new!
             Stock s10 = new Stock(10, "Sam's Johns", 67.00, 1, 1);
-            Stock s11 = new Stock(11, "Jenna Gyms", 140.00, 2, 2);
+            Stock s11 = new Stock(11, "Jungle Gyms", 140.00, 2, 2);
             Stock s12 = new Stock(12, "Rockford Mine", 13000.00, 1, 3);
             Stock s13 = new Stock(13, "Colin Call-Center", 240.00, 2.9, 3);
             Stock s14 = new Stock(14, "Dave's Drive-In", 150.00, 1, 1);
@@ -1225,7 +1259,9 @@ public class Game {
         }
 
         // advance time to generate histories so early game graphs aren't empty
+        DO_TAXMAN = false; // disable taxman
         advance(120);
+        DO_TAXMAN = true;  // reenable taxman
 
         // save files
         mkt.save();
