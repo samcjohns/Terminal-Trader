@@ -1,5 +1,8 @@
 package tetrad;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 
 /**
@@ -12,7 +15,7 @@ import java.io.PrintStream;
  *              of what line it is currently on, the appropriate dimensions
  *              of the menu, and manipulating text on the screen. It is also
  *              designed to throw runtime exceptions when the proper screen
- *              size is violated.
+ *              size is violated. 
  */
 public class ScreenBuilder {
     /** total width of the menu on screen */
@@ -38,6 +41,15 @@ public class ScreenBuilder {
     public ScreenBuilder(PrintStream out) {
         this.out = out;
         this.isBare = true;
+        line = 0;
+    }
+
+    /**
+     * Gets the current line number on screen
+     * @return the current line number on screen
+     */
+    public int getLine() {
+        return line;
     }
 
     /**
@@ -53,7 +65,7 @@ public class ScreenBuilder {
             throw new ScreenBuilderException("Menu Height Exceeded With Line: " + str);
         }
 
-        System.out.print(str);
+        out.print(str);
     }
 
     /**
@@ -69,7 +81,7 @@ public class ScreenBuilder {
             throw new ScreenBuilderException("Menu Height Exceeded With Line: " + str);
         }
 
-        System.out.print(str);
+        out.print(str);
         cursorDown(1);
         line++;
     }
@@ -77,35 +89,63 @@ public class ScreenBuilder {
     /**
      * Prints string at the desired line, does not move to next line
      * @param str string to be printed
-     * @param line given line to print at
+     * @param gotoline given line to print at
      */
-    public void printAt(String str, int line) {
-        if (line > this.line) {
-            cursorDown(line - this.line);
-            this.line = line;
+    public void printAt(String str, int gotoLine) {
+        if (gotoLine > this.line) {
+            cursorDown(gotoLine - this.line);
+            this.line = gotoLine;
         }
-        else if (line < this.line) {
-            cursorUp(this.line - line);
-            this.line = line;
+        else if (gotoLine < this.line) {
+            cursorUp(this.line - gotoLine);
+            this.line = gotoLine;
         }
-        System.out.print(str);
+        out.print("\r"); // goto beginning of line
+        out.print(str);
     }
 
     /**
      * Moves to the next line
      */
     public void next() {
+        if (isBare) {
+            throw new ScreenBuilderException("Cannot Operate on Bare Screen");
+        }
+        if (line >= MENU_HEIGHT) {
+            throw new ScreenBuilderException("Menu Height Exceeded With Next");
+        }
         cursorDown(1);
         line++;
+    }
+
+    /**
+     * Goes to the given line
+     */
+    public void gotoLine(int gotoLine) {
+        if (isBare) {
+            throw new ScreenBuilderException("Cannot Operate on Bare Screen");
+        }
+        if (line >= MENU_HEIGHT) {
+            throw new ScreenBuilderException("Menu Height Exceeded With GoToLine");
+        }
+        if (gotoLine > line) {
+            cursorDown(gotoLine - line);
+            line = gotoLine;
+        }
+        else if (gotoLine < line) {
+            cursorUp(line - gotoLine);
+            line = gotoLine;
+        }
+        out.print("\r"); // goto beginning of the line
     }
 
     /**
      * Clears the screen and scrollback buffer using ANSI Escape Code
      */
     public void clearScreen() {
-        System.out.print("\033[H\033[2J"); // clear screen
-        System.out.println("\033[3J");     // clear scrollback buffer
-        System.out.flush();
+        out.print("\033[H\033[2J"); // clear screen
+        out.println("\033[3J");     // clear scrollback buffer
+        out.flush();
         isBare = true;
     }
 
@@ -113,8 +153,9 @@ public class ScreenBuilder {
      * Creates a fresh page with proper dimensions for printing
      */
     public void freshPage() {
+        clearScreen();
         for (int i = 0; i < MENU_HEIGHT; i++) {
-            System.out.println();
+            out.println();
         }
         isBare = false;
     }
@@ -123,7 +164,7 @@ public class ScreenBuilder {
      * Clears the current line, and does not move
      */
     public void clearLine() {
-        System.out.print("\r" + " ".repeat(MENU_WIDTH) + "\r");
+        out.print("\r" + " ".repeat(MENU_WIDTH) + "\r");
     }
 
     /**
@@ -131,6 +172,9 @@ public class ScreenBuilder {
      * @param num number of lines to be erased
      */
     public void eraseLines(int num) {
+        if (isBare) {
+            throw new ScreenBuilderException("Cannot Operate on Bare Screen");
+        }
         for (int i = 0; i < num; i++) {
             clearLine();
             cursorUp(1);
@@ -144,8 +188,11 @@ public class ScreenBuilder {
      * @param num number of lines up
      */
     public void cursorUp(int num) {
+        if (isBare) {
+            throw new ScreenBuilderException("Cannot Operate on Bare Screen");
+        }
         if (line > 0 && !isBare) {
-            System.out.print("\033[" + num + "A");
+            out.print("\033[" + num + "A");
             line--;
         }
     }
@@ -157,11 +204,14 @@ public class ScreenBuilder {
      * @param num number of lines down
      */
     public void cursorDown(int num) {
+        if (isBare) {
+            throw new ScreenBuilderException("Cannot Operate on Bare Screen");
+        }
         if (line >= MENU_HEIGHT) {
             throw new ScreenBuilderException("Max Screen Height Exceeded");
         }
         if (line < MENU_HEIGHT && !isBare) {
-            System.out.print("\033[" + num + "B");
+            out.print("\033[" + num + "B");
             line++;
         }
     }
@@ -172,7 +222,7 @@ public class ScreenBuilder {
      * @param num number of characters right
      */
     public void cursorRight(int num) {
-        System.out.print("\033[" + num + "C");
+        out.print("\033[" + num + "C");
     }
 
     /**
@@ -181,7 +231,61 @@ public class ScreenBuilder {
      * @param num number of characters left
      */
     public void cursorLeft(int num) {
-        System.out.print("\033[" + num + "D");
+        out.print("\033[" + num + "D");
+    }
+
+    /**
+     * Takes a String and prints it as a header at the top of the page
+     * @param title String to be used for header
+     */
+    public void header(String title) {
+        int oLine = line;
+        gotoLine(0);
+        println("-".repeat(MENU_WIDTH));
+        println("~ ".repeat((MENU_WIDTH - title.length())/4) + title + " ~".repeat((MENU_WIDTH - title.length())/4) + " ");
+        println("-".repeat(MENU_WIDTH));
+        gotoLine(oLine);
+    }
+
+    /**
+     * Takes the string array of commands and creates a command tray at the
+     * bottom of the screen
+     * @param commands an array of Strings that represent commands that the 
+     *                 the user can use in the given menu. Ex. "Next - '/'"
+     */
+    public void commandTray(String[] commands) {
+        int oLine = line;
+        gotoLine(33);
+        println("-".repeat(MENU_WIDTH));
+        print(commands[0]);
+        for (int i = 1; i < commands.length; i++) {
+            print(" | " + commands[i]);
+        }
+        cursorDown(1);
+        println("-".repeat(MENU_WIDTH));
+        gotoLine(oLine);
+    }
+
+    /**
+     * Prints the ASCII art designated by the file name of the art in the 
+     * assets directory. Prints the image and returns the cursor to the top of
+     * the page to allow for overwriting.
+     * @param fileName name of the file in the assets directory
+     */
+    public void backgroundImage(String fileName) {
+        String filePath = Main.getSource("assets");
+        filePath += fileName;
+
+        gotoLine(3);
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String currentLine; // current printed line of image
+            while ((currentLine = reader.readLine()) != null && line < MENU_HEIGHT) {
+                println(Mutil.cyan(center(currentLine, MENU_WIDTH)));
+            }
+        }
+        catch (IOException e) {
+            throw new MissingAssetException(fileName);
+        }
     }
 
     // static methods
@@ -218,15 +322,5 @@ public class ScreenBuilder {
     */
     public static String center(String string) {
         return center(string, MENU_WIDTH, " ");
-    }
-
-    /**
-     * Takes a String and prints it as a header
-     * @param title String to be used for header
-     */
-    public static void header(String title) {
-        System.out.println("-".repeat(MENU_WIDTH));
-        System.out.println("~ ".repeat((MENU_WIDTH - title.length())/4) + title + " ~".repeat((MENU_WIDTH - title.length())/4) + " ");
-        System.out.println("-".repeat(MENU_WIDTH));
     }
 }

@@ -843,35 +843,6 @@ public class Game {
         Mutil.cursorRight("Account Name: ".length());
     }
 
-    /**
-     * Prints the main menu ASCII art
-     * @param less The amount that the art will be shortened to fit in the
-     * current screen
-     */
-    private void printMenuArt(int less) {
-        // main menu art
-        String filePath = Main.getSource("assets");
-        filePath += "city-1.txt";
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-
-            // truncate for less
-            for (int i = 0; i < 27; i++) {
-                if (less != 0) {
-                    reader.readLine(); // skip current line
-                    less--;
-                }
-            }
-
-            while ((line = reader.readLine()) != null) {
-                System.out.println(cyan(center(line, MENU_WIDTH)));
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading the file: " + e.getMessage());
-        }
-    }
-
     // extras
     /**
      * Settings menu method, handles everything in Settings and returns when
