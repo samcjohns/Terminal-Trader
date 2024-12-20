@@ -15,7 +15,6 @@ import static tetrad.Alert.BAD_STOCK;
 import static tetrad.Alert.GOOD_MARKET;
 import static tetrad.Alert.GOOD_STOCK;
 import static tetrad.Alert.HOLIDAY;
-import static tetrad.Mutil.MENU_WIDTH;
 import static tetrad.Mutil.add;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.bold;
@@ -26,6 +25,7 @@ import static tetrad.Mutil.magenta;
 import static tetrad.Mutil.numColor;
 import static tetrad.Mutil.red;
 import static tetrad.Mutil.yellow;
+import static tetrad.ScreenBuilder.MENU_WIDTH;
 
 /**
  * News class for holding, preparing, and displaying Alert events

@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
-import static tetrad.Mutil.MENU_WIDTH;
+import static tetrad.ScreenBuilder.MENU_WIDTH;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.blueB;
 import static tetrad.Mutil.bold;

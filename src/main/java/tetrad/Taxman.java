@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.Random;
 import java.util.Scanner;
 
-import static tetrad.Mutil.MENU_WIDTH;
+import static tetrad.ScreenBuilder.MENU_WIDTH;
 import static tetrad.Mutil.blue;
 import static tetrad.Mutil.center;
 import static tetrad.Mutil.clearScreen;
