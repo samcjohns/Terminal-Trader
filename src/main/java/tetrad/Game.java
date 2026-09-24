@@ -4,9 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.NoSuchElementException;
-import java.util.Random;
 import java.util.Scanner;
+import java.util.NoSuchElementException;
 
 import static tetrad.Mutil.DB_LOG;
 import static tetrad.Mutil.MENU_WIDTH;
@@ -58,7 +57,6 @@ public class Game {
     User usr;          // current user object
     Market mkt;        // main market object
     News news;         // main news object
-    SoundPlayer theme; // theme song control
     Calendar cldr;     // game calendar
     Taxman tm;         // taxman object
     Scanner scanner;   // user input scanner object
@@ -76,26 +74,6 @@ public class Game {
         cldr = new Calendar(this);
         tm = new Taxman(this);
         this.scanner = scanner;
-
-        // choose a random song to play
-        String filePath;
-        Random rand = new Random();
-        int num = rand.nextInt(9);
-        switch (num) {
-            case 0 -> filePath = "2018-08-02 - Doctor Dreamchip";
-            case 1 -> filePath = "Chiptune Dream - Tim Beek";
-            case 2 -> filePath = "Funk Modulator - RoccoW";
-            case 3 -> filePath = "Gamer's Rush - Gingerbru";
-            case 4 -> filePath = "Jam Jam Jam - RoccoW";
-            case 5 -> filePath = "Jazz Blue - RoccoW";
-            case 6 -> filePath = "Party's Cancelled - RoccoW";
-            case 7 -> filePath = "PhilosophicalSongTitle - RoccoW";
-            case 8 -> filePath = "The Crow - RoccoW";
-            case 9 -> filePath = "The Origin - Legna Zeg";
-            default -> throw new AssertionError();
-        }
-
-        theme = new SoundPlayer(filePath);
     }
 
     /**
@@ -104,54 +82,26 @@ public class Game {
      * @return false if the user selects to exit the program
      */
     public boolean startGame() {
-        theme.play();
-        while(true) {
-            showMainMenu();
-            String choice = scanner.nextLine();
-            switch (choice) {
-                case "1" -> {
-                    showLoadGameMenu();
-                    String username = scanner.nextLine();
-                    try {
-                        loadGame(username);
-                        initAdvance();
-                        return true; // loading successful, exit method
-                    }
-                    catch (InitException e) {
-                        clearScreen();
-                        printHeader();
-                        System.out.println("");
-                        System.out.println(redB(e.getMessage()));
-                        System.out.println("User: '" + username + "' cannot be accessed...");
-                        System.out.println(italic("Try making a new save if this is your first time! :)"));
-                        printMenuArt(2);
-                        System.out.println("-".repeat(MENU_WIDTH));
-                        System.out.println("");
-                        System.out.println("-".repeat(MENU_WIDTH));
-                        cursorUp(2);
-                        pause(scanner);
-                        // error, so repeat
-                    }
-                }
-                case "2" -> {
-                    showNewGameMenu();
-                    createSaveFile(scanner.nextLine());
-                    initAdvance();
-                    return true; // move on
-                }
-                case "3" -> doExtras();
-                case "4" -> {
-                    theme.stop();
-                    return false; // exit program
-                }
-                default -> {
-                    clearLine();
-                    System.out.println(red("Invalid Input"));
-                    pause(1000);
-                    clearLine();
-                    // error, so repeat
-                }
-            }
+        String username = Main.getIdentity();
+        try {
+            loadGame(username);
+        }
+        catch (InitException e) {
+            createSaveFile(username);
+        }
+
+        try {
+            initAdvance();
+            return true;
+        }
+        catch (Exception e) {
+            clearScreen();
+            printHeader();
+            System.out.println("");
+            System.out.println(redB("Unable to start your session."));
+            System.out.println(red(e.getMessage()));
+            pause(scanner);
+            return false;
         }
     }
 
@@ -212,7 +162,7 @@ public class Game {
      * Exit method, used for cleanup.
      */
     public void endGame() {
-        theme.stop();
+        // reserved for cleanup in server mode
     }
 
     /**
@@ -764,7 +714,7 @@ public class Game {
         printHeader();
 
         // main menu options
-        System.out.println(blue(italic(center("Now Playing: " + theme.getSongTitle(), MENU_WIDTH))));
+        System.out.println(blue(italic(center("SSH Session: " + Main.getIdentity(), MENU_WIDTH))));
         System.out.println(italic(center("Version " + Main.version, MENU_WIDTH)));
 
         printMenuArt(0);

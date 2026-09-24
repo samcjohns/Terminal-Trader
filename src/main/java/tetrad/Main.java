@@ -2,6 +2,12 @@ package tetrad;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 import static tetrad.Mutil.MENU_WIDTH;
@@ -21,29 +27,35 @@ import static tetrad.Mutil.red;
 
 public class Main {    
     static String version = "1.1.1"; // current game version
-    static boolean   PROD = false;    // false when testing in VSCode
     static boolean   INIT = false;
+
+    private static final String ENV_DATA_ROOT = "TT_DATA_ROOT";
+    private static final String ENV_APP_ROOT = "TT_APP_ROOT";
+    private static final String ENV_IDENTITY = "TT_IDENTITY";
+    private static final String ENV_SSH_KEY_FP = "TT_SSH_KEY_FP";
+    private static final String ENV_SSH_PUBLIC_KEY = "TT_SSH_PUBLIC_KEY";
+
+    private static Path appRoot;
+    private static Path dataRoot;
+    private static Path playerRoot;
+    private static String resolvedIdentity;
     
     public static void main(String[] args) {
         Game game = null; // main game object
         try {
-            if (args.length > 0) {
-                PROD = args[0].equals("-PROD");
-            }
+            initRuntime();
 
             Scanner scanner = new Scanner(System.in);
             startup(scanner); // init dialogue
-    
-            while (true) {
-                game = new Game(scanner);
-                // exits if user selects exit
-                if (!game.startGame()) {
-                    scanner.close();
-                    return;
-                }
-                game.play();
-                game.endGame();
+
+            game = new Game(scanner);
+            if (!game.startGame()) {
+                scanner.close();
+                return;
             }
+            game.play();
+            game.endGame();
+            scanner.close();
         }
         catch (Exception e) {
             // fatal error report
@@ -87,6 +99,10 @@ public class Main {
         }
     }
 
+    static String getIdentity() {
+        return resolvedIdentity;
+    }
+
     /**
      * Used to get the soure or destination of save file depending of
      * environment. Takes the directory as a string and to determine 
@@ -95,67 +111,84 @@ public class Main {
      * @return file path of the save file
      */
     static String getSource(String dir) {
-        String os = System.getProperty("os.name").toLowerCase();
-        
-        // Windows
-        if (os.contains("win")) {
-            if (dir.equals("saves") || dir.equals("gen")) {
-                // Production environment
-                if (PROD) {
-                    return System.getenv("APPDATA") + "\\Terminal Trader\\" + dir + "\\";
-                } 
-                // Development (VSCode)
-                else {
-                    return dir + "/";
-                }
-            } else if (dir.equals("assets")) {
-                if (PROD) {
-                    return "C:\\Program Files\\Terminal Trader\\" + dir + "\\";
-                } else {
-                    return dir + "/";
-                }
-            }
+        return switch (dir) {
+            case "saves" -> sourcePath(playerRoot.resolve("saves"));
+            case "gen" -> sourcePath(playerRoot.resolve("gen"));
+            case "logs" -> sourcePath(playerRoot.resolve("logs"));
+            case "assets" -> sourcePath(appRoot.resolve("assets"));
+            case "wav" -> sourcePath(appRoot.resolve("wav"));
+            default -> sourcePath(appRoot.resolve(dir));
+        };
+    }
+
+    private static String sourcePath(Path path) {
+        return path.toString() + File.separator;
+    }
+
+    private static void initRuntime() throws IOException {
+        appRoot = resolveRoot(System.getenv(ENV_APP_ROOT), ".");
+        dataRoot = resolveRoot(System.getenv(ENV_DATA_ROOT), appRoot.resolve("data").toString());
+
+        resolvedIdentity = resolveIdentity();
+        playerRoot = dataRoot.resolve("players").resolve(resolvedIdentity);
+
+        Files.createDirectories(playerRoot.resolve("saves"));
+        Files.createDirectories(playerRoot.resolve("gen"));
+        Files.createDirectories(playerRoot.resolve("logs"));
+    }
+
+    private static Path resolveRoot(String value, String fallback) {
+        String source = (value == null || value.isBlank()) ? fallback : value;
+        return Paths.get(source).toAbsolutePath().normalize();
+    }
+
+    private static String resolveIdentity() {
+        String explicit = sanitizeIdentity(System.getenv(ENV_IDENTITY));
+        if (!explicit.equals("guest")) {
+            return explicit;
         }
-    
-        // macOS
-        else if (os.contains("mac")) {
-            if (dir.equals("saves") || dir.equals("gen")) {
-                // Production environment
-                if (PROD) {
-                    return System.getProperty("user.home") + "/Library/Application Support/Terminal Trader/" + dir + "/";
-                } 
-                // Development (VSCode)
-                else {
-                    return dir + "/";
-                }
-            } else if (dir.equals("assets")) {
-                if (PROD) {
-                    return "/Applications/Terminal Trader/" + dir + "/";
-                } else {
-                    return dir + "/";
-                }
-            }
+
+        String fp = sanitizeIdentity(System.getenv(ENV_SSH_KEY_FP));
+        if (!fp.equals("guest")) {
+            return "fp_" + fp;
         }
-    
-        // Linux
-        else {
-            if (dir.equals("saves") || dir.equals("gen")) {
-                if (PROD) {
-                    return System.getProperty("user.home") + "/.terminal-trader/" + dir + "/";
-                } else {
-                    return dir + "/";
-                }
-            } else if (dir.equals("assets")) {
-                if (PROD) {
-                    return "/usr/local/share/Terminal Trader/" + dir + "/";
-                } else {
-                    return dir + "/";
-                }
-            }
+
+        String pub = System.getenv(ENV_SSH_PUBLIC_KEY);
+        if (pub != null && !pub.isBlank()) {
+            return "key_" + hash(pub);
         }
-    
-        // Default to returning the directory itself if no match
-        return dir + "/";
+
+        return "guest";
+    }
+
+    private static String sanitizeIdentity(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return "guest";
+        }
+
+        String sanitized = raw.trim().toLowerCase().replaceAll("[^a-z0-9._-]", "_");
+        sanitized = sanitized.replaceAll("_+", "_");
+        sanitized = sanitized.replaceAll("^[_-]+|[_-]+$", "");
+        if (sanitized.isBlank()) {
+            return "guest";
+        }
+
+        return sanitized.length() > 64 ? sanitized.substring(0, 64) : sanitized;
+    }
+
+    private static String hash(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder builder = new StringBuilder();
+            for (byte b : hash) {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.substring(0, 16);
+        }
+        catch (NoSuchAlgorithmException e) {
+            return "guest";
+        }
     }
 
     static void startup(Scanner scanner) {
@@ -187,37 +220,9 @@ public class Main {
             clearLine();
         }
 
-        String os = System.getProperty("os.name").toLowerCase();
-
-        if (os.contains("win")) {
-            System.out.println("Running on Windows");
-        } else if (os.contains("mac")) {
-            System.out.println("Running on macOS");
-        } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
-            System.out.println("Running on Linux/Unix");
-        } else {
-            System.out.println("Unknown operating system");
-        }
-
-        pause (250); // pause for effect ;)
-
-        String term1 = System.getenv("TERM");
-        String wtSession = System.getenv("WT_SESSION"); // Windows Terminal
-        String conemu = System.getenv("ConEmu");        // ConEmu/Cmder
-        String colorterm = System.getenv("COLORTERM");  // Common in modern terminals
-
-        pause(250);
-        if (wtSession != null) {
-            System.out.println("Running in Windows Terminal.");
-        } else if (conemu != null) {
-            System.out.println("Running in ConEmu or Cmder.");
-        } else if (colorterm != null) {
-            System.out.println("Running in a color-capable terminal: " + colorterm);
-        } else if (term1 != null) {
-            System.out.println("Terminal detected: " + term1);
-        } else {
-            System.out.println("No terminal environment variables detected.");
-        }
+        System.out.println("Session identity: " + getIdentity());
+        System.out.println("Data root: " + dataRoot);
+        pause(250); // pause for effect ;)
         System.out.println("Starting now...");
         pause(500);
     }
