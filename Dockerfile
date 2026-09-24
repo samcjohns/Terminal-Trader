@@ -27,7 +27,8 @@ RUN apt-get update \
 	&& apt-get install -y --no-install-recommends openssh-server \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m -s /usr/sbin/nologin tt \
+RUN useradd -m -s /bin/bash tt \
+	&& passwd -d tt \
 	&& mkdir -p /var/run/sshd /home/tt/.ssh /keys \
 	&& chown -R tt:tt /home/tt
 

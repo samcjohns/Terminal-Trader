@@ -12,11 +12,11 @@ fi
 
 mkdir -p "$ROOT_DIR/ssh-test"
 
-printf '6\n' | ssh \
+printf '\n6\n' | ssh \
   -i "$KEY" \
   -p 2222 \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile="$ROOT_DIR/ssh-test/known_hosts" \
-  -tt tt@localhost || true
+  -T tt@localhost >/dev/null
 
 echo "Smoke test complete."
