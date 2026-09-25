@@ -1,7 +1,9 @@
 package tetrad;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +31,9 @@ public class Main {
     static String version = "1.1.1"; // current game version
     static boolean   INIT = false;
 
+    private static final int MIN_TERMINAL_WIDTH = 120;
+    private static final int MIN_TERMINAL_HEIGHT = 36;
+
     private static final String ENV_DATA_ROOT = "TT_DATA_ROOT";
     private static final String ENV_APP_ROOT = "TT_APP_ROOT";
     private static final String ENV_IDENTITY = "TT_IDENTITY";
@@ -53,6 +58,8 @@ public class Main {
                 scanner.close();
                 return;
             }
+
+            warnIfTerminalTooSmall(scanner);
             game.play();
             game.endGame();
             scanner.close();
@@ -188,6 +195,86 @@ public class Main {
         }
         catch (NoSuchAlgorithmException e) {
             return "guest";
+        }
+    }
+
+    private static void warnIfTerminalTooSmall(Scanner scanner) {
+        TerminalSize size = detectTerminalSize();
+        if (!size.isKnown()) {
+            return;
+        }
+
+        if (size.width >= MIN_TERMINAL_WIDTH && size.height >= MIN_TERMINAL_HEIGHT) {
+            return;
+        }
+
+        clearScreen();
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println(red(center("TERMINAL SIZE WARNING", MENU_WIDTH)));
+        System.out.println("-".repeat(MENU_WIDTH));
+        System.out.println("\nCurrent terminal size: " + size.width + " x " + size.height + " (width x height)");
+        System.out.println("Recommended minimum: " + MIN_TERMINAL_WIDTH + " x " + MIN_TERMINAL_HEIGHT);
+        System.out.println("Please make your terminal larger for the best gameplay experience.\n");
+        pause(scanner);
+        clearLine();
+    }
+
+    private static TerminalSize detectTerminalSize() {
+        int width = parsePositiveInt(System.getenv("COLUMNS"));
+        int height = parsePositiveInt(System.getenv("LINES"));
+        if (width > 0 && height > 0) {
+            return new TerminalSize(width, height);
+        }
+
+        try {
+            Process process = new ProcessBuilder("sh", "-c", "stty size < /dev/tty").start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                String line = reader.readLine();
+                int exitCode = process.waitFor();
+                if (exitCode == 0 && line != null) {
+                    String[] parts = line.trim().split("\\s+");
+                    if (parts.length == 2) {
+                        int rows = parsePositiveInt(parts[0]);
+                        int cols = parsePositiveInt(parts[1]);
+                        if (cols > 0 && rows > 0) {
+                            return new TerminalSize(cols, rows);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ignored) {
+            // Best-effort detection only. If unavailable, skip warning.
+        }
+
+        return new TerminalSize(-1, -1);
+    }
+
+    private static int parsePositiveInt(String value) {
+        if (value == null || value.isBlank()) {
+            return -1;
+        }
+
+        try {
+            int parsed = Integer.parseInt(value.trim());
+            return parsed > 0 ? parsed : -1;
+        }
+        catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private static final class TerminalSize {
+        final int width;
+        final int height;
+
+        TerminalSize(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        boolean isKnown() {
+            return width > 0 && height > 0;
         }
     }
 
