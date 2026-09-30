@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
-import java.util.Random;
 import java.util.Scanner;
 
 import static tetrad.Mutil.DB_LOG;
@@ -58,7 +57,6 @@ public class Game {
     User usr;          // current user object
     Market mkt;        // main market object
     News news;         // main news object
-    SoundPlayer theme; // theme song control
     Calendar cldr;     // game calendar
     Taxman tm;         // taxman object
     Scanner scanner;   // user input scanner object
@@ -76,26 +74,6 @@ public class Game {
         cldr = new Calendar(this);
         tm = new Taxman(this);
         this.scanner = scanner;
-
-        // choose a random song to play
-        String filePath;
-        Random rand = new Random();
-        int num = rand.nextInt(9);
-        switch (num) {
-            case 0 -> filePath = "2018-08-02 - Doctor Dreamchip";
-            case 1 -> filePath = "Chiptune Dream - Tim Beek";
-            case 2 -> filePath = "Funk Modulator - RoccoW";
-            case 3 -> filePath = "Gamer's Rush - Gingerbru";
-            case 4 -> filePath = "Jam Jam Jam - RoccoW";
-            case 5 -> filePath = "Jazz Blue - RoccoW";
-            case 6 -> filePath = "Party's Cancelled - RoccoW";
-            case 7 -> filePath = "PhilosophicalSongTitle - RoccoW";
-            case 8 -> filePath = "The Crow - RoccoW";
-            case 9 -> filePath = "The Origin - Legna Zeg";
-            default -> throw new AssertionError();
-        }
-
-        theme = new SoundPlayer(filePath);
     }
 
     /**
@@ -104,7 +82,6 @@ public class Game {
      * @return false if the user selects to exit the program
      */
     public boolean startGame() {
-        theme.play();
         while(true) {
             showMainMenu();
             String choice = scanner.nextLine();
@@ -141,7 +118,6 @@ public class Game {
                 }
                 case "3" -> doExtras();
                 case "4" -> {
-                    theme.stop();
                     return false; // exit program
                 }
                 default -> {
@@ -212,7 +188,7 @@ public class Game {
      * Exit method, used for cleanup.
      */
     public void endGame() {
-        theme.stop();
+
     }
 
     /**
@@ -764,7 +740,7 @@ public class Game {
         printHeader();
 
         // main menu options
-        System.out.println(blue(italic(center("Now Playing: " + theme.getSongTitle(), MENU_WIDTH))));
+        System.out.println(blue(italic(center("Welcome to Terminal Trader", MENU_WIDTH))));
         System.out.println(italic(center("Version " + Main.version, MENU_WIDTH)));
 
         printMenuArt(0);
