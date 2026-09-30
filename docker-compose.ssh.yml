@@ -1,0 +1,13 @@
+services:
+  tt-ssh:
+    build:
+      context: .
+      target: ssh-runtime
+    container_name: terminal-trader-ssh
+    ports:
+      - "2222:2222"
+    environment:
+      TT_DATA_ROOT: /data
+    volumes:
+      - ./tt-data:/data
+      - ./ssh-test/keys:/keys:ro

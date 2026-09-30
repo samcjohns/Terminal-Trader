@@ -436,7 +436,7 @@ public class Mutil {
      * @param input message to be outputed
      */
     public static void DB_LOG(String input) {
-        String logPath = System.getenv("APPDATA") + "\\Terminal Trader\\err.txt";
+        String logPath = Main.getSource("logs") + "err.txt";
         try (PrintWriter writer = new PrintWriter(new FileWriter(logPath, true))) {
             writer.println(input);
         } catch (IOException e) {

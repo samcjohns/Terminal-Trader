@@ -1,0 +1,21 @@
+Port 2222
+Protocol 2
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+UsePAM no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+PermitRootLogin no
+PermitEmptyPasswords no
+AllowUsers tt
+ChallengeResponseAuthentication no
+X11Forwarding no
+AllowAgentForwarding no
+AllowTcpForwarding no
+PermitTunnel no
+ClientAliveInterval 300
+ClientAliveCountMax 2
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem sftp internal-sftp

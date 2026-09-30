@@ -4,8 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.NoSuchElementException;
 
 import static tetrad.Mutil.DB_LOG;
 import static tetrad.Mutil.MENU_WIDTH;
@@ -82,52 +82,26 @@ public class Game {
      * @return false if the user selects to exit the program
      */
     public boolean startGame() {
-        while(true) {
-            showMainMenu();
-            String choice = scanner.nextLine();
-            switch (choice) {
-                case "1" -> {
-                    showLoadGameMenu();
-                    String username = scanner.nextLine();
-                    try {
-                        loadGame(username);
-                        initAdvance();
-                        return true; // loading successful, exit method
-                    }
-                    catch (InitException e) {
-                        clearScreen();
-                        printHeader();
-                        System.out.println("");
-                        System.out.println(redB(e.getMessage()));
-                        System.out.println("User: '" + username + "' cannot be accessed...");
-                        System.out.println(italic("Try making a new save if this is your first time! :)"));
-                        printMenuArt(2);
-                        System.out.println("-".repeat(MENU_WIDTH));
-                        System.out.println("");
-                        System.out.println("-".repeat(MENU_WIDTH));
-                        cursorUp(2);
-                        pause(scanner);
-                        // error, so repeat
-                    }
-                }
-                case "2" -> {
-                    showNewGameMenu();
-                    createSaveFile(scanner.nextLine());
-                    initAdvance();
-                    return true; // move on
-                }
-                case "3" -> doExtras();
-                case "4" -> {
-                    return false; // exit program
-                }
-                default -> {
-                    clearLine();
-                    System.out.println(red("Invalid Input"));
-                    pause(1000);
-                    clearLine();
-                    // error, so repeat
-                }
-            }
+        String username = Main.getIdentity();
+        try {
+            loadGame(username);
+        }
+        catch (InitException e) {
+            createSaveFile(username);
+        }
+
+        try {
+            initAdvance();
+            return true;
+        }
+        catch (Exception e) {
+            clearScreen();
+            printHeader();
+            System.out.println("");
+            System.out.println(redB("Unable to start your session."));
+            System.out.println(red(e.getMessage()));
+            pause(scanner);
+            return false;
         }
     }
 
@@ -188,7 +162,7 @@ public class Game {
      * Exit method, used for cleanup.
      */
     public void endGame() {
-
+        // reserved for cleanup in server mode
     }
 
     /**
@@ -740,7 +714,7 @@ public class Game {
         printHeader();
 
         // main menu options
-        System.out.println(blue(italic(center("Welcome to Terminal Trader", MENU_WIDTH))));
+        System.out.println(blue(italic(center("SSH Session: " + Main.getIdentity(), MENU_WIDTH))));
         System.out.println(italic(center("Version " + Main.version, MENU_WIDTH)));
 
         printMenuArt(0);
